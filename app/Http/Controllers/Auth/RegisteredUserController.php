@@ -40,6 +40,18 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
         ]);
+        $request->validate([
+            'name' => ['required','string','max:255'],
+            'email' => ['required','string','lowercase','email','max:255','unique:'.User::class],
+            'password' => [
+                'required','confirmed','min:8', // pastikan ada input password_confirmation
+                'regex:/[A-Z]/',     // minimal 1 huruf besar
+                'regex:/[a-z]/',     // minimal 1 huruf kecil
+                'regex:/[0-9]/',     // minimal 1 angka
+            ],
+        ],[
+            'password.regex' => 'Password harus mengandung huruf besar, huruf kecil, dan angka.',
+        ]);
 
         event(new Registered($user));
 
