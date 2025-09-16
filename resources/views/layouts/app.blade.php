@@ -40,7 +40,9 @@
             </header>
 
             <main class="px-6 py-6">
-                @yield('content-desktop')
+                <div class="hidden md:block">
+                    @yield('content-desktop')
+                </div>
             </main>
         </div>
     </div>
@@ -73,7 +75,9 @@
         </header>
 
         <main class="p-4">
-            @yield('content-mobile')
+            <div class="md:hidden">
+                @yield('content-mobile')
+            </div>
         </main>
         @include('partials.nav.mobile')
     </div>

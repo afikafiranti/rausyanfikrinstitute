@@ -2,23 +2,24 @@
 
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
-use Illuminate\Foundation\Configuration\Middleware; 
-
-
+use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
         web: __DIR__.'/../routes/web.php',
         commands: __DIR__.'/../routes/console.php',
-        api: __DIR__.'/../routes/api.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
-        $middleware->alias([
-            'scope.wilayah' => \App\Http\Middleware\ScopeWilayah::class,
-        ]);
+    ->withMiddleware(function (Middleware $middleware) {
+        // alias bawaan biasanya sudah ada
     })
-    ->withExceptions(function (Exceptions $exceptions): void {
+    ->withExceptions(function (Exceptions $exceptions) {
         //
-    })->create();
+    })
+    ->withProviders([
+        App\Providers\AppServiceProvider::class,
+        App\Providers\AuthServiceProvider::class,   // <— penting
+        // App\Providers\EventServiceProvider::class, // opsional kalau dipakai
+        // App\Providers\BroadcastServiceProvider::class, // opsional
+    ])
+    ->create();

@@ -27,19 +27,24 @@ class User extends Authenticatable implements MustVerifyEmail
         'consent_at'        => 'datetime',
     ];
 
-    // ==== Relations ====
-    public function roles()    { return $this->belongsToMany(Role::class); }             // role_user
-    public function level()    { return $this->belongsTo(Level::class); }                 // levels
-    public function wilayah()  { return $this->belongsTo(Wilayah::class); }               // wilayah
-    public function reports()  { return $this->hasMany(KajianReport::class); }            // kajian_reports
-    public function audits()   { return $this->hasMany(AuditLog::class, 'actor_id'); }    // audit_logs
-
-    // ==== Helpers ====
-    public function isKoorda(): bool { return $this->roles()->where('name','koorda')->exists(); }
-    public function hasRole(string $name): bool {
-    return $this->roles()->where('name', $name)->exists();
+    // Relations
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'role_user', 'user_id', 'role_id');
     }
-    public function isAdminLike(): bool {
-    return $this->roles()->whereIn('name',['admin','super_admin'])->exists();
+    public function level()   { return $this->belongsTo(Level::class); }
+    public function wilayah() { return $this->belongsTo(Wilayah::class); }
+
+    // Helpers
+    public function hasRole(string|array $roles): bool
+    {
+        $roles = (array) $roles;
+        return $this->roles()->whereIn('name', $roles)->exists();
+    }
+
+    public function isAdminLike(): bool
+    {
+        // sesuaikan dengan data DB Anda: super_admin, admin, koorda
+        return $this->roles()->whereIn('name', ['super_admin','admin','koorda'])->exists();
     }
 }
