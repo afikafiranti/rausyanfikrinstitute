@@ -21,5 +21,6 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('manage-all', function (User $user) {
             return $user->roles()->whereIn('name', ['admin','super_admin'])->exists();
         });
+        
     }
 }

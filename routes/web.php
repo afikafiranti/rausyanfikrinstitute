@@ -6,6 +6,12 @@ use Illuminate\Http\Request;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AlumniController;
+
+Route::middleware(['auth','can:view-alumni'])->group(function () {
+    Route::get('/alumni', [AlumniController::class, 'index'])->name('alumni.index');
+});
+
 
 Route::middleware(['auth'])->prefix('notifikasi')->name('notifications.')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');

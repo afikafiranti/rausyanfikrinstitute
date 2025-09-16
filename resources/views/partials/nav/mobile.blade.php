@@ -28,6 +28,15 @@
                 <span>Verifikasi</span>
             </a>
         @endcan
+        @can('view-alumni')
+            <a href="{{ route('alumni.index') }}"
+                class="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-50
+            {{ request()->routeIs('alumni.*') ? 'text-indigo-600 bg-indigo-50' : 'text-slate-700' }}">
+                <i class="fas fa-users text-base" aria-hidden="true"></i>
+                <span>Alumni</span>
+            </a>
+        @endcan
+
 
     </div>
 </nav>
