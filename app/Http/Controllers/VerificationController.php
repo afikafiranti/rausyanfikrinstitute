@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VerificationApproveRequest;
+use App\Notifications\AccountStatusNotification;
 use App\Http\Requests\VerificationRejectRequest;
 use App\Models\AuditLog;
 use App\Models\Level;
@@ -58,6 +59,12 @@ class VerificationController extends Controller
             $user->level_id = $levelId;
             $user->status   = User::STATUS_ACTIVE;
             $user->save();
+            $user->notify(new AccountStatusNotification('approved', [
+                'level_id'   => $user->level_id,
+                'level_name' => optional($user->level)->name,
+                'note'       => $request->input('note'),
+                'by'         => $me->name,
+            ]));
 
             // pastikan user minimal punya role 'alumni'
             $alumni = Role::firstOrCreate(['name' => 'alumni']);
@@ -94,10 +101,15 @@ class VerificationController extends Controller
         if (!$me->isAdminLike() && $user->wilayah_id !== $me->wilayah_id) {
             abort(403);
         }
+        $user->notify(new AccountStatusNotification('rejected', [
+            'reason' => (string) $request->input('reason'),
+            'by'     => $me->name,
+        ]));
 
         if ($user->status !== User::STATUS_PENDING) {
             return back()->withErrors(['msg' => 'Akun ini tidak dalam status pending.']);
         }
+        
 
         // Catat alasan di audit; status biarkan tetap pending (user bisa perbaiki profil)
         AuditLog::create([

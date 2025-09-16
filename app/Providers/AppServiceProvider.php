@@ -27,5 +27,9 @@ class AppServiceProvider extends ServiceProvider
         RateLimiter::for('forgot-password', function (Request $request) {
             return Limit::perMinute(3)->by($request->ip());
         });
+        if (app()->environment('production')) {
+            \URL::forceScheme('https');
+        }
+
     }
 }

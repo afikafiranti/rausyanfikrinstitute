@@ -5,6 +5,14 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\NotificationController;
+
+Route::middleware(['auth'])->prefix('notifikasi')->name('notifications.')->group(function () {
+    Route::get('/', [NotificationController::class, 'index'])->name('index');
+    Route::post('/{id}/read', [NotificationController::class, 'markAsRead'])->name('read');
+    Route::post('/read-all', [NotificationController::class, 'readAll'])->name('readAll');
+});
+
 
 Route::middleware(['auth','can:review-user'])->prefix('verifikasi')->name('verification.')->group(function () {
     Route::get('/', [VerificationController::class, 'index'])->name('index');

@@ -51,6 +51,12 @@ class ProfileController extends Controller
         }
 
         $user->save();
+        if ($criticalChanged) {
+            $user->notify(new \App\Notifications\AccountStatusNotification('pending', [
+                'by' => $request->user()->name,
+            ]));
+        }
+
 
         // Audit perubahan
         $after = $user->only([

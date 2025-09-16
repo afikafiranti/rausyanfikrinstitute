@@ -2,74 +2,118 @@
 
 {{-- DESKTOP: Dashboard Nexus --}}
 @section('content-desktop')
-  <div class="grid grid-cols-12 gap-4">
-    {{-- Stat cards --}}
-    <div class="col-span-3 rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Total Alumni</div>
-      <div class="mt-1 text-2xl font-semibold">12.345</div>
-    </div>
-    <div class="col-span-3 rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Aktif</div>
-      <div class="mt-1 text-2xl font-semibold">10.102</div>
-    </div>
-    <div class="col-span-3 rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Kajian/Bulan</div>
-      <div class="mt-1 text-2xl font-semibold">87</div>
-    </div>
-    <div class="col-span-3 rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Rata2 Peserta</div>
-      <div class="mt-1 text-2xl font-semibold">42</div>
-    </div>
+    <div class="grid grid-cols-12 gap-4">
+        {{-- Stat cards --}}
+        <div class="col-span-3 rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Total Alumni</div>
+            <div class="mt-1 text-2xl font-semibold">12.345</div>
+        </div>
+        <div class="col-span-3 rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Aktif</div>
+            <div class="mt-1 text-2xl font-semibold">10.102</div>
+        </div>
+        <div class="col-span-3 rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Kajian/Bulan</div>
+            <div class="mt-1 text-2xl font-semibold">87</div>
+        </div>
+        <div class="col-span-3 rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Rata2 Peserta</div>
+            <div class="mt-1 text-2xl font-semibold">42</div>
+        </div>
+        @can('review-user')
+            <div class="col-span-12 rounded-xl bg-white p-4 shadow">
+                @php
+                    $pendingCount = \App\Models\User::where('status', 'pending')
+                        ->when(
+                            !auth()->user()->isAdminLike(),
+                            fn($q) => $q->where('wilayah_id', auth()->user()->wilayah_id),
+                        )
+                        ->count();
+                @endphp
+                <div class="flex items-center justify-between">
+                    <div>
+                        <div class="font-semibold">Verifikasi Pending</div>
+                        <div class="text-sm text-slate-600">Akun menunggu persetujuan Koorda</div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="rf-badge bg-yellow-100 text-yellow-800">{{ $pendingCount }} akun</div>
+                        <a href="{{ route('verification.index') }}" class="rf-btn"><i class="fas fa-user-check"></i> Buka</a>
+                    </div>
+                </div>
+            </div>
+        @endcan
 
-    {{-- Chart besar --}}
-    <div class="col-span-8 rounded-xl bg-white p-4 shadow">
-      <div class="flex items-center justify-between mb-3">
-        <h3 class="font-semibold">Tren Kajian</h3>
-        <a href="#" class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600 text-white">Lihat Detail</a>
-      </div>
-      <canvas id="chartKajianDesktop" class="w-full h-80"></canvas>
-    </div>
 
-    {{-- Tabel ringkas / aktivitas --}}
-    <div class="col-span-4 rounded-xl bg-white p-4 shadow">
-      <h3 class="font-semibold mb-3">Aktivitas Terbaru</h3>
-      <ul class="space-y-2 text-sm">
-        <li class="flex items-center justify-between">
-          <span>Input Laporan Koorda Luwu</span><span class="text-slate-500">2 jam lalu</span>
-        </li>
-        <li class="flex items-center justify-between">
-          <span>Pembaruan Materi #24</span><span class="text-slate-500">kemarin</span>
-        </li>
-      </ul>
+        {{-- Chart besar --}}
+        <div class="col-span-8 rounded-xl bg-white p-4 shadow">
+            <div class="flex items-center justify-between mb-3">
+                <h3 class="font-semibold">Tren Kajian</h3>
+                <a href="#"
+                    class="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-indigo-600 text-white">Lihat Detail</a>
+            </div>
+            <canvas id="chartKajianDesktop" class="w-full h-80"></canvas>
+        </div>
+
+        {{-- Tabel ringkas / aktivitas --}}
+        <div class="col-span-4 rounded-xl bg-white p-4 shadow">
+            <h3 class="font-semibold mb-3">Aktivitas Terbaru</h3>
+            <ul class="space-y-2 text-sm">
+                <li class="flex items-center justify-between">
+                    <span>Input Laporan Koorda Luwu</span><span class="text-slate-500">2 jam lalu</span>
+                </li>
+                <li class="flex items-center justify-between">
+                    <span>Pembaruan Materi #24</span><span class="text-slate-500">kemarin</span>
+                </li>
+            </ul>
+        </div>
     </div>
-  </div>
 @endsection
 
 {{-- MOBILE: simpel + bottom navbar --}}
 @section('content-mobile')
-  <h1 class="text-xl font-semibold">Dashboard</h1>
+    <h1 class="text-xl font-semibold">Dashboard</h1>
 
-  <div class="mt-4 grid grid-cols-2 gap-3">
-    <div class="rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Total Alumni</div>
-      <div class="mt-1 text-2xl font-semibold">12.345</div>
+    <div class="mt-4 grid grid-cols-2 gap-3">
+        <div class="rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Total Alumni</div>
+            <div class="mt-1 text-2xl font-semibold">12.345</div>
+        </div>
+        <div class="rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Aktif</div>
+            <div class="mt-1 text-2xl font-semibold">10.102</div>
+        </div>
+        <div class="rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Kajian/Bulan</div>
+            <div class="mt-1 text-2xl font-semibold">87</div>
+        </div>
+        <div class="rounded-xl bg-white p-4 shadow">
+            <div class="text-xs text-slate-500">Rata2 Peserta</div>
+            <div class="mt-1 text-2xl font-semibold">42</div>
+        </div>
     </div>
-    <div class="rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Aktif</div>
-      <div class="mt-1 text-2xl font-semibold">10.102</div>
-    </div>
-    <div class="rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Kajian/Bulan</div>
-      <div class="mt-1 text-2xl font-semibold">87</div>
-    </div>
-    <div class="rounded-xl bg-white p-4 shadow">
-      <div class="text-xs text-slate-500">Rata2 Peserta</div>
-      <div class="mt-1 text-2xl font-semibold">42</div>
-    </div>
-  </div>
+    @can('review-user')
+        <div class="rf-card mt-4">
+            @php
+                $pendingCount = \App\Models\User::where('status', 'pending')
+                    ->when(
+                        !auth()->user()->isAdminLike(),
+                        fn($q) => $q->where('wilayah_id', auth()->user()->wilayah_id),
+                    )
+                    ->count();
+            @endphp
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="font-semibold">Verifikasi Pending</div>
+                    <div class="text-xs text-slate-600">{{ $pendingCount }} akun menunggu</div>
+                </div>
+                <a href="{{ route('verification.index') }}" class="rf-btn"><i class="fas fa-user-check"></i> Buka</a>
+            </div>
+        </div>
+    @endcan
 
-  <div class="mt-6 rounded-xl bg-white p-4 shadow">
-    <h3 class="font-semibold mb-3">Tren Kajian</h3>
-    <canvas id="chartKajianMobile" class="w-full h-64"></canvas>
-  </div>
+
+    <div class="mt-6 rounded-xl bg-white p-4 shadow">
+        <h3 class="font-semibold mb-3">Tren Kajian</h3>
+        <canvas id="chartKajianMobile" class="w-full h-64"></canvas>
+    </div>
 @endsection
