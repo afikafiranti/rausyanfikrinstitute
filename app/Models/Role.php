@@ -13,6 +13,6 @@ class Role extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class);
+        return $this->belongsToMany(User::class); // pivot: role_user (user_id, role_id)
     }
 }

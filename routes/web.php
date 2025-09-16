@@ -4,6 +4,13 @@ use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\VerificationController;
+
+Route::middleware(['auth','can:review-user'])->prefix('verifikasi')->name('verification.')->group(function () {
+    Route::get('/', [VerificationController::class, 'index'])->name('index');
+    Route::post('/users/{user}/approve', [VerificationController::class, 'approve'])->name('approve');
+    Route::post('/users/{user}/reject',  [VerificationController::class, 'reject'])->name('reject');
+});
 
 Route::get('/', function () {
     return view('welcome');
