@@ -1,4 +1,5 @@
 import './bootstrap';
+import './notus';
 import Alpine from 'alpinejs';
 import { initDashboardCharts } from './pages/dashboard';
 

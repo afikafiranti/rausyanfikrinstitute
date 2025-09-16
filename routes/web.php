@@ -8,6 +8,13 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\VerificationController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AlumniController;
+use App\Http\Controllers\ChartController;
+
+Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function () {
+    Route::get('/alumni/monthly', [ChartController::class, 'alumniMonthly'])->name('alumni.monthly');
+    Route::get('/alumni/status',  [ChartController::class, 'alumniStatus'])->name('alumni.status');
+});
+
 
 // HOME
 Route::view('/', 'dashboard')->name('dashboard'); // hapus definisi '/' lain

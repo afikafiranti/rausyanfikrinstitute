@@ -6,11 +6,13 @@ use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
     use HasFactory, Notifiable;
-
+    
     public const STATUS_PENDING   = 'pending';
     public const STATUS_ACTIVE    = 'active';
     public const STATUS_SUSPENDED = 'suspended';
@@ -46,5 +48,28 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         // sesuaikan dengan data DB Anda: super_admin, admin, koorda
         return $this->roles()->whereIn('name', ['super_admin','admin','koorda'])->exists();
+    }
+    protected $appends = ['avatar_url','has_avatar'];
+
+    public function getAvatarUrlAttribute(): ?string
+    {
+        $url  = $this->attributes['avatar_url'] ?? null;
+        if ($url && Str::startsWith($url, ['http://','https://'])) return $url;
+
+        $path = $this->attributes['avatar_path'] ?? $this->attributes['avatar'] ?? $this->attributes['photo'] ?? null;
+        if ($path) {
+            if (Str::startsWith($path, ['http://','https://'])) return $path;
+            if (Storage::disk('public')->exists($path)) return Storage::url($path);
+            if (!Str::contains($path, '/')) {
+                $guess = "avatars/{$path}";
+                if (Storage::disk('public')->exists($guess)) return Storage::url($guess);
+            }
+        }
+        return null; // tidak ada foto -> pakai ikon
+    }
+
+    public function getHasAvatarAttribute(): bool
+    {
+        return filled($this->avatar_url);
     }
 }
