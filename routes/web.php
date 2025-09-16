@@ -13,20 +13,19 @@ Route::get('/', function () {
 Route::view('/', 'dashboard')->name('dashboard');
 Route::prefix('materi')->name('materi.')->group(fn() => Route::view('/', 'materi/index')->name('index'));
 Route::prefix('laporan')->name('laporan.')->group(fn() => Route::view('/', 'laporan/index')->name('index'));
-Route::prefix('profile')->name('profile.')->group(fn() => Route::view('/', 'profile/show')->name('show'));
+// Route::prefix('profile')->name('profile.')->group(fn() => Route::view('/', 'profile/show')->name('show'));
 
 
-// Route::middleware('auth')->group(function () {
-//     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
-//     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
-//     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
-// });
+Route::middleware(['auth'])->group(function () {
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.show');   // tampil form
+    Route::put('/profile', [ProfileController::class, 'update'])->name('profile.update'); // submit form
+});
 
 require __DIR__.'/auth.php';
-Route::middleware(['auth','verified'])->group(function () {
-    // Contoh: nanti pindahkan dashboard ke sini bila ingin wajib verifikasi
-    // Route::view('/app', 'dashboard')->name('app.dashboard');
-});
+// Route::middleware(['auth','verified'])->group(function () {
+//     // Contoh: nanti pindahkan dashboard ke sini bila ingin wajib verifikasi
+//     // Route::view('/app', 'dashboard')->name('app.dashboard');
+// });
 Route::middleware(['auth','scope.wilayah'])->group(function () {
 
     // Debug scope: menampilkan wilayah efektif dari middleware
