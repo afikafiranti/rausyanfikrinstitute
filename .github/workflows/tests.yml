@@ -1,47 +1,74 @@
-name: Tests
+name: CI
 
 on:
   push:
-    branches:
-      - master
-      - '*.x'
+    branches: [ "**" ]
   pull_request:
-  schedule:
-    - cron: '0 0 * * *'
 
-permissions:
-  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  tests:
+  test:
     runs-on: ubuntu-latest
 
-    strategy:
-      fail-fast: true
-      matrix:
-        php: [8.2, 8.3, 8.4]
-
-    name: PHP ${{ matrix.php }}
-
     steps:
-      - name: Checkout code
+      - name: Checkout
         uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: ${{ matrix.php }}
-          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite
+          php-version: '8.3'            # Laravel 12 OK di 8.3; ganti ke 8.4 bila perlu
+          tools: composer:2.5.5
           coverage: none
+          extensions: mbstring, intl, pdo, sqlite, bcmath, openssl
 
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-interaction --no-progress
+      - name: Cache Composer
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.composer/cache
+            vendor
+          key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            composer-${{ runner.os }}-
 
-      - name: Copy environment file
-        run: cp .env.example .env
+      - name: Install PHP deps
+        run: composer install --no-interaction --prefer-dist --no-progress
 
-      - name: Generate app key
-        run: php artisan key:generate
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.19.0'
+          cache: 'npm'
 
-      - name: Execute tests
-        run: php artisan test
+      - name: Install JS deps
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm i --no-audit --no-fund; fi
+
+      # Opsional: build asset jika dibutuhkan oleh test
+      # - name: Build assets
+      #   run: npm run build
+
+      - name: Prepare test environment (SQLite)
+        run: |
+          cp .env.example .env
+          echo "APP_ENV=testing
+APP_KEY=
+DB_CONNECTION=sqlite
+DB_DATABASE=${{ github.workspace }}/database/database.sqlite
+CACHE_DRIVER=array
+SESSION_DRIVER=array
+QUEUE_CONNECTION=sync
+MAIL_MAILER=array" > .env.testing
+          mkdir -p database
+          touch database/database.sqlite
+          php artisan key:generate --env=testing
+          php artisan migrate --env=testing --no-interaction -v
+
+      - name: Run tests
+        env:
+          APP_ENV: testing
+        run: php artisan test --env=testing --parallel --no-coverage -q
