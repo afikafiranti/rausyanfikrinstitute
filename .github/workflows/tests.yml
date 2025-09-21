@@ -1,4 +1,4 @@
-name: CI
+name: Tests
 
 on:
   push:
@@ -12,6 +12,7 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -19,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'          # Laravel 12 OK di 8.3
+          php-version: '8.3'
           tools: composer:2.5.5
           coverage: none
           extensions: mbstring, intl, pdo, sqlite, bcmath, openssl
@@ -35,7 +36,7 @@ jobs:
             composer-${{ runner.os }}-
 
       - name: Install PHP deps
-        run: composer install --no-interaction --prefer-dist --no-progress
+        run: composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -47,7 +48,7 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm i --no-audit --no-fund; fi
 
-      # - name: Build assets
+      # - name: Build assets (optional)
       #   run: npm run build
 
       - name: Prepare test env (SQLite)
@@ -67,9 +68,9 @@ jobs:
           mkdir -p database
           touch database/database.sqlite
           php artisan key:generate --env=testing
-          php artisan migrate --env=testing --no-interaction -v
+          php artisan migrate --env=testing --no-interaction --force -v
 
       - name: Run tests
         env:
           APP_ENV: testing
-        run: php artisan test --env=testing --parallel --no-coverage -q
+        run: php artisan test --env=testing --no-coverage -q
