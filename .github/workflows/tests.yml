@@ -20,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'            # Laravel 12
+          php-version: '8.3'
           tools: composer:2.5.5
           coverage: none
           extensions: mbstring, intl, sqlite3, pdo_sqlite, bcmath, openssl
@@ -28,8 +28,7 @@ jobs:
       - name: Cache Composer
         uses: actions/cache@v4
         with:
-          path: |
-            ~/.composer/cache
+          path: ~/.composer/cache
           key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: composer-${{ runner.os }}-
 
@@ -60,5 +59,3 @@ jobs:
         env:
           APP_ENV: testing
         run: php artisan test --env=testing
-        # Jika masih bermasalah, ganti baris run di atas dengan:
-        # run: vendor/bin/phpunit
