@@ -12,7 +12,6 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,7 +19,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'            # Laravel 12 OK di 8.3; ganti ke 8.4 bila perlu
+          php-version: '8.3'          # Laravel 12 OK di 8.3
           tools: composer:2.5.5
           coverage: none
           extensions: mbstring, intl, pdo, sqlite, bcmath, openssl
@@ -48,21 +47,23 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm i --no-audit --no-fund; fi
 
-      # Opsional: build asset jika dibutuhkan oleh test
       # - name: Build assets
       #   run: npm run build
 
-      - name: Prepare test environment (SQLite)
+      - name: Prepare test env (SQLite)
+        shell: bash
         run: |
           cp .env.example .env
-          echo "APP_ENV=testing
-APP_KEY=
-DB_CONNECTION=sqlite
-DB_DATABASE=${{ github.workspace }}/database/database.sqlite
-CACHE_DRIVER=array
-SESSION_DRIVER=array
-QUEUE_CONNECTION=sync
-MAIL_MAILER=array" > .env.testing
+          cat > .env.testing <<'EOF'
+          APP_ENV=testing
+          APP_KEY=
+          DB_CONNECTION=sqlite
+          DB_DATABASE=${{ github.workspace }}/database/database.sqlite
+          CACHE_DRIVER=array
+          SESSION_DRIVER=array
+          QUEUE_CONNECTION=sync
+          MAIL_MAILER=array
+          EOF
           mkdir -p database
           touch database/database.sqlite
           php artisan key:generate --env=testing
