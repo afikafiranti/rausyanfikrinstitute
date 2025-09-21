@@ -20,7 +20,7 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: '8.3'
+          php-version: '8.3'            # Laravel 12
           tools: composer:2.5.5
           coverage: none
           extensions: mbstring, intl, sqlite3, pdo_sqlite, bcmath, openssl
@@ -59,4 +59,6 @@ jobs:
       - name: Run tests
         env:
           APP_ENV: testing
-        run: php artisan test --env=testing -v --no-coverage
+        run: php artisan test --env=testing
+        # Jika masih bermasalah, ganti baris run di atas dengan:
+        # run: vendor/bin/phpunit
