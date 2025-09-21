@@ -120,4 +120,5 @@ class ProfileController extends Controller
         // Test mengharapkan redirect ke '/'
         return Redirect::to('/');
     }
+    
 }
