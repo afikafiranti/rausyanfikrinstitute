@@ -2,7 +2,8 @@ name: CI
 
 on:
   push:
-    branches: [ "**" ]
+    branches:
+      - '**'
   pull_request:
 
 concurrency:
@@ -10,10 +11,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-and-build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
@@ -21,17 +23,15 @@ jobs:
           php-version: '8.3'
           tools: composer:2.5.5
           coverage: none
-          extensions: mbstring, intl, pdo, sqlite, bcmath, openssl
+          extensions: mbstring, intl, sqlite3, pdo_sqlite, bcmath, openssl
 
       - name: Cache Composer
         uses: actions/cache@v4
         with:
           path: |
             ~/.composer/cache
-            vendor
           key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
-          restore-keys: |
-            composer-${{ runner.os }}-
+          restore-keys: composer-${{ runner.os }}-
 
       - name: Install PHP deps
         run: composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
@@ -46,58 +46,17 @@ jobs:
         run: |
           if [ -f package-lock.json ]; then npm ci; else npm i --no-audit --no-fund; fi
 
-      - name: PHP syntax lint
-        run: |
-          set -e
-          find app config database routes tests -type f -name "*.php" -print0 | xargs -0 -n1 -P4 php -l
-
-      - name: Prepare env & migrate (SQLite)
+      - name: Prepare test env (SQLite)
         shell: bash
         run: |
           cp .env.example .env
-          cat > .env.testing <<'EOF'
-          APP_ENV=testing
-          APP_KEY=
-          DB_CONNECTION=sqlite
-          DB_DATABASE=${{ github.workspace }}/database/database.sqlite
-          CACHE_DRIVER=array
-          SESSION_DRIVER=array
-          QUEUE_CONNECTION=sync
-          MAIL_MAILER=array
-          EOF
+          printf "APP_ENV=testing\nAPP_KEY=\nDB_CONNECTION=sqlite\nDB_DATABASE=${{ github.workspace }}/database/database.sqlite\nCACHE_DRIVER=array\nSESSION_DRIVER=array\nQUEUE_CONNECTION=sync\nMAIL_MAILER=array\n" > .env.testing
           mkdir -p database
           touch database/database.sqlite
           php artisan key:generate --env=testing
           php artisan migrate --env=testing --no-interaction --force -v
 
-  tests-diagnostic:
-    needs: lint-and-build
-    runs-on: ubuntu-latest
-    continue-on-error: true   # do not fail the whole workflow on Day-1
-    steps:
-      - uses: actions/checkout@v4
-      - uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          tools: composer:2.5.5
-          coverage: none
-          extensions: mbstring, intl, pdo, sqlite, bcmath, openssl
-      - run: composer install --no-interaction --prefer-dist --no-progress
-      - name: Prepare env (SQLite)
-        run: |
-          cp .env.example .env
-          echo "APP_ENV=testing
-DB_CONNECTION=sqlite
-DB_DATABASE=${{ github.workspace }}/database/database.sqlite
-CACHE_DRIVER=array
-SESSION_DRIVER=array
-QUEUE_CONNECTION=sync
-MAIL_MAILER=array" > .env.testing
-          mkdir -p database
-          touch database/database.sqlite
-          php artisan key:generate --env=testing
-          php artisan migrate --env=testing --no-interaction --force -v
-      - name: Run tests (verbose)
+      - name: Run tests
         env:
           APP_ENV: testing
-        run: php artisan test --env=testing -v
+        run: php artisan test --env=testing -v --no-coverage
