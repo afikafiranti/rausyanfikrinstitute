@@ -15,10 +15,17 @@ class ProfileController extends Controller
 {
     public function edit(Request $request)
     {
-        $user = $request->user();
-        $wilayah = DB::table('wilayah')->select('id', 'name')->orderBy('name')->get();
+        // $user = $request->user();
+        // $wilayah = DB::table('wilayah')->select('id', 'name')->orderBy('name')->get();
 
-        return view('profile.edit', compact('user', 'wilayah'));
+        // return view('profile.edit', compact('user', 'wilayah'));
+            $user = $request->user();
+
+        $wilayah = Schema::hasTable('wilayah')
+            ? DB::table('wilayah')->select('id','name')->orderBy('name')->get()
+            : collect(); // CI/testing tanpa tabel 'wilayah'
+
+        return view('profile.edit', compact('user','wilayah'));
     }
 
     public function update(ProfileUpdateRequest $request)
