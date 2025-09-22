@@ -39,6 +39,7 @@ class RegisteredUserController extends Controller
         Auth::login($user);
 
         // Breeze default dan kompatibel dengan test
-        return redirect()->route('verification.notice');
+        // return redirect()->route('verification.notice');
+        return redirect()->route('dashboard');
     }
 }
