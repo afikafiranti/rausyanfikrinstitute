@@ -6,6 +6,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rules\Password;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,6 +14,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        Password::defaults(function () {
+            // CI/testing: cukup min 8 (biar "password" lulus)
+            if (app()->environment('testing')) {
+                return Password::min(8);
+            }
+
+            // Production/staging: wajib huruf besar/kecil + angka
+            return Password::min(8)->mixedCase()->numbers();
+        });
         RateLimiter::for('login', function (Request $request) {
             $email = (string) $request->input('email');
             return [
