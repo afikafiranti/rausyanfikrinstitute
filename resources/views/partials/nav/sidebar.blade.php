@@ -86,8 +86,8 @@
         {{-- Profile: hanya user login --}}
         @auth
         <li class="items-center">
-          <a href="{{ route('profile.show') }}"
-             class="{{ $link(request()->routeIs('profile.show')) }}">
+          <a href="{{ route('profile.edit') }}"
+             class="{{ $link(request()->routeIs('profile.edit')) }}">
             <i class="fas fa-user-circle mr-2 text-sm text-blueGray-300"></i> Profile
           </a>
         </li>

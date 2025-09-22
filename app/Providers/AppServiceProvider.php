@@ -14,15 +14,11 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
-        Password::defaults(function () {
-            // CI/testing: cukup min 8 (biar "password" lulus)
-            if (app()->environment('testing')) {
-                return Password::min(8);
-            }
-
-            // Production/staging: wajib huruf besar/kecil + angka
-            return Password::min(8)->mixedCase()->numbers();
-        });
+         Password::defaults(function () {
+                return app()->environment('testing')
+                    ? Password::min(8)
+                    : Password::min(8)->mixedCase()->numbers();
+            });
         RateLimiter::for('login', function (Request $request) {
             $email = (string) $request->input('email');
             return [

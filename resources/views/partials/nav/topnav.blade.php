@@ -18,7 +18,7 @@
                 str_starts_with($r, 'verification.') => 'Verifikasi',
                 str_starts_with($r, 'alumni.') => 'Alumni',
                 str_starts_with($r, 'notifications.') => 'Notifikasi',
-                $r === 'profile.show' => 'Profil',
+                $r === 'profile.edit' => 'Profil',
                 default => \Illuminate\Support\Str::headline(request()->segment(1)) ?: 'Dashboard',
             };
         @endphp
@@ -80,7 +80,7 @@
                                     class="ml-2 inline-flex text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-700">{{ $unread }}</span>
                             @endif
                         </a>
-                        <a href="{{ route('profile.show') }}" class="text-sm py-2 px-4 block w-full text-blueGray-700">
+                        <a href="{{ route('profile.edit') }}" class="text-sm py-2 px-4 block w-full text-blueGray-700">
                             <i class="fas fa-user mr-2"></i> Profile
                         </a>
                         <div class="h-0 my-2 border border-solid border-blueGray-100"></div>
