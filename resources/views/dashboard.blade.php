@@ -8,6 +8,12 @@
   {{-- DESKTOP --}}
   <div class="hidden md:block">
     <div class="grid grid-cols-12 gap-4 ">
+      @guest
+        <a href="{{ route('login') }}" 
+          class="rf-btn inline-flex items-center justify-center px-4 py-2 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 w-full sm:w-auto text-center">
+          Masuk
+        </a>
+      @endguest
       {{-- Stat cards --}}
       <div class="col-span-3 rounded-xl bg-white p-4 shadow">
         <div class="text-xs text-slate-500">Total Alumni</div>
@@ -25,6 +31,7 @@
         <div class="text-xs text-slate-500">Rata2 Peserta</div>
         <div class="mt-1 text-2xl font-semibold">42</div>
       </div>
+      
 
       @can('review-user')
         <div class="col-span-12 rounded-xl bg-white p-4 shadow">
@@ -47,6 +54,7 @@
           </div>
         </div>
       @endcan
+      
 
       {{-- Chart besar --}}
       <div class="col-span-8 rounded-xl bg-slate-900 p-4 shadow">
