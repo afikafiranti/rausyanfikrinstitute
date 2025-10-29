@@ -3,6 +3,7 @@
 @php
     $avatar = $user->avatar_url ?? ($user->photo_url ?? null);
     $badge = ['active' => 'green', 'pending' => 'yellow', 'suspended' => 'red'][$user->status] ?? 'blue';
+    $pwRoute = Route::has('password.update') ? route('password.update') : '#';
 @endphp
 
 @section('page-content')
@@ -20,11 +21,11 @@
         </div>
     @endif
 
-    {{-- =============== DESKTOP (≥ md) =============== --}}
+    {{-- DESKTOP --}}
     <div class="hidden md:block">
-
-
         <div class="grid grid-cols-12 gap-4">
+
+            {{-- Header Profil --}}
             <section class="col-span-12 rounded-xl bg-white p-4 shadow flex items-center gap-4">
                 @if ($avatar)
                     <img class="h-16 w-16 rounded-xl object-cover"
@@ -40,85 +41,109 @@
                     <div class="text-sm text-slate-500">
                         {{ $user->angkatan ?: 'Angkatan ?' }} • {{ optional($user->wilayah)->name ?: 'Wilayah ?' }}
                     </div>
-                    <span
-                        class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize mt-1 inline-block">{{ $user->status }}</span>
+                    <span class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize mt-1 inline-block">
+                        {{ $user->status }}
+                    </span>
                 </div>
+                <label for="photo-uploader" class="rf-btn cursor-pointer"><i class="fas fa-image"></i> Ubah Foto</label>
             </section>
 
+            {{-- Info Pribadi --}}
             <section class="col-span-8 rounded-xl bg-white p-4 shadow">
                 <h3 class="font-semibold mb-3">Info Pribadi</h3>
                 <form id="formProfile" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"
                     class="grid grid-cols-2 gap-4">
                     @csrf @method('PUT')
 
+                    {{-- Foto --}}
+                    <div class="col-span-2 hidden">
+                        <input id="photo-uploader" type="file" name="photo" accept="image/*"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    {{-- Nama --}}
                     <div>
                         <label class="block text-sm mb-1">Nama Lengkap</label>
                         <input type="text" name="name" value="{{ old('name', $user->name) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" required>
-                        @error('name')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
+                    {{-- Email --}}
                     <div>
                         <label class="block text-sm mb-1">Email</label>
                         <input type="email" name="email" value="{{ old('email', $user->email) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" required>
-                        @error('email')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
+                    {{-- Telepon --}}
                     <div>
                         <label class="block text-sm mb-1">No. WA</label>
                         <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="+62...">
-                        @error('phone')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
+                    {{-- Tempat Lahir --}}
                     <div>
-                        <label class="block text-sm mb-1">Pekerjaan</label>
-                        <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
+                        <label class="block text-sm mb-1">Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
-                        @error('pekerjaan')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
+                    {{-- Tanggal Lahir --}}
+                    <div>
+                        <label class="block text-sm mb-1">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    {{-- Pendidikan --}}
+                    <div>
+                        <label class="block text-sm mb-1">Pendidikan Terakhir</label>
+                        <input type="text" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    {{-- Kampus --}}
+                    <div>
+                        <label class="block text-sm mb-1">Kampus</label>
+                        <input type="text" name="kampus" value="{{ old('kampus', $user->kampus) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    {{-- Status Pernikahan --}}
+                    <div>
+                        <label class="block text-sm mb-1">Status Pernikahan</label>
+                        <select name="status_pernikahan"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                            <option value="">Pilih...</option>
+                            <option value="lajang" @selected(old('status_pernikahan', $user->status_pernikahan) == 'lajang')>Lajang</option>
+                            <option value="menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'menikah')>Menikah</option>
+                            <option value="duda/janda" @selected(old('status_pernikahan', $user->status_pernikahan) == 'duda/janda')>Duda / Janda</option>
+                        </select>
+                    </div>
+
+                    {{-- Angkatan --}}
                     <div>
                         <label class="block text-sm mb-1">Angkatan</label>
                         <input type="text" name="angkatan" value="{{ old('angkatan', $user->angkatan) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
-                        @error('angkatan')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
+                    {{-- Wilayah --}}
                     <div>
                         <label class="block text-sm mb-1">Wilayah</label>
                         <select name="wilayah_id" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                             <option value="">Pilih...</option>
                             @foreach ($wilayah as $w)
-                                <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>{{ $w->name }}
+                                <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>
+                                    {{ $w->name }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('wilayah_id')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
-                    <div class="col-span-1">
-                        <label class="block text-sm mb-1">Foto</label>
-                        <input type="file" name="photo" class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                            accept="image/*">
-                        @error('photo')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="col-span-1 flex justify-end pt-6">
+                    {{-- Tombol --}}
+                    <div class="col-span-2 flex justify-end pt-6">
                         <button form="formProfile" class="rf-btn">
                             <i class="fas fa-save"></i> Simpan Perubahan
                         </button>
@@ -126,17 +151,40 @@
                 </form>
             </section>
 
+            {{-- Keamanan Akun --}}
             <section class="col-span-4 rounded-xl bg-white p-4 shadow">
-                <h3 class="font-semibold mb-3">Status Akun</h3>
-                <p class="text-sm text-slate-600">
-                    Mengubah <b>Wilayah</b> atau <b>Angkatan</b> akan mengubah status menjadi
-                    <span class="rf-badge bg-yellow-100 text-yellow-800">pending</span> sampai diverifikasi Koorda.
-                </p>
+                <h3 class="font-semibold mb-3">Keamanan</h3>
+                <form method="POST" action="{{ $pwRoute }}" class="space-y-3">
+                    @csrf
+                    @if ($pwRoute !== '#')
+                        @method('PUT')
+                    @endif
+                    <div>
+                        <label class="block text-sm mb-1">Password Saat Ini</label>
+                        <input type="password" name="current_password"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                            autocomplete="current-password">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Password Baru</label>
+                        <input type="password" name="password"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                            autocomplete="new-password">
+                    </div>
+                    <div>
+                        <label class="block text-sm mb-1">Ulangi Password Baru</label>
+                        <input type="password" name="password_confirmation"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                            autocomplete="new-password">
+                    </div>
+                    <button class="rf-btn w-full">Ganti Password</button>
+                </form>
             </section>
+
         </div>
     </div>
 
-    {{-- =============== MOBILE (< md) =============== --}}
+    {{-- MOBILE --}}
     <div class="md:hidden">
         <h2 class="text-xl font-semibold">Profil</h2>
 
@@ -159,29 +207,57 @@
                 </div>
 
                 <input type="text" name="name" value="{{ old('name', $user->name) }}"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Nama" required>
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Nama">
                 <input type="email" name="email" value="{{ old('email', $user->email) }}"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Email" required>
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Email">
                 <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="No. WA">
-                <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pekerjaan">
+                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Tempat Lahir">
+                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                <input type="text" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pendidikan">
+                <input type="text" name="kampus" value="{{ old('kampus', $user->kampus) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Kampus">
+                <select name="status_pernikahan" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    <option value="">Status Pernikahan</option>
+                    <option value="lajang" @selected(old('status_pernikahan', $user->status_pernikahan) == 'lajang')>Lajang</option>
+                    <option value="menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'menikah')>Menikah</option>
+                    <option value="duda/janda" @selected(old('status_pernikahan', $user->status_pernikahan) == 'duda/janda')>Duda / Janda</option>
+                </select>
+
                 <input type="text" name="angkatan" value="{{ old('angkatan', $user->angkatan) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Angkatan">
 
                 <select name="wilayah_id" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     <option value="">Wilayah</option>
                     @foreach ($wilayah as $w)
-                        <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>{{ $w->name }}</option>
+                        <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>
+                            {{ $w->name }}</option>
                     @endforeach
                 </select>
 
                 <button class="rf-btn w-full">Simpan</button>
             </form>
+        </div>
 
-            <p class="text-xs text-slate-500 mt-2">
-                Ubah Wilayah/Angkatan → status <b>pending</b> (menunggu verifikasi Koorda).
-            </p>
+        {{-- Form Keamanan --}}
+        <div class="rf-section mt-4">
+            <h3 class="font-semibold mb-3">Keamanan</h3>
+            <form method="POST" action="{{ $pwRoute }}" class="space-y-3">
+                @csrf
+                @if ($pwRoute !== '#')
+                    @method('PUT')
+                @endif
+                <input type="password" name="current_password"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Password Saat Ini">
+                <input type="password" name="password"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Password Baru">
+                <input type="password" name="password_confirmation"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Ulangi Password Baru">
+                <button class="rf-btn w-full">Ganti Password</button>
+            </form>
         </div>
     </div>
 @endsection

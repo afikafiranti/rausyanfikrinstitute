@@ -8,6 +8,7 @@
 
     $pwRoute = Route::has('password.update') ? route('password.update') : '#';
 @endphp
+
 @section('page-content')
 
     @if (session('success'))
@@ -65,45 +66,67 @@
                         <label class="block text-sm mb-1">Nama Lengkap</label>
                         <input type="text" name="name" value="{{ old('name', $user->name) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" required>
-                        @error('name')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm mb-1">Email</label>
                         <input type="email" name="email" value="{{ old('email', $user->email) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" required>
-                        @error('email')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm mb-1">No. WA</label>
                         <input type="text" name="phone" value="{{ old('phone', $user->phone) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="+62...">
-                        @error('phone')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <div>
                         <label class="block text-sm mb-1">Pekerjaan</label>
                         <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
-                        @error('pekerjaan')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Tempat Lahir</label>
+                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Tanggal Lahir</label>
+                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Pendidikan Terakhir</label>
+                        <input type="text" name="pendidikan_terakhir"
+                            value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Kampus</label>
+                        <input type="text" name="kampus" value="{{ old('kampus', $user->kampus) }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm mb-1">Status Pernikahan</label>
+                        <select name="status_pernikahan"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                            <option value="">Pilih...</option>
+                            <option value="Belum Menikah"
+                                @selected(old('status_pernikahan', $user->status_pernikahan) == 'Belum Menikah')>Belum Menikah</option>
+                            <option value="Menikah"
+                                @selected(old('status_pernikahan', $user->status_pernikahan) == 'Menikah')>Menikah</option>
+                        </select>
                     </div>
 
                     <div>
                         <label class="block text-sm mb-1">Angkatan</label>
                         <input type="text" name="angkatan" value="{{ old('angkatan', $user->angkatan) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
-                        @error('angkatan')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
 
                     <div>
@@ -111,16 +134,14 @@
                         <select name="wilayah_id" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                             <option value="">Pilih...</option>
                             @foreach ($wilayah as $w)
-                                <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>{{ $w->name }}
+                                <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>
+                                    {{ $w->name }}
                                 </option>
                             @endforeach
                         </select>
-                        @error('wilayah_id')
-                            <p class="text-sm text-red-600 mt-1">{{ $message }}</p>
-                        @enderror
                     </div>
+
                     <div class="col-span-2 flex justify-end pt-6">
-                        
                         <button form="formProfile" class="rf-btn">
                             <i class="fas fa-save"></i> Simpan Perubahan
                         </button>
@@ -139,17 +160,20 @@
                     <div>
                         <label class="block text-sm mb-1">Password Saat Ini</label>
                         <input type="password" name="current_password"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="current-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                            autocomplete="current-password">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Password Baru</label>
                         <input type="password" name="password"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="new-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                            autocomplete="new-password">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Ulangi Password Baru</label>
                         <input type="password" name="password_confirmation"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="new-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                            autocomplete="new-password">
                     </div>
                     <button class="rf-btn w-full">Ganti Password</button>
                 </form>
@@ -188,13 +212,32 @@
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="No. WA">
                 <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pekerjaan">
+                <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Tempat Lahir">
+                <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Tanggal Lahir">
+                <input type="text" name="pendidikan_terakhir"
+                    value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pendidikan Terakhir">
+                <input type="text" name="kampus" value="{{ old('kampus', $user->kampus) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Kampus">
+                <select name="status_pernikahan" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    <option value="">Status Pernikahan</option>
+                    <option value="Belum Menikah"
+                        @selected(old('status_pernikahan', $user->status_pernikahan) == 'Belum Menikah')>Belum Menikah</option>
+                    <option value="Menikah"
+                        @selected(old('status_pernikahan', $user->status_pernikahan) == 'Menikah')>Menikah</option>
+                </select>
+
                 <input type="text" name="angkatan" value="{{ old('angkatan', $user->angkatan) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Angkatan">
 
                 <select name="wilayah_id" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     <option value="">Wilayah</option>
                     @foreach ($wilayah as $w)
-                        <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>{{ $w->name }}</option>
+                        <option value="{{ $w->id }}" @selected(old('wilayah_id', $user->wilayah_id) == $w->id)>
+                            {{ $w->name }}
+                        </option>
                     @endforeach
                 </select>
 
@@ -202,6 +245,7 @@
             </form>
         </div>
 
+        {{-- Keamanan Mobile --}}
         <div class="rf-section mt-4">
             <h3 class="font-semibold mb-3">Keamanan</h3>
             <form method="POST" action="{{ $pwRoute }}" class="space-y-3">
