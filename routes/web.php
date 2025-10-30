@@ -41,6 +41,8 @@ Route::prefix('laporan')->name('laporan.')->group(fn() => Route::view('/', 'lapo
 Route::middleware(['auth'])->group(function () {
     Route::get('/profile',  [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile',[ProfileController::class, 'update'])->name('profile.update');
+    Route::put('/profile/update-password', [ProfileController::class, 'updatePassword'])
+    ->name('profile.updatePassword');
     Route::delete('/profile',[ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
