@@ -47,6 +47,10 @@ Route::middleware(['auth'])->group(function () {
 // ALUMNI (Hari 7)
 
 Route::middleware(['auth','can:view-alumni'])->get('/alumni', [\App\Http\Controllers\AlumniController::class, 'index'])->name('alumni.index');
+// DETAIL ALUMNI
+Route::middleware(['auth','can:view-alumni'])
+    ->get('/alumni/{id}', [\App\Http\Controllers\AlumniController::class, 'show'])
+    ->name('alumni.show');
 
 
 // SCOPE WILAYAH + REVIEW LAPORAN

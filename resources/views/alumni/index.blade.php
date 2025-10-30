@@ -10,8 +10,10 @@
   $q          = $q          ?? request('q');
   $angkatan   = $angkatan   ?? request('angkatan');
   $wilayahId  = $wilayahId  ?? request('wilayah_id');
+  $levelId    = $levelId    ?? request('level_id');
   $perPage    = $perPage    ?? (int) request('per_page', 15);
 @endphp
+
 @section('page-content')
 
   {{-- ===================== DESKTOP (≥ md) ===================== --}}
@@ -31,6 +33,12 @@
             <option value="{{ $w->id }}" @selected((string)$wilayahId===(string)$w->id)>{{ $w->name }}</option>
           @endforeach
         </select>
+        <select name="level_id" class="rounded-lg border px-3 py-2">
+          <option value="">Level</option>
+          @foreach($level as $l)
+            <option value="{{ $l->id }}" @selected((string)$levelId===(string)$l->id)>{{ $l->description }}</option>
+          @endforeach
+        </select>
         <select name="per_page" class="rounded-lg border px-3 py-2">
           @foreach([15,25,50,100] as $pp)
             <option value="{{ $pp }}" @selected((int)$perPage===$pp)>{{ $pp }}/hal</option>
@@ -46,12 +54,11 @@
           <thead class="border-b text-slate-600">
             <tr>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('name') }}" class="hover:underline">Nama</a></th>
-              <th class="py-2 px-3 text-left"><a href="{{ sort_link('email') }}" class="hover:underline">Email</a></th>
-              <th class="py-2 px-3 text-left"><a href="{{ sort_link('angkatan') }}" class="hover:underline">Angkatan</a></th>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('wilayah') }}" class="hover:underline">Wilayah</a></th>
+              <th class="py-2 px-3 text-left"><a href="{{ sort_link('pekerjaan') }}" class="hover:underline">Pekerjaan</a></th>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('level') }}" class="hover:underline">Level</a></th>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('status') }}" class="hover:underline">Status</a></th>
-              <th class="py-2 px-3 text-left"><a href="{{ sort_link('created_at') }}" class="hover:underline">Terdaftar</a></th>
+              <th class="py-2 px-3 text-center">Aksi</th>
             </tr>
           </thead>
           <tbody class="divide-y">
@@ -59,20 +66,24 @@
               @php $badge = ['active'=>'green','pending'=>'yellow','suspended'=>'red'][$u->status] ?? 'blue'; @endphp
               <tr>
                 <td class="py-2 px-3">{{ $u->name }}</td>
-                <td class="py-2 px-3">{{ $u->email }}</td>
-                <td class="py-2 px-3">{{ $u->angkatan ?? '-' }}</td>
-                <td class="py-2 px-3">{{ $u->wilayah_name ?? '-' }}</td>
-                <td class="py-2 px-3">{{ $u->level_name ?? '-' }}</td>
-                <td class="py-2 px-3"><span class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize">{{ $u->status }}</span></td>
-                <td class="py-2 px-3">{{ \Illuminate\Support\Carbon::parse($u->created_at)->format('d M Y') }}</td>
+                <td class="py-2 px-3">{{ optional($u->wilayah)->name ?? '-' }}</td>
+                <td class="py-2 px-3">{{ $u->pekerjaan ?? '-' }}</td>
+                <td class="py-2 px-3">{{ optional($u->level)->description ?? '-' }}</td>
+                <td class="py-2 px-3">
+                  <span class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize">{{ $u->status }}</span>
+                </td>
+                <td class="py-2 px-3 text-center">
+                  <a href="{{ route('alumni.show', $u->id) }}" class="rf-btn-sm bg-blue-100 text-blue-700 hover:bg-blue-200">
+                    <i class="fas fa-eye"></i> Detail
+                  </a>
+                </td>
               </tr>
             @empty
-              <tr><td class="py-4 px-3 text-center text-slate-500" colspan="7">Tidak ada data.</td></tr>
+              <tr><td class="py-4 px-3 text-center text-slate-500" colspan="6">Tidak ada data.</td></tr>
             @endforelse
           </tbody>
         </table>
       </div>
-
       <div class="mt-4">{{ $alumni->withQueryString()->links() }}</div>
     </div>
   </div>
@@ -83,7 +94,7 @@
 
     <form method="GET" action="{{ route('alumni.index') }}" class="rf-card mt-3 space-y-2">
       <input type="text" name="q" value="{{ $q }}" class="w-full rounded-lg border px-3 py-2" placeholder="Cari nama/email...">
-      <div class="grid grid-cols-3 gap-2">
+      <div class="grid grid-cols-2 gap-2">
         <select name="angkatan" class="rounded-lg border px-2 py-2">
           <option value="">Angkatan</option>
           @foreach($angkatanList as $a)
@@ -96,9 +107,10 @@
             <option value="{{ $w->id }}" @selected((string)$wilayahId===(string)$w->id)>{{ $w->name }}</option>
           @endforeach
         </select>
-        <select name="per_page" class="rounded-lg border px-2 py-2">
-          @foreach([15,25,50,100] as $pp)
-            <option value="{{ $pp }}" @selected((int)$perPage===$pp)>{{ $pp }}/hal</option>
+        <select name="level_id" class="rounded-lg border px-2 py-2">
+          <option value="">Level</option>
+          @foreach($level as $l)
+            <option value="{{ $l->id }}" @selected((string)$levelId===(string)$l->id)>{{ $l->description }}</option>
           @endforeach
         </select>
       </div>
@@ -112,14 +124,17 @@
           <div class="flex items-start justify-between">
             <div>
               <div class="font-medium">{{ $u->name }}</div>
-              <div class="text-xs text-slate-500">{{ $u->email }}</div>
+              <div class="text-xs text-slate-500">{{ optional($u->wilayah)->name ?? '-' }}</div>
+              <div class="text-xs text-slate-500">{{ $u->pekerjaan ?? '-' }}</div>
             </div>
             <span class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize">{{ $u->status }}</span>
           </div>
           <div class="mt-2 text-sm text-slate-600">
-            Angkatan: <b>{{ $u->angkatan ?? '-' }}</b> • Wilayah: <b>{{ $u->wilayah_name ?? '-' }}</b> • Level: <b>{{ $u->level_name ?? '-' }}</b>
+            Level: <b>{{ optional($u->level)->description ?? '-' }}</b>
           </div>
-          <div class="text-xs text-slate-500 mt-1">Terdaftar: {{ \Illuminate\Support\Carbon::parse($u->created_at)->format('d M Y') }}</div>
+          <a href="{{ route('alumni.show', $u->id) }}" class="rf-btn-sm mt-2 w-full text-center bg-blue-100 text-blue-700 hover:bg-blue-200">
+            <i class="fas fa-eye"></i> Detail
+          </a>
         </div>
       @empty
         <div class="rf-card text-slate-500">Tidak ada data.</div>
