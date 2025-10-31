@@ -16,7 +16,9 @@ class DatabaseSeeder extends Seeder
             LevelSeeder::class,
             RoleSeeder::class,
             WilayahSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            PostSeeder::class,
+    GallerySeeder::class,
         ]);
     }
 }

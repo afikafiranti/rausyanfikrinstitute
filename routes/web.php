@@ -1,23 +1,28 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
-use App\Http\Controllers\ProfileController;
-use App\Http\Controllers\ReportController;
-use App\Http\Controllers\VerificationController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\AlumniController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\LandingController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\VerificationController;
+use App\Http\Controllers\Management\PostController;
+use App\Http\Controllers\Management\GalleryController;
 
 Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function () {
     Route::get('/alumni/monthly', [ChartController::class, 'alumniMonthly'])->name('alumni.monthly');
     Route::get('/alumni/status',  [ChartController::class, 'alumniStatus'])->name('alumni.status');
 });
 
+// LANDING PAGE
+Route::get('/', [LandingController::class, 'index'])->name('landing');
 
-// HOME
-Route::view('/', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
+//  DASHBOARD
+Route::view('/dashboard', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
 
 // NOTIFIKASI
 Route::middleware(['auth'])->prefix('notifikasi')->name('notifications.')->group(function () {
@@ -65,5 +70,19 @@ Route::middleware(['auth','scope.wilayah'])->group(function () {
         ->middleware('can:review-report')
         ->name('laporan.review');
 });
+
+// ADMIN: POST & GALLERY 
+
+Route::middleware(['auth', 'can:manage-content'])
+    ->prefix('management')
+    ->name('management.')
+    ->group(function () {
+
+        // ========== POST MANAGEMENT ==========
+        Route::resource('post', PostController::class);
+
+        // ========== GALLERY MANAGEMENT ==========
+        Route::resource('galeri', GalleryController::class);
+    });
 
 require __DIR__.'/auth.php';

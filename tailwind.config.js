@@ -36,11 +36,13 @@
 // }
 
 // tailwind.config.js (CJS – aman di Laravel + Vite)
+/** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
     './resources/views/**/*.blade.php',
     './resources/js/**/*.js',
     './vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php',
+    './node_modules/flowbite/**/*.js', // ← tambahkan ini agar komponen Flowbite aktif
   ],
   safelist: [
     'bg-green-100','text-green-800',
@@ -50,11 +52,23 @@ module.exports = {
   ],
   theme: {
     extend: {
-      // opsional: nada brand (Notus banyak main di indigo/blue)
-      colors: { brand: { DEFAULT: '#4f46e5' } },
-      borderRadius: { '2xl': '1rem' },
-      boxShadow: { card: '0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1)' },
+      colors: {
+        brand: { DEFAULT: '#4f46e5' },
+        latar: '#f9fafb',
+        gelap: '#111827',
+        primary: '#10B981', // tambahan untuk keseragaman di Notus + Flowbite
+      },
+      borderRadius: {
+        '2xl': '1rem',
+      },
+      boxShadow: {
+        card: '0 10px 15px -3px rgba(0,0,0,.1), 0 4px 6px -4px rgba(0,0,0,.1)',
+      },
     },
   },
-  plugins: [require('@tailwindcss/forms'), require('@tailwindcss/typography')],
-}
+  plugins: [
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/typography'),
+    require('flowbite/plugin'), // ← tambahkan ini agar komponen JS Flowbite aktif
+  ],
+};
