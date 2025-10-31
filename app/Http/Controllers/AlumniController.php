@@ -74,4 +74,14 @@ class AlumniController extends Controller
             'q', 'angkatan', 'wilayahId', 'levelId', 'perPage', 'sort', 'dir'
         ));
     }
+
+    public function show($id)
+{
+    $alumni = \App\Models\User::with(['wilayah:id,name', 'level:id,description'])
+        ->whereIn('level_id', [3,4])
+        ->findOrFail($id);
+
+    return view('alumni.show', compact('alumni'));
+}
+
 }

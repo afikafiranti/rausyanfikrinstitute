@@ -53,6 +53,7 @@ Route::middleware(['auth','can:view-alumni'])
     ->name('alumni.show');
 
 
+
 // SCOPE WILAYAH + REVIEW LAPORAN
 Route::middleware(['auth','scope.wilayah'])->group(function () {
     Route::get('/debug/scope', function (Request $r) {

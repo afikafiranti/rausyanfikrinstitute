@@ -55,8 +55,8 @@
             <tr>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('name') }}" class="hover:underline">Nama</a></th>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('wilayah') }}" class="hover:underline">Wilayah</a></th>
-              <th class="py-2 px-3 text-left"><a href="{{ sort_link('pekerjaan') }}" class="hover:underline">Pekerjaan</a></th>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('level') }}" class="hover:underline">Level</a></th>
+              <th class="py-2 px-3 text-left"><a href="{{ sort_link('pekerjaan') }}" class="hover:underline">Pekerjaan</a></th>
               <th class="py-2 px-3 text-left"><a href="{{ sort_link('status') }}" class="hover:underline">Status</a></th>
               <th class="py-2 px-3 text-center">Aksi</th>
             </tr>
@@ -67,8 +67,9 @@
               <tr>
                 <td class="py-2 px-3">{{ $u->name }}</td>
                 <td class="py-2 px-3">{{ optional($u->wilayah)->name ?? '-' }}</td>
-                <td class="py-2 px-3">{{ $u->pekerjaan ?? '-' }}</td>
+                
                 <td class="py-2 px-3">{{ optional($u->level)->description ?? '-' }}</td>
+                <td class="py-2 px-3">{{ $u->pekerjaan ?? '-' }}</td>
                 <td class="py-2 px-3">
                   <span class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize">{{ $u->status }}</span>
                 </td>
