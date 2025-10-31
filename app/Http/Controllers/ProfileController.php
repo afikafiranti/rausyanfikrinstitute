@@ -2,15 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\ProfileUpdateRequest;
-use App\Models\AuditLog;
 use App\Models\User;
+use App\Models\AuditLog;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Redirect;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Redirect;
+use App\Http\Requests\ProfileUpdateRequest;
 
 
 class ProfileController extends Controller
@@ -35,7 +36,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $before = $user->only([
-            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
+            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status','tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan'
         ]);
 
         // Upload foto (opsional)
@@ -52,10 +53,16 @@ class ProfileController extends Controller
             'name'       => (string) $request->input('name'),
             'email'      => $newEmail,
             'phone'      => $request->input('phone'),
+            'tempat_lahir'      => $request->input('tempat_lahir'),
+            'tanggal_lahir'      => $request->input('tanggal_lahir'),
+            'pendidikan_terakhir'      => $request->input('pendidikan_terakhir'),
+            'kampus'      => $request->input('kampus'),
+            'status_pernikahan'      => $request->input('status_pernikahan'),
             'angkatan'   => $request->input('angkatan'),
             'pekerjaan'  => $request->input('pekerjaan'),
             'wilayah_id' => $request->integer('wilayah_id') ?: null,
             'photo_url'  => $photoUrl,
+            
         ]);
 
         // Reset verifikasi jika email berubah (sesuai ekspektasi test)
@@ -79,7 +86,7 @@ class ProfileController extends Controller
 
         // Audit perubahan
         $after = $user->only([
-            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
+            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status','tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan'
         ]);
 
         $changes = [];
@@ -108,6 +115,30 @@ class ProfileController extends Controller
                 ? 'Profil disimpan. Perubahan wilayah/angkatan memerlukan verifikasi. Status akun: pending.'
                 : 'Profil disimpan.'
         );
+    }
+    public function updatePassword(Request $request)
+    {
+        $user = auth()->user();
+
+        // Validasi input
+        $request->validate([
+            'current_password' => 'required',
+            'password' => 'required|confirmed|min:8',
+        ]);
+
+        // Cek apakah password lama sesuai
+        if (!Hash::check($request->current_password, $user->password)) {
+            return back()->withErrors([
+                'current_password' => 'Password saat ini tidak cocok.',
+            ]);
+        }
+
+        // Update hanya kolom password
+        $user->update([
+            'password' => Hash::make($request->password),
+        ]);
+
+        return back()->with('success', 'Password berhasil diperbarui.');
     }
 
     public function destroy(Request $request)

@@ -5,11 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Rausyan Fikr' }}</title>
-
-    {{-- FontAwesome CDN --}}
-    {{-- <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/> --}}
-
-    {{-- CSS & JS yang sudah kita pakai (Tailwind/Notus-ready + app.js) --}}
     @if (!app()->environment('testing'))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif

@@ -3,7 +3,7 @@
 @php
     $avatar = $user->avatar_url ?? ($user->photo_url ?? null);
     $badge = ['active' => 'green', 'pending' => 'yellow', 'suspended' => 'red'][$user->status] ?? 'blue';
-    $pwRoute = Route::has('password.update') ? route('password.update') : '#';
+    $pwRoute = route('profile.updatePassword');
 @endphp
 
 @section('page-content')
@@ -41,7 +41,8 @@
                     <div class="text-sm text-slate-500">
                         {{ $user->angkatan ?: 'Angkatan ?' }} • {{ optional($user->wilayah)->name ?: 'Wilayah ?' }}
                     </div>
-                    <span class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize mt-1 inline-block">
+                    <span
+                        class="rf-badge bg-{{ $badge }}-100 text-{{ $badge }}-800 capitalize mt-1 inline-block">
                         {{ $user->status }}
                     </span>
                 </div>
@@ -53,7 +54,7 @@
                 <h3 class="font-semibold mb-3">Info Pribadi</h3>
                 <form id="formProfile" method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"
                     class="grid grid-cols-2 gap-4">
-                    @csrf @method('PUT')
+                    @csrf @method('PATCH')
 
                     {{-- Foto --}}
                     <div class="col-span-2 hidden">
@@ -82,24 +83,33 @@
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="+62...">
                     </div>
 
-                    {{-- Tempat Lahir --}}
-                    <div>
-                        <label class="block text-sm mb-1">Tempat Lahir</label>
-                        <input type="text" name="tempat_lahir" value="{{ old('tempat_lahir', $user->tempat_lahir) }}"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    {{-- Tempat Lahir --}} {{-- Tanggal Lahir --}}
+                    <div class="grid grid-cols-2 gap-2 ">
+                        <div>
+                            <label class="block text-sm mb-1">Tempat Lahir</label>
+                            <input type="text" name="tempat_lahir"
+                                value="{{ old('tempat_lahir', $user->tempat_lahir) }}"
+                                class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                        </div>
+                        <div>
+                            <label class="block text-sm mb-1">Tanggal Lahir</label>
+                            <input type="date" name="tanggal_lahir"
+                                value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
+                                class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                        </div>
                     </div>
-
-                    {{-- Tanggal Lahir --}}
+                    {{-- Peekerjaan --}}
                     <div>
-                        <label class="block text-sm mb-1">Tanggal Lahir</label>
-                        <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
+                        <label class="block text-sm mb-1">Pekerjaan</label>
+                        <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     </div>
 
                     {{-- Pendidikan --}}
                     <div>
                         <label class="block text-sm mb-1">Pendidikan Terakhir</label>
-                        <input type="text" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
+                        <input type="text" name="pendidikan_terakhir"
+                            value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     </div>
 
@@ -113,8 +123,7 @@
                     {{-- Status Pernikahan --}}
                     <div>
                         <label class="block text-sm mb-1">Status Pernikahan</label>
-                        <select name="status_pernikahan"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                        <select name="status_pernikahan" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                             <option value="">Pilih...</option>
                             <option value="lajang" @selected(old('status_pernikahan', $user->status_pernikahan) == 'lajang')>Lajang</option>
                             <option value="menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'menikah')>Menikah</option>
@@ -168,18 +177,18 @@
                     <div>
                         <label class="block text-sm mb-1">Password Baru</label>
                         <input type="password" name="password"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                            autocomplete="new-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="new-password">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Ulangi Password Baru</label>
                         <input type="password" name="password_confirmation"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                            autocomplete="new-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="new-password">
                     </div>
                     <button class="rf-btn w-full">Ganti Password</button>
                 </form>
             </section>
+
+
 
         </div>
     </div>
@@ -189,8 +198,9 @@
         <h2 class="text-xl font-semibold">Profil</h2>
 
         <div class="rf-section mt-3">
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-3">
-                @csrf @method('PUT')
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"
+                class="space-y-3">
+                @csrf @method('PATCH')
 
                 <div class="flex items-center gap-4">
                     @if ($avatar)
@@ -216,7 +226,10 @@
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Tempat Lahir">
                 <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
-                <input type="text" name="pendidikan_terakhir" value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
+                <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                <input type="text" name="pendidikan_terakhir"
+                    value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pendidikan">
                 <input type="text" name="kampus" value="{{ old('kampus', $user->kampus) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Kampus">
@@ -252,8 +265,8 @@
                 @endif
                 <input type="password" name="current_password"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Password Saat Ini">
-                <input type="password" name="password"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Password Baru">
+                <input type="password" name="password" class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                    placeholder="Password Baru">
                 <input type="password" name="password_confirmation"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Ulangi Password Baru">
                 <button class="rf-btn w-full">Ganti Password</button>

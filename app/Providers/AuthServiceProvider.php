@@ -12,6 +12,7 @@ class AuthServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::define('view-alumni', fn($user) => $user->isAdminLike());
+        Gate::define('manage-content', fn($user) => $user->isAdminLike());
         Gate::define('review-user', fn($user) => $user->isAdminLike());
         Gate::define('review-report', fn($user) => $user->isAdminLike());
     }
