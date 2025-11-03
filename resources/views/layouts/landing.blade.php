@@ -145,33 +145,36 @@
                     <p class="py-1 font-medium">Kumpulan informasi dan update terbaru dari kami. (Belum fix)</p>
 
                 </div>
-                    <div class="flex flex-wrap">
-                        @foreach ($posts as $p)
-                            <div class="w-full md:w-4/12 px-4 mr-auto ml-auto">
-                                <div
-                                    class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-pink-500">
-@php
-                                        $imgSrc = Str::startsWith($p->cover_url, ['http', 'https'])
-                                            ? $p->cover_url
-                                            : ($p->cover_url ? asset('storage/'.$p->cover_url) : asset('assets/img/default-img.jpg'));
-                                    @endphp
-                                    <img src="{{ $imgSrc }}" alt="{{ $p->title }}"class="w-full align-middle rounded-t-lg" />
-                                    <blockquote class="relative p-8 mb-4">
+                <div class="flex flex-wrap">
+                    @foreach ($posts as $p)
+                        <div class="w-full md:w-4/12 px-4 mr-auto ml-auto">
+                            <div
+                                class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded-lg bg-pink-500">
+                                @php
+                                    $imgSrc = Str::startsWith($p->cover_url, ['http', 'https'])
+                                        ? $p->cover_url
+                                        : ($p->cover_url
+                                            ? asset('storage/' . $p->cover_url)
+                                            : asset('assets/img/default-img.jpg'));
+                                @endphp
+                                <img src="{{ $imgSrc }}"
+                                    alt="{{ $p->title }}"class="w-full align-middle rounded-t-lg" />
+                                <blockquote class="relative p-8 mb-4">
 
-                                        <h4 class="text-xl font-bold text-white">
-                                            {{ Str::limit($p->title, 90) }}
-                                        </h4>
+                                    <h4 class="text-xl font-bold text-white">
+                                        {{ Str::limit($p->title, 90) }}
+                                    </h4>
 
-                                        <p class="text-md font-light mt-2 text-white">Published :
-                                            {{ $p->updated_at }}
-                                        </p>
+                                    <p class="text-md font-light mt-2 text-white">Published :
+                                        {{ $p->updated_at }}
+                                    </p>
 
-                                    </blockquote>
-                                </div>
+                                </blockquote>
                             </div>
-                        @endforeach
-                    </div>
+                        </div>
+                    @endforeach
                 </div>
+            </div>
         </section>
         <section class="relative py-20">
             <div class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
@@ -181,91 +184,93 @@
                     <polygon class="text-white fill-current" points="2560 0 2560 100 0 100"></polygon>
                 </svg>
             </div>
-            {{-- ======================= Galeri ======================= --}}
-            <section class="pt-20 pb-48">
-                <div class="container mx-auto px-4">
-                    <div class="flex flex-wrap justify-center text-center mb-24">
-                        <div class="w-full lg:w-6/12 px-4">
-                            <h2 class="text-4xl font-semibold">Galeri</h2>
-                            <p class="text-lg leading-relaxed m-4 text-blueGray-500">
-                                Dokumentasi kegiatan
-                            </p>
-                        </div>
+        </section>
+        {{-- ======================= Galeri ======================= --}}
+        <section class="pt-20 pb-48">
+            <div class="container mx-auto px-4">
+                <div class="flex flex-wrap justify-center text-center mb-24">
+                    <div class="w-full lg:w-6/12 px-4">
+                        <h2 class="text-4xl font-semibold">Galeri</h2>
+                        <p class="text-lg leading-relaxed m-4 text-blueGray-500">
+                            Dokumentasi kegiatan
+                        </p>
                     </div>
-                    <div class="flex flex-wrap">
-                        @foreach ($galleries as $g)
-                            <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
-                                <div class="px-6">
-                                    <img src="{{ asset('storage/' . $g->image_url) }}" alt="{{ $g->title }}"
-                                        class="shadow-lg object-cover  mx-auto max-h-120-px" />
-                                    <div class="pt-6 text-center">
-                                        <h5 class="text-xl font-bold">{{ $g->title }}</h5>
-                                        <p class="mt-1 text-sm text-blueGray-400  font-semibold">
-                                            {{ $g->caption }}
-                                        </p>
+                </div>
+                <div class="flex flex-wrap">
+                    @foreach ($galleries as $g)
+                        <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
+                            <div class="px-6">
+                                <img src="{{ asset('storage/' . $g->image_url) }}" alt="{{ $g->title }}"
+                                    class="shadow-lg object-cover  mx-auto max-h-120-px" />
+                                <div class="pt-6 text-center">
+                                    <h5 class="text-xl font-bold">{{ $g->title }}</h5>
+                                    <p class="mt-1 text-sm text-blueGray-400  font-semibold">
+                                        {{ $g->caption }}
+                                    </p>
 
-                                    </div>
                                 </div>
                             </div>
-                        @endforeach
+                        </div>
+                    @endforeach
 
-                    </div>
                 </div>
-            </section>
+            </div>
+        </section>
 
-            {{-- ======================= SECTION: TENTANG ======================= --}}
-            <section class="pb-20 relative block bg-blueGray-800">
-                <div class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
-                    style="transform: translateZ(0px)">
-                    <svg class="absolute bottom-0 overflow-hidden" xmlns="http://www.w3.org/2000/svg"
-                        preserveAspectRatio="none" version="1.1" viewBox="0 0 2560 100" x="0" y="0">
-                        <polygon class="text-blueGray-800 fill-current" points="2560 0 2560 100 0 100"></polygon>
-                    </svg>
-                </div>
-                <div class="container mx-auto px-4 lg:pt-24 lg:pb-64">
-                    <div class="flex flex-wrap text-center justify-center">
-                        <div class="w-full lg:w-6/12 px-4">
-                            <h2 class="text-4xl font-semibold text-white">Tentang Kami</h2>
-                            <p class="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">
-                                Rausyan Fikr adalah komunitas kajian Islam yang berfokus pada pengembangan diri,
-                                kontribusi
-                                sosial,
-                                dan
-                                kolaborasi antarwilayah untuk menghadirkan dampak positif bagi masyarakat.
-                            </p>
-                        </div>
-                    </div>
-                    <div class="flex flex-wrap mt-12 justify-center">
-                        <div class="w-full lg:w-3/12 px-4 text-center">
-                            <div
-                                class="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
-                                <i class="fas fa-medal text-xl"></i>
-                            </div>
-                            <h6 class="text-xl mt-5 font-semibold text-white">
-                                Visi
-                            </h6>
-                            <p class="mt-2 mb-4 text-blueGray-400">
-                                Some quick example text to build on the card title and make up
-                                the bulk of the card's content.
-                            </p>
-                        </div>
-                        <div class="w-full lg:w-3/12 px-4 text-center">
-                            <div
-                                class="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
-                                <i class="fas fa-poll text-xl"></i>
-                            </div>
-                            <h5 class="text-xl mt-5 font-semibold text-white">
-                                Misi
-                            </h5>
-                            <p class="mt-2 mb-4 text-blueGray-400">
-                                Some quick example text to build on the card title and make up
-                                the bulk of the card's content.
-                            </p>
-                        </div>
+        {{-- ======================= SECTION: TENTANG ======================= --}}
+        <section class="pb-20 relative block bg-blueGray-800">
+            <div class="bottom-auto top-0 left-0 right-0 w-full absolute pointer-events-none overflow-hidden -mt-20 h-20"
+                style="transform: translateZ(0px)">
+                <svg class="absolute bottom-0 overflow-hidden" xmlns="http://www.w3.org/2000/svg"
+                    preserveAspectRatio="none" version="1.1" viewBox="0 0 2560 100" x="0" y="0">
+                    <polygon class="text-blueGray-800 fill-current" points="2560 0 2560 100 0 100"></polygon>
+                </svg>
+            </div>
+            <div class="container mx-auto px-4 lg:pt-24 lg:pb-64">
+                <div class="flex flex-wrap text-center justify-center">
+                    <div class="w-full lg:w-6/12 px-4">
+                        <h2 class="text-4xl font-semibold text-white">Tentang Kami</h2>
+                        <p class="text-lg leading-relaxed mt-4 mb-4 text-blueGray-400">
+                            Rausyan Fikr adalah komunitas kajian Islam yang berfokus pada pengembangan diri,
+                            kontribusi
+                            sosial,
+                            dan
+                            kolaborasi antarwilayah untuk menghadirkan dampak positif bagi masyarakat.
+                        </p>
                     </div>
                 </div>
-            </section>
-            {{-- <section class="relative block py-24 lg:pt-0 bg-blueGray-800">
+                <div class="flex flex-wrap mt-12 justify-center">
+                    <div class="w-full lg:w-3/12 px-4 text-center">
+                        <div
+                            class="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
+                            <i class="fas fa-medal text-xl"></i>
+                        </div>
+                        <h6 class="text-xl mt-5 font-semibold text-white">
+                            Visi
+                        </h6>
+                        <p class="mt-2 mb-4 text-blueGray-400">
+                            Some quick example text to build on the card title and make up
+                            the bulk of the card's content.
+                        </p>
+                    </div>
+                    <div class="w-full lg:w-3/12 px-4 text-center">
+                        <div
+                            class="text-blueGray-800 p-3 w-12 h-12 shadow-lg rounded-full bg-white inline-flex items-center justify-center">
+                            <i class="fas fa-poll text-xl"></i>
+                        </div>
+                        <h5 class="text-xl mt-5 font-semibold text-white">
+                            Misi
+                        </h5>
+                        <p class="mt-2 mb-4 text-blueGray-400">
+                            Some quick example text to build on the card title and make up
+                            the bulk of the card's content.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        {{-- <section class="relative block py-24 lg:pt-0 bg-blueGray-800">
                 <div class="container mx-auto px-4">
                     <div class="flex flex-wrap justify-center lg:-mt-64 -mt-48">
                         <div class="w-full lg:w-6/12 px-4">
@@ -308,6 +313,165 @@
                     </div>
                 </div>
             </section> --}}
+        <section class="relative py-24 lg:pt-0">
+            <div class="container mx-auto px-4">
+                <div class="content mt-10 md:mt-15 xl:mt-25 mb-10 md:mb-25 max-xxl:p-2" id="portfolio">
+                    <div class="xl:mb-17.5 mb-5">
+                        <div class="max-sm:px-2 text-center mx-auto max-w-144.25">
+                            <p class="section-title ">Portfolio</p>
+                            <p class="font-normal text-[18px] max-sm:text-[14px] pt-6 text-gray-400">Here's a
+                                selection
+                                of my recent work, showcasing my skills in creating user-centric and visually
+                                appealing
+                                interfaces.</p>
+                        </div>
+                    </div>
+                    <div class="mx-auto flex justify-center">
+                        <div class="grid xl:grid-cols-3 md:grid-cols-2 gap-6">
+                            <div
+                                class="max-w-106 rounded-lg outline-[#FFFFFF] hover:shadow-2xl duration-300 transition-all shadow-gray-300 border border-gray-200">
+                                <img alt="Product Admin Dashboard image" src="/picto/assets/card-1-D83uj-qZ.png">
+                                <div class="p-4 xs:p-8">
+                                    <p class="text-gray-400 text-xs font-medium">UI-UX DESIGN</p>
+                                    <p class="text-gray-900 text-md xxs:text-lg font-semibold pt-1 mb-3">Product
+                                        Admin
+                                        Dashboard</p>
+                                    <p class="text-gray-600 text-xs xxs:text-[14px] text-wrap"
+                                        style="line-height: 20px;">I focus on crafting smooth, responsive
+                                        interfaces
+                                        that balance aesthetic appeal with practical functionality.</p><a
+                                        href="#!"
+                                        class="btn hover:border-picto-primary hover:text-picto-primary bg-white text-sm xs:text-[16px] font-semibold hover:gap-3 xs:hover:gap-4 transition-all duration-300 mt-5 xs:py-5.75 px-6 max-sm:w-full">Case
+                                        Study<span class="ms-1 xs:ms-3"><svg aria-hidden="true" focusable="false"
+                                                data-prefix="fas" data-icon="arrow-right"
+                                                class="svg-inline--fa fa-arrow-right fa-l " role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z">
+                                                </path>
+                                            </svg></span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="max-w-106 rounded-lg outline-[#FFFFFF] hover:shadow-2xl duration-300 transition-all shadow-gray-300 border border-gray-200">
+                                <img alt="Product Admin Dashboard image" src="/picto/assets/card-2-BJ8-9N8h.png">
+                                <div class="p-4 xs:p-8">
+                                    <p class="text-gray-400 text-xs font-medium">UI-UX DESIGN</p>
+                                    <p class="text-gray-900 text-md xxs:text-lg font-semibold pt-1 mb-3">Product
+                                        Admin
+                                        Dashboard</p>
+                                    <p class="text-gray-600 text-xs xxs:text-[14px] text-wrap"
+                                        style="line-height: 20px;">Designed an intuitive dashboard for product
+                                        management, emphasizing clarity and user efficiency.</p><a href="#!"
+                                        class="btn hover:border-picto-primary hover:text-picto-primary bg-white text-sm xs:text-[16px] font-semibold hover:gap-3 xs:hover:gap-4 transition-all duration-300 mt-5 xs:py-5.75 px-6 max-sm:w-full">Case
+                                        Study<span class="ms-1 xs:ms-3"><svg aria-hidden="true" focusable="false"
+                                                data-prefix="fas" data-icon="arrow-right"
+                                                class="svg-inline--fa fa-arrow-right fa-l " role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z">
+                                                </path>
+                                            </svg></span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="max-w-106 rounded-lg outline-[#FFFFFF] hover:shadow-2xl duration-300 transition-all shadow-gray-300 border border-gray-200">
+                                <img alt="Product Admin Dashboard image" src="/picto/assets/card-3-Ka1ll87R.png">
+                                <div class="p-4 xs:p-8">
+                                    <p class="text-gray-400 text-xs font-medium">UI-UX DESIGN</p>
+                                    <p class="text-gray-900 text-md xxs:text-lg font-semibold pt-1 mb-3">Product
+                                        Admin
+                                        Dashboard</p>
+                                    <p class="text-gray-600 text-xs xxs:text-[14px] text-wrap"
+                                        style="line-height: 20px;">Developed a modern admin panel with a focus on
+                                        usability and seamless navigation for end users and so on.</p><a href="#!"
+                                        class="btn hover:border-picto-primary hover:text-picto-primary bg-white text-sm xs:text-[16px] font-semibold hover:gap-3 xs:hover:gap-4 transition-all duration-300 mt-5 xs:py-5.75 px-6 max-sm:w-full">Case
+                                        Study<span class="ms-1 xs:ms-3"><svg aria-hidden="true" focusable="false"
+                                                data-prefix="fas" data-icon="arrow-right"
+                                                class="svg-inline--fa fa-arrow-right fa-l " role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z">
+                                                </path>
+                                            </svg></span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="max-w-106 rounded-lg outline-[#FFFFFF] hover:shadow-2xl duration-300 transition-all shadow-gray-300 border border-gray-200">
+                                <img alt="Product Admin Dashboard image" src="/picto/assets/card-4-1lvzje-u.png">
+                                <div class="p-4 xs:p-8">
+                                    <p class="text-gray-400 text-xs font-medium">UI-UX DESIGN</p>
+                                    <p class="text-gray-900 text-md xxs:text-lg font-semibold pt-1 mb-3">Product
+                                        Admin
+                                        Dashboard</p>
+                                    <p class="text-gray-600 text-xs xxs:text-[14px] text-wrap"
+                                        style="line-height: 20px;">Created a responsive dashboard layout that
+                                        adapts
+                                        smoothly across devices and screen sizes and so on.</p><a href="#!"
+                                        class="btn hover:border-picto-primary hover:text-picto-primary bg-white text-sm xs:text-[16px] font-semibold hover:gap-3 xs:hover:gap-4 transition-all duration-300 mt-5 xs:py-5.75 px-6 max-sm:w-full">Case
+                                        Study<span class="ms-1 xs:ms-3"><svg aria-hidden="true" focusable="false"
+                                                data-prefix="fas" data-icon="arrow-right"
+                                                class="svg-inline--fa fa-arrow-right fa-l " role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z">
+                                                </path>
+                                            </svg></span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="max-w-106 rounded-lg outline-[#FFFFFF] hover:shadow-2xl duration-300 transition-all shadow-gray-300 border border-gray-200">
+                                <img alt="Product Admin Dashboard image" src="/picto/assets/card-5-TrbU7d8r.png">
+                                <div class="p-4 xs:p-8">
+                                    <p class="text-gray-400 text-xs font-medium">UI-UX DESIGN</p>
+                                    <p class="text-gray-900 text-md xxs:text-lg font-semibold pt-1 mb-3">Product
+                                        Admin
+                                        Dashboard</p>
+                                    <p class="text-gray-600 text-xs xxs:text-[14px] text-wrap"
+                                        style="line-height: 20px;">Implemented interactive charts and widgets to
+                                        visualize product data effectively for stakeholders.</p><a href="#!"
+                                        class="btn hover:border-picto-primary hover:text-picto-primary bg-white text-sm xs:text-[16px] font-semibold hover:gap-3 xs:hover:gap-4 transition-all duration-300 mt-5 xs:py-5.75 px-6 max-sm:w-full">Case
+                                        Study<span class="ms-1 xs:ms-3"><svg aria-hidden="true" focusable="false"
+                                                data-prefix="fas" data-icon="arrow-right"
+                                                class="svg-inline--fa fa-arrow-right fa-l " role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z">
+                                                </path>
+                                            </svg></span></a>
+                                </div>
+                            </div>
+                            <div
+                                class="max-w-106 rounded-lg outline-[#FFFFFF] hover:shadow-2xl duration-300 transition-all shadow-gray-300 border border-gray-200">
+                                <img alt="Product Admin Dashboard image" src="/picto/assets/card-6-CMi2awuo.png">
+                                <div class="p-4 xs:p-8">
+                                    <p class="text-gray-400 text-xs font-medium">UI-UX DESIGN</p>
+                                    <p class="text-gray-900 text-md xxs:text-lg font-semibold pt-1 mb-3">Product
+                                        Admin
+                                        Dashboard</p>
+                                    <p class="text-gray-600 text-xs xxs:text-[14px] text-wrap"
+                                        style="line-height: 20px;">Enhanced user experience by streamlining
+                                        workflows
+                                        and optimizing interface components and so on.</p><a href="#!"
+                                        class="btn hover:border-picto-primary hover:text-picto-primary bg-white text-sm xs:text-[16px] font-semibold hover:gap-3 xs:hover:gap-4 transition-all duration-300 mt-5 xs:py-5.75 px-6 max-sm:w-full">Case
+                                        Study<span class="ms-1 xs:ms-3"><svg aria-hidden="true" focusable="false"
+                                                data-prefix="fas" data-icon="arrow-right"
+                                                class="svg-inline--fa fa-arrow-right fa-l " role="img"
+                                                xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+                                                <path fill="currentColor"
+                                                    d="M438.6 278.6c12.5-12.5 12.5-32.8 0-45.3l-160-160c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3L338.8 224 32 224c-17.7 0-32 14.3-32 32s14.3 32 32 32l306.7 0L233.4 393.4c-12.5 12.5-12.5 32.8 0 45.3s32.8 12.5 45.3 0l160-160z">
+                                                </path>
+                                            </svg></span></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="text-center"><a href="#!"
+                            class="btn btn-primary py-3 px-6 mt-12.5 text-center text-[16px] font-semibold">More
+                            Project</a></div>
+                </div>
+            </div>
+        </section>
     </main>
     {{-- ======================= Footer ======================= --}}
     <footer id="kontak" class="relative bg-blueGray-200 pt-8 pb-6">
@@ -405,6 +569,7 @@
             </div>
         </div>
     </footer>
+
 </body>
 
 

@@ -28,7 +28,7 @@
         </div>
 
         {{-- KONTEN HALAMAN --}}
-        <main class="relative z-0 px-4 md:px-10 mx-auto w-full -m-36">
+        <main class="relative z-0 px-4  md:px-10 mx-auto w-full -m-36">
             @yield('page-content')
         </main>
 

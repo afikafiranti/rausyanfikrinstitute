@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\ChartController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\AlumniController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\LandingController;
@@ -21,8 +22,13 @@ Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function (
 // LANDING PAGE
 Route::get('/', [LandingController::class, 'index'])->name('landing');
 
+//SAMPLE
+Route::view('/lg', '/layouts/landing2')->name('landing_page');
+
 //  DASHBOARD
-Route::view('/dashboard', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
+//Route::view('/dashboard', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
+Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
 
 // NOTIFIKASI
 Route::middleware(['auth'])->prefix('notifikasi')->name('notifications.')->group(function () {

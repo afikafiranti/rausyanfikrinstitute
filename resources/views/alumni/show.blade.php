@@ -83,7 +83,7 @@
     {{-- Tombol kembali --}}
     <div class="p-6 border-t text-center bg-slate-50">
         <a href="{{ route('alumni.index') }}"
-           class="inline-block bg-white text-slate-700 hover:bg-slate-100 font-medium px-5 py-2 rounded-lg shadow-sm border border-slate-200 transition">
+           class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-lg shadow-sm border border-slate-200 transition">
             ← Kembali ke Daftar Alumni
         </a>
     </div>
