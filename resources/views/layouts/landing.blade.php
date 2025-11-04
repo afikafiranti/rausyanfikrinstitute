@@ -200,8 +200,17 @@
                     @foreach ($galleries as $g)
                         <div class="w-full md:w-6/12 lg:w-3/12 lg:mb-0 mb-12 px-4">
                             <div class="px-6">
-                                <img src="{{ asset('storage/' . $g->image_url) }}" alt="{{ $g->title }}"
-                                    class="shadow-lg object-cover  mx-auto max-h-120-px" />
+                                @php
+                                    $imgSrc = Str::startsWith($g->image_url, ['http', 'https'])
+                                        ? $g->image_url
+                                        : ($g->image_url
+                                            ? asset('storage/' . $g->image_url)
+                                            : asset('assets/img/default-img.jpg'));
+                                @endphp
+                                <img src="{{ $imgSrc }}"
+                                    alt="{{ $g->title }}"class="shadow-lg object-cover  mx-auto max-h-120-px" />
+                                <blockquote class="relative p-8 mb-4">
+                                    
                                 <div class="pt-6 text-center">
                                     <h5 class="text-xl font-bold">{{ $g->title }}</h5>
                                     <p class="mt-1 text-sm text-blueGray-400  font-semibold">

@@ -48,8 +48,13 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     @foreach ($galleries as $gallery)
                         <div class="bg-white rounded-lg shadow ">
-                            <img src="{{ asset('storage/' . $gallery->image_url) }}" alt="{{ $gallery->title }}"
-                                class="w-full h-48 object-cover rounded">
+                            @php
+                                        $imgSrc = Str::startsWith($gallery->image_url, ['http', 'https'])
+                                            ? $gallery->image_url
+                                            : ($gallery->image_url ? asset('storage/'.$gallery->image_url) : asset('assets/img/default-img.jpg'));
+                                    @endphp
+                                    <img src="{{ $imgSrc }}" alt="{{ $gallery->title }}"  class="w-full h-48 object-cover rounded">
+                               
                             <h3 class="mt-2 text-lg font-semibold px-4">{{ $gallery->title }}</h3>
                             <p class="text-sm text-gray-600 px-4">{{ Str::limit($gallery->caption, 80) }}</p>
                             <div class="flex justify-between mt-3 p-4 ">
