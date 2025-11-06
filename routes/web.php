@@ -20,10 +20,8 @@ Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function (
 });
 
 // LANDING PAGE
-Route::get('/', [LandingController::class, 'index'])->name('landing');
-
-//SAMPLE
-Route::view('/lg', '/layouts/landing2')->name('landing_page');
+// Route::get('/', [LandingController::class, 'index'])->name('landing');
+Route::view('/', '/landingpage/home')->name('landing_page');
 
 //  DASHBOARD
 //Route::view('/dashboard', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
