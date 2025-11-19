@@ -72,7 +72,7 @@
                 </div>
             </div>
 
-            {{-- BLOK TABEL BAWAH  --}} 
+            {{-- BLOK TABEL BAWAH  --}}
 
             <div class="col-span-8 rounded-lg bg-slate-50 shadow">
                 {{-- TABEL SEBARAN ANGKATAN --}}

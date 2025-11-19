@@ -64,7 +64,7 @@
             <div class="container relative mx-auto">
                 <div class="items-center flex flex-wrap">
                     <div class="w-full lg:w-6/12 px-4 ml-auto mr-auto text-center">
-                        <h1 class="text-white font-semibold text-5xl">Komunitas Kajian Rausyan Fikr</h1>
+                        <h1 class="text-white font-semibold text-5xl">Rausyan Fikr</h1>
                         <p class="mt-4 text-lg text-blueGray-200">
                             Wadah silaturahmi, kajian, dan kolaborasi untuk membangun kontribusi nyata.
                         </p>

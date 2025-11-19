@@ -1,17 +1,33 @@
  <!-- ====== Navbar Section Start -->
  <section id="navbar">
-     <div class="absolute top-0 left-0 z-40 flex items-center w-full bg-transparent ud-header">
+     <div class="absolute top-0 left-0 z-40 flex item
+     s-center w-full bg-transparent ud-header">
          <div class="container px-4 mx-auto">
              <div class="relative flex items-center justify-between -mx-4">
-                 <div class="max-w-full px-4 w-60">
-                     <a href="#" class="block w-full py-5 navbar-logo">
-                         <img src="{{ asset('landingpage/images/logo/logo-white.svg') }}"
+
+                 {{-- <div class="max-w-full px-4 w-60">
+                     <a href="#" class="block w-full py-5 navbar-logo"> --}}
+
+                 {{-- <img src="{{ asset('landingpage/images/logo/logo-white.svg') }}" --}}
+
+                 {{-- <img src="{{ asset('landingpage/images/logo/logo_rf.jpeg') }}"
                              data-logo-dark="{{ asset('landingpage/images/logo/logo.svg') }}"
                              data-logo-light="{{ asset('landingpage/images/logo/logo-white.svg') }}}" alt="RFI Logo"
                              class="w-full header-logo" />
+                     </a>
+                 </div> --}}
 
+                 <div class="px-4 flex items-center">
+                     <a href="#" class="block">
+                         <img src="{{ asset('landingpage/images/logo/logo_rf.jpeg') }}"
+                             data-logo-dark="{{ asset('landingpage/images/logo/logo.svg') }}"
+                             data-logo-light="{{ asset('landingpage/images/logo/logo-white.svg') }}" alt="RFI Logo"
+                             class="h-[10px] md:h-[12px] lg:h-[14px] w-auto object-contain header-logo"
+                             style="max-width: 60px;" />
                      </a>
                  </div>
+
+
                  <div class="flex items-center justify-between w-full px-4">
                      <div>
                          <button id="navbarToggler"
@@ -32,25 +48,25 @@
                                  <li class="relative group">
                                      <a href="#about"
                                          class="flex py-2 mx-8 text-base font-medium ud-menu-scroll text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10">
-                                         About
+                                         Katalog
                                      </a>
                                  </li>
                                  <li class="relative group">
                                      <a href="#pricing"
                                          class="flex py-2 mx-8 text-base font-medium ud-menu-scroll text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10">
-                                         Pricing
+                                         Refleksi
                                      </a>
                                  </li>
                                  <li class="relative group">
                                      <a href="#team"
                                          class="flex py-2 mx-8 text-base font-medium ud-menu-scroll text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10">
-                                         Team
+                                         JAKFI
                                      </a>
                                  </li>
                                  <li class="relative group">
                                      <a href="#contact"
                                          class="flex py-2 mx-8 text-base font-medium ud-menu-scroll text-dark group-hover:text-primary dark:text-white lg:ml-7 lg:mr-0 lg:inline-flex lg:px-0 lg:py-6 lg:text-white lg:group-hover:text-white lg:group-hover:opacity-70 xl:ml-10">
-                                         Contact
+                                         RCF
                                      </a>
                                  </li>
                                  <li class="relative group">
@@ -156,10 +172,10 @@
                                  class="loginBtn px-[22px] py-2 text-base font-medium text-white hover:opacity-70">
                                  Masuk
                              </a>
-                             <a href="/register"
+                             {{-- <a href="/register"
                                  class="px-6 py-2 text-base font-medium text-white duration-300 ease-in-out rounded-md bg-white/20 signUpBtn hover:bg-white/100 hover:text-dark">
                                  Daftar
-                             </a>
+                             </a> --}}
                          </div>
                      </div>
                  </div>

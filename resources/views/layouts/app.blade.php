@@ -21,7 +21,7 @@
         @include('partials.nav.topnav')
 
         {{-- HEADER GRADIENT --}}
-        <div class="relative z-0 bg-pink-600 md:pt-32 pb-32 pt-8 ">
+        <div class="relative z-0 bg-red-700 md:pt-32 pb-32 pt-8 ">
             <div class="px-4 md:px-10 mx-auto w-full">
                 @yield('page-header')
             </div>

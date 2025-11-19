@@ -1,6 +1,6 @@
 @php
     $link = fn($active) => $active
-        ? 'text-xs uppercase py-3 font-bold block text-pink-500 hover:text-pink-600'
+        ? 'text-xs uppercase py-3 font-bold block text-red-600 hover:text-red-600'
         : 'text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500';
 @endphp
 
@@ -93,23 +93,23 @@
 
                 {{-- ================== Manajemen Web ================== --}}
                 @can('manage-content')
-                <hr class="my-4 md:min-w-full" />
-                <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4">Manajemen Web
-                </h6>
+                    <hr class="my-4 md:min-w-full" />
+                    <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4">Manajemen Web
+                    </h6>
 
-                <li class="items-center">
-                    <a href="{{ route('management.post.index') }}"
-                        class="{{ $link(request()->routeIs('management.post.*')) }}">
-                        <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Berita
-                    </a>
-                </li>
+                    <li class="items-center">
+                        <a href="{{ route('management.post.index') }}"
+                            class="{{ $link(request()->routeIs('management.post.*')) }}">
+                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Berita
+                        </a>
+                    </li>
 
-                <li class="items-center">
-                    <a href="{{ route('management.galeri.index') }}"
-                        class="{{ $link(request()->routeIs('management.galeri.*')) }}">
-                        <i class="fas fa-images mr-2 text-sm text-blueGray-300"></i> Galeri
-                    </a>
-                </li>
+                    <li class="items-center">
+                        <a href="{{ route('management.galeri.index') }}"
+                            class="{{ $link(request()->routeIs('management.galeri.*')) }}">
+                            <i class="fas fa-images mr-2 text-sm text-blueGray-300"></i> Galeri
+                        </a>
+                    </li>
                 @endcan
 
 
