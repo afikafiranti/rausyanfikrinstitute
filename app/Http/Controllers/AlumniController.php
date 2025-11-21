@@ -11,7 +11,7 @@ class AlumniController extends Controller
 {
     public function index(Request $request)
     {
-        $me = $request->user();
+        $me = $request->user(); 
 
         $q          = trim((string) $request->input('q'));
         $angkatan   = trim((string) $request->input('angkatan'));
@@ -25,21 +25,21 @@ class AlumniController extends Controller
             'email'      => 'users.email',
             'angkatan'   => 'users.angkatan',
             'wilayah'    => 'wilayah.name',
-            'level'      => 'level.description', // ubah ke description
+            'level'      => 'level.description',
             'status'     => 'users.status',
             'created_at' => 'users.created_at',
         ];
         $sort = $sortMap[$request->input('sort', 'created_at')] ?? 'users.created_at';
         $dir  = $request->input('dir') === 'asc' ? 'asc' : 'desc';
 
-        // Query pakai Eloquent agar relasi tetap bisa diakses di view
+        // QUERY UTAMA — TANPA filter level_id
         $query = User::with([
             'wilayah:id,name',
-            'level:id,description', // ambil description
-        ])->whereIn('level_id', [3, 4]); // hanya level 3 dan 4
+            'level:id,description'
+        ]);
 
-        // Filter level manual jika dipilih
-        if ($levelId && in_array($levelId, [3,4])) {
+        // Filter dropdown level jika dipilih
+        if ($levelId) {
             $query->where('level_id', $levelId);
         }
 
@@ -50,24 +50,34 @@ class AlumniController extends Controller
 
         // Filter pencarian
         if ($q !== '') {
-            $query->where(fn($x) => $x->where('name', 'like', "%{$q}%")
-                                      ->orWhere('email', 'like', "%{$q}%"));
+            $query->where(function ($x) use ($q) {
+                $x->where('name', 'like', "%{$q}%")
+                  ->orWhere('email', 'like', "%{$q}%");
+            });
         }
+
         if ($angkatan !== '') {
             $query->where('angkatan', $angkatan);
         }
+
         if ($wilayahId) {
             $query->where('wilayah_id', $wilayahId);
         }
 
-        // Sorting dan pagination
+        // Sorting & pagination
         $query = $query->orderByRaw("$sort $dir");
         $alumni = $query->paginate($perPage)->appends($request->query());
 
-        // Data untuk dropdown
+        // Dropdown data
         $wilayah = Wilayah::select('id', 'name')->orderBy('name')->get();
-        $level   = Level::select('id', 'description')->whereIn('id', [3,4])->orderBy('description')->get();
-        $angkatanList = User::whereNotNull('angkatan')->distinct()->orderBy('angkatan')->pluck('angkatan');
+
+        // Semua level ditampilkan (1–4 atau sesuai database)
+        $level   = Level::select('id', 'description')->orderBy('description')->get();
+
+        $angkatanList = User::whereNotNull('angkatan')
+                            ->distinct()
+                            ->orderBy('angkatan')
+                            ->pluck('angkatan');
 
         return view('alumni.index', compact(
             'alumni', 'wilayah', 'level', 'angkatanList',
@@ -76,12 +86,11 @@ class AlumniController extends Controller
     }
 
     public function show($id)
-{
-    $alumni = \App\Models\User::with(['wilayah:id,name', 'level:id,description'])
-        ->whereIn('level_id', [3,4])
-        ->findOrFail($id);
+    {
+        // DETAIL: juga tampilkan semua level (tanpa filter)
+        $alumni = User::with(['wilayah:id,name', 'level:id,description'])
+            ->findOrFail($id);
 
-    return view('alumni.show', compact('alumni'));
-}
-
+        return view('alumni.show', compact('alumni'));
+    }
 }
