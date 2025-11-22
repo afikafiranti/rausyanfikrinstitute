@@ -100,7 +100,7 @@
                     <li class="items-center">
                         <a href="{{ route('management.post.index') }}"
                             class="{{ $link(request()->routeIs('management.post.*')) }}">
-                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Refleksi <i class="fas fa-face-grin-tears mr-2 text-sm"></i>
+                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Refleksi 😂
                         </a>
                     </li>
 

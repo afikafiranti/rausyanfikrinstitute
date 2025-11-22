@@ -42,18 +42,22 @@
 
         {{-- Avatar + badge + dropdown --}}
         @auth
-            @php $unread = auth()->user()->unreadNotifications()->count(); @endphp
+            @php
+                $unread = auth()->user()->unreadNotifications()->count();
+                $user = $user ?? auth()->user();
+                $avatar = $user->avatar_url ?? ($user->photo_url ?? null);
+            @endphp
             <ul class="flex-col md:flex-row list-none items-center hidden md:flex">
                 <li class="inline-block relative">
                     <a href="#" class="text-blueGray-500 block" onclick="openDropdown(event,'user-dropdown')"
                         data-dropdown-trigger="user-dropdown">
                         <div class="items-center flex relative">
-                            @if (auth()->user()->has_avatar)
+                            @if ($avatar)
                                 <span
                                     class="w-12 h-12 inline-flex items-center justify-center rounded-full ring-2 ring-white overflow-hidden">
                                     <img alt="avatar" class="w-full h-full object-cover align-middle border-none"
-                                        src="{{ auth()->user()->avatar_url }}?v={{ optional(auth()->user()->updated_at)->timestamp }}"
-                                        loading="lazy">
+                                        src="{{ $avatar }}?v={{ optional($user->updated_at)->timestamp }}"
+                                        alt="avatar" loading="lazy">
                                 </span>
                             @else
                                 <span
