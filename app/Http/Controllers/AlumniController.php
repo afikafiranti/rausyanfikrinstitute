@@ -17,6 +17,7 @@ class AlumniController extends Controller
         $angkatan   = trim((string) $request->input('angkatan'));
         $wilayahId  = $request->integer('wilayah_id');
         $levelId    = $request->integer('level_id');
+        $ab         = trim((string) $request->input('ab'));
         $perPage    = min(max((int) $request->input('per_page', 15), 5), 100);
 
         // Kolom yang diizinkan untuk sorting
@@ -32,13 +33,16 @@ class AlumniController extends Controller
         $sort = $sortMap[$request->input('sort', 'created_at')] ?? 'users.created_at';
         $dir  = $request->input('dir') === 'asc' ? 'asc' : 'desc';
 
-        // QUERY UTAMA — TANPA filter level_id
+        // ==========================
+        // QUERY UTAMA + RELASI ROLES
+        // ==========================
         $query = User::with([
             'wilayah:id,name',
-            'level:id,description'
+            'level:id,description',
+            'roles:id,name'    // <-- WAJIB AGAR ROLE TAMPIL
         ]);
 
-        // Filter dropdown level jika dipilih
+        // Filter level
         if ($levelId) {
             $query->where('level_id', $levelId);
         }
@@ -56,12 +60,19 @@ class AlumniController extends Controller
             });
         }
 
+        // Filter angkatan
         if ($angkatan !== '') {
             $query->where('angkatan', $angkatan);
         }
 
+        // Filter wilayah
         if ($wilayahId) {
             $query->where('wilayah_id', $wilayahId);
+        }
+
+        // Filter AB
+        if ($ab !== '') {
+            $query->where('ab', $ab);
         }
 
         // Sorting & pagination
@@ -70,10 +81,9 @@ class AlumniController extends Controller
 
         // Dropdown data
         $wilayah = Wilayah::select('id', 'name')->orderBy('name')->get();
-
-        // Semua level ditampilkan (1–4 atau sesuai database)
         $level   = Level::select('id', 'description')->orderBy('description')->get();
 
+        // List angkatan
         $angkatanList = User::whereNotNull('angkatan')
                             ->distinct()
                             ->orderBy('angkatan')
@@ -81,15 +91,17 @@ class AlumniController extends Controller
 
         return view('alumni.index', compact(
             'alumni', 'wilayah', 'level', 'angkatanList',
-            'q', 'angkatan', 'wilayahId', 'levelId', 'perPage', 'sort', 'dir'
+            'q', 'angkatan', 'wilayahId', 'levelId', 'perPage', 'sort', 'dir', 'ab'
         ));
     }
 
     public function show($id)
     {
-        // DETAIL: juga tampilkan semua level (tanpa filter)
-        $alumni = User::with(['wilayah:id,name', 'level:id,description'])
-            ->findOrFail($id);
+        $alumni = User::with([
+            'wilayah:id,name',
+            'level:id,description',
+            'roles:id,name'   // <-- AGAR ROLE TAMPIL DI HALAMAN DETAIL
+        ])->findOrFail($id);
 
         return view('alumni.show', compact('alumni'));
     }

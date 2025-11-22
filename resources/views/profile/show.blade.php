@@ -113,13 +113,10 @@
 
                     <div>
                         <label class="block text-sm mb-1">Status Pernikahan</label>
-                        <select name="status_pernikahan"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                        <select name="status_pernikahan" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                             <option value="">Pilih...</option>
-                            <option value="Belum Menikah"
-                                @selected(old('status_pernikahan', $user->status_pernikahan) == 'Belum Menikah')>Belum Menikah</option>
-                            <option value="Menikah"
-                                @selected(old('status_pernikahan', $user->status_pernikahan) == 'Menikah')>Menikah</option>
+                            <option value="Belum Menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'Belum Menikah')>Belum Menikah</option>
+                            <option value="Menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'Menikah')>Menikah</option>
                         </select>
                     </div>
 
@@ -143,7 +140,7 @@
 
                     <div class="col-span-2 flex justify-end pt-6">
                         <button form="formProfile" class="rf-btn">
-                            <i class="fas fa-save"></i> Simpan Perubahan
+                            <i class="fas fa-save"></i> Simpan Perubahann
                         </button>
                     </div>
                 </form>
@@ -166,14 +163,12 @@
                     <div>
                         <label class="block text-sm mb-1">Password Baru</label>
                         <input type="password" name="password"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                            autocomplete="new-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="new-password">
                     </div>
                     <div>
                         <label class="block text-sm mb-1">Ulangi Password Baru</label>
                         <input type="password" name="password_confirmation"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                            autocomplete="new-password">
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" autocomplete="new-password">
                     </div>
                     <button class="rf-btn w-full">Ganti Password</button>
                 </form>
@@ -187,7 +182,8 @@
         <h2 class="text-xl font-semibold">Profil</h2>
 
         <div class="rf-section mt-3">
-            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data" class="space-y-3">
+            <form method="POST" action="{{ route('profile.update') }}" enctype="multipart/form-data"
+                class="space-y-3">
                 @csrf @method('PUT')
 
                 <div class="flex items-center gap-4">
@@ -223,10 +219,8 @@
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Kampus">
                 <select name="status_pernikahan" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     <option value="">Status Pernikahan</option>
-                    <option value="Belum Menikah"
-                        @selected(old('status_pernikahan', $user->status_pernikahan) == 'Belum Menikah')>Belum Menikah</option>
-                    <option value="Menikah"
-                        @selected(old('status_pernikahan', $user->status_pernikahan) == 'Menikah')>Menikah</option>
+                    <option value="Belum Menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'Belum Menikah')>Belum Menikah</option>
+                    <option value="Menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'Menikah')>Menikah</option>
                 </select>
 
                 <input type="text" name="angkatan" value="{{ old('angkatan', $user->angkatan) }}"

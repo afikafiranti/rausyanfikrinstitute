@@ -20,6 +20,8 @@ Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function (
 
     Route::get('/alumni/status-pernikahan', [ChartController::class, 'alumniStatusPernikahan'])
     ->name('alumni.status_pernikahan');
+    Route::get('/alumni/ab', [ChartController::class, 'alumniAb'])->name('alumni.ab');
+
 });
 
 // LANDING PAGE

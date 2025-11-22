@@ -64,4 +64,17 @@ class ChartController extends Controller
             'values' => $raw->values(),
         ]);
     }
+
+    public function alumniAb()
+{
+    $raw = \App\Models\User::selectRaw('ab, COUNT(*) as c')
+        ->groupBy('ab')
+        ->pluck('c', 'ab'); // ['iya' => 10, 'tidak' => 5]
+
+    return response()->json([
+        'labels' => $raw->keys()->values(),
+        'values' => $raw->values(),
+    ]);
+}
+
 }

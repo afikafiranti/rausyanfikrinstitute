@@ -83,7 +83,7 @@
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="+62...">
                     </div>
 
-                    {{-- Tempat Lahir --}} {{-- Tanggal Lahir --}}
+                    {{-- Tempat Lahir --}}
                     <div class="grid grid-cols-2 gap-2 ">
                         <div>
                             <label class="block text-sm mb-1">Tempat Lahir</label>
@@ -98,7 +98,8 @@
                                 class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                         </div>
                     </div>
-                    {{-- Peekerjaan --}}
+
+                    {{-- Pekerjaan --}}
                     <div>
                         <label class="block text-sm mb-1">Pekerjaan</label>
                         <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
@@ -128,6 +129,16 @@
                             <option value="lajang" @selected(old('status_pernikahan', $user->status_pernikahan) == 'lajang')>Lajang</option>
                             <option value="menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'menikah')>Menikah</option>
                             <option value="duda/janda" @selected(old('status_pernikahan', $user->status_pernikahan) == 'duda/janda')>Duda / Janda</option>
+                        </select>
+                    </div>
+
+                    {{-- AB --}}
+                    <div>
+                        <label class="block text-sm mb-1">AB</label>
+                        <select name="ab" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                            <option value="">Pilih...</option>
+                            <option value="iya" @selected(old('ab', $user->ab) == 'iya')>Iya</option>
+                            <option value="tidak" @selected(old('ab', $user->ab) == 'tidak')>Tidak</option>
                         </select>
                     </div>
 
@@ -188,8 +199,6 @@
                 </form>
             </section>
 
-
-
         </div>
     </div>
 
@@ -226,18 +235,29 @@
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Tempat Lahir">
                 <input type="date" name="tanggal_lahir" value="{{ old('tanggal_lahir', $user->tanggal_lahir) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+
                 <input type="text" name="pekerjaan" value="{{ old('pekerjaan', $user->pekerjaan) }}"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pekerjaan">
+
                 <input type="text" name="pendidikan_terakhir"
                     value="{{ old('pendidikan_terakhir', $user->pendidikan_terakhir) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Pendidikan">
+
                 <input type="text" name="kampus" value="{{ old('kampus', $user->kampus) }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Kampus">
+
                 <select name="status_pernikahan" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     <option value="">Status Pernikahan</option>
                     <option value="lajang" @selected(old('status_pernikahan', $user->status_pernikahan) == 'lajang')>Lajang</option>
                     <option value="menikah" @selected(old('status_pernikahan', $user->status_pernikahan) == 'menikah')>Menikah</option>
                     <option value="duda/janda" @selected(old('status_pernikahan', $user->status_pernikahan) == 'duda/janda')>Duda / Janda</option>
+                </select>
+
+                {{-- AB MOBILE --}}
+                <select name="ab" class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                    <option value="">AB</option>
+                    <option value="iya" @selected(old('ab', $user->ab) == 'iya')>Iya</option>
+                    <option value="tidak" @selected(old('ab', $user->ab) == 'tidak')>Tidak</option>
                 </select>
 
                 <input type="text" name="angkatan" value="{{ old('angkatan', $user->angkatan) }}"

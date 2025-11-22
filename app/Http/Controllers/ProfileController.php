@@ -18,15 +18,11 @@ class ProfileController extends Controller
 {
     public function edit(Request $request)
     {
-        // $user = $request->user();
-        // $wilayah = DB::table('wilayah')->select('id', 'name')->orderBy('name')->get();
-
-        // return view('profile.edit', compact('user', 'wilayah'));
-            $user = $request->user();
+        $user = $request->user();
 
         $wilayah = Schema::hasTable('wilayah')
             ? DB::table('wilayah')->select('id','name')->orderBy('name')->get()
-            : collect(); // CI/testing tanpa tabel 'wilayah'
+            : collect();
 
         return view('profile.edit', compact('user','wilayah'));
     }
@@ -36,7 +32,8 @@ class ProfileController extends Controller
         $user = $request->user();
 
         $before = $user->only([
-            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status','tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan'
+            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
+            'tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan','ab' // <-- AB
         ]);
 
         // Upload foto (opsional)
@@ -58,14 +55,14 @@ class ProfileController extends Controller
             'pendidikan_terakhir'      => $request->input('pendidikan_terakhir'),
             'kampus'      => $request->input('kampus'),
             'status_pernikahan'      => $request->input('status_pernikahan'),
+            'ab'          => $request->input('ab'), // <-- AB
             'angkatan'   => $request->input('angkatan'),
             'pekerjaan'  => $request->input('pekerjaan'),
             'wilayah_id' => $request->integer('wilayah_id') ?: null,
             'photo_url'  => $photoUrl,
-            
         ]);
 
-        // Reset verifikasi jika email berubah (sesuai ekspektasi test)
+        // Reset verifikasi jika email berubah
         if ($user->isDirty('email')) {
             $user->email_verified_at = null;
         }
@@ -86,7 +83,8 @@ class ProfileController extends Controller
 
         // Audit perubahan
         $after = $user->only([
-            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status','tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan'
+            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
+            'tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan','ab' // <-- AB
         ]);
 
         $changes = [];
@@ -108,7 +106,6 @@ class ProfileController extends Controller
             ]);
         }
 
-        // Test mengharapkan redirect ke /profile
         return Redirect::to('/profile')->with(
             'success',
             $criticalChanged
@@ -116,24 +113,22 @@ class ProfileController extends Controller
                 : 'Profil disimpan.'
         );
     }
+
     public function updatePassword(Request $request)
     {
         $user = auth()->user();
 
-        // Validasi input
         $request->validate([
             'current_password' => 'required',
             'password' => 'required|confirmed|min:8',
         ]);
 
-        // Cek apakah password lama sesuai
         if (!Hash::check($request->current_password, $user->password)) {
             return back()->withErrors([
                 'current_password' => 'Password saat ini tidak cocok.',
             ]);
         }
 
-        // Update hanya kolom password
         $user->update([
             'password' => Hash::make($request->password),
         ]);
@@ -145,20 +140,16 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        // Wajib: error bag 'userDeletion' agar assertSessionHasErrorsIn lulus saat salah password
         $request->validateWithBag('userDeletion', [
             'password' => ['required', 'current_password'],
         ]);
 
         Auth::logout();
-
         $user->delete();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // Test mengharapkan redirect ke '/'
         return Redirect::to('/');
     }
-    
 }
