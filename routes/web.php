@@ -17,6 +17,9 @@ use App\Http\Controllers\Management\GalleryController;
 Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function () {
     Route::get('/alumni/monthly', [ChartController::class, 'alumniMonthly'])->name('alumni.monthly');
     Route::get('/alumni/status',  [ChartController::class, 'alumniStatus'])->name('alumni.status');
+
+    Route::get('/alumni/status-pernikahan', [ChartController::class, 'alumniStatusPernikahan'])
+    ->name('alumni.status_pernikahan');
 });
 
 // LANDING PAGE

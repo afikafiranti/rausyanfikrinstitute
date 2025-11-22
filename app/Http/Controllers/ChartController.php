@@ -3,21 +3,20 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class ChartController extends Controller
 {
-    /** query builder fleksibel: pakai Alumni jika ada, jika tidak pakai User role=alumni */
+    /**
+     * Ambil semua user (karena semua user = alumni)
+     * Tidak perlu pakai role atau model Alumni.
+     */
     protected function alumniQuery()
     {
-        if (class_exists(\App\Models\Alumni::class)) {
-            return \App\Models\Alumni::query();
-        }
-        return \App\Models\User::query()->where(function ($q) {
-            $q->where('role', 'alumni')->orWhere('is_alumni', 1);
-        });
+        return User::query();
     }
 
-    /** GET /charts/alumni/monthly?year=2025 -> {year,labels[],values[]} */
+    /** GET /charts/alumni/monthly?year=2025 */
     public function alumniMonthly(Request $request)
     {
         $year = (int) ($request->query('year') ?: now()->year);
@@ -30,6 +29,7 @@ class ChartController extends Controller
 
         $labels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
         $values = [];
+
         for ($m = 1; $m <= 12; $m++) {
             $values[] = (int) ($raw[$m] ?? 0);
         }
@@ -41,14 +41,27 @@ class ChartController extends Controller
         ]);
     }
 
-    /** Opsional: kartu ringkas */
+    /** Kartu ringkas */
     public function alumniStatus()
     {
-        $q = $this->alumniQuery();
         return response()->json([
-            'total'   => (int) $q->count(),
+            'total'   => (int) $this->alumniQuery()->count(),
             'active'  => (int) $this->alumniQuery()->where('status','active')->count(),
             'pending' => (int) $this->alumniQuery()->where('status','pending')->count(),
+        ]);
+    }
+
+    /** Pie Chart: Status Pernikahan */
+    public function alumniStatusPernikahan()
+    {
+        $raw = $this->alumniQuery()
+            ->selectRaw('COALESCE(status_pernikahan, "Tidak Diisi") as status_pernikahan, COUNT(*) as c')
+            ->groupBy('status_pernikahan')
+            ->pluck('c', 'status_pernikahan');
+
+        return response()->json([
+            'labels' => $raw->keys()->values(),
+            'values' => $raw->values(),
         ]);
     }
 }

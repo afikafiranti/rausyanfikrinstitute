@@ -72,6 +72,18 @@
                 </div>
             </div>
 
+            {{-- ========================= PIE CHART STATUS PERNIKAHAN ========================= --}}
+            <div class="col-span-4 rounded-lg bg-white p-4 shadow">
+                <h3 class="font-semibold mb-3">Status Pernikahan Alumni</h3>
+                <div class="relative h-350-px">
+                    <div id="chartStatusPernikahan" class="w-full h-72"></div>
+                </div>
+
+                {{-- LEGEND MANUAL --}}
+                <div id="legendStatusPernikahan" class="flex flex-wrap gap-4 mt-4 text-sm px-2"></div>
+            </div>
+
+
             {{-- BLOK TABEL BAWAH  --}}
 
             <div class="col-span-8 rounded-lg bg-slate-50 shadow">
@@ -387,5 +399,62 @@
         };
 
         new ApexCharts(document.querySelector("#chartKajian"), optionsKajianBulan).render();
+    </script>
+
+    {{-- ========================= PIE CHART STATUS PERNIKAHAN ========================= --}}
+    <script>
+        (function() {
+            fetch('/charts/alumni/status-pernikahan')
+                .then(res => res.json())
+                .then(res => {
+
+                    const colors = ['#EF4444', '#3B82F6', '#F59E0B', '#10B981', '#8B5CF6'];
+
+                    // PIE CHART
+                    const chart = new ApexCharts(
+                        document.querySelector("#chartStatusPernikahan"), {
+                            chart: {
+                                type: 'pie',
+                                height: 300,
+                                toolbar: {
+                                    show: false
+                                }
+                            },
+                            labels: res.labels,
+                            series: res.values,
+                            colors: colors,
+                            legend: {
+                                show: false
+                            }, // legend default DIMATIKAN
+                            dataLabels: {
+                                enabled: true,
+                                formatter: val => val.toFixed(1) + "%"
+                            },
+                            tooltip: {
+                                y: {
+                                    formatter: val => val + " orang"
+                                }
+                            }
+                        }
+                    );
+
+                    chart.render();
+
+                    // LEGEND MANUAL
+                    const legend = document.getElementById("legendStatusPernikahan");
+                    let html = "";
+
+                    res.labels.forEach((label, i) => {
+                        html += `
+                    <div class="flex items-center gap-2">
+                        <span class="inline-block w-3 h-3 rounded-full" style="background:${colors[i]}"></span>
+                        <span class="text-slate-700 font-medium">${label}</span>
+                    </div>
+                `;
+                    });
+
+                    legend.innerHTML = html;
+                });
+        })();
     </script>
 @endsection

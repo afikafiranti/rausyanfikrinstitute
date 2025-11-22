@@ -41,9 +41,9 @@ class UserSeeder extends Seeder
 
         // 1) SUPER ADMIN
         $super = User::query()->updateOrCreate(
-            ['email' => 'superadmin@rausyanfikr.test'],
+            ['email' => 'afika@rausyanfikr.com'],
             [
-                'name' => 'Super Admin',
+                'name' => 'Nur Afika Firanti',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => $now,
                 'phone' => '081200000001',
@@ -52,11 +52,11 @@ class UserSeeder extends Seeder
                 'wilayah_id' => 1,
                 'level_id' => 1,
                 'status' => 'active',
-                'tempat_lahir' => 'Makassar',
+                'tempat_lahir' => 'Palopo',
                 'tanggal_lahir' => '1990-01-01',
-                'pendidikan_terakhir' => 'S2 Informatika',
-                'kampus' => 'Universitas Hasanuddin',
-                'status_pernikahan' => 'Menikah',
+                'pendidikan_terakhir' => 'S1 Informatika',
+                'kampus' => 'Universitas Cokroaminoto Palopo',
+                'status_pernikahan' => 'Lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -66,9 +66,9 @@ class UserSeeder extends Seeder
 
         // 2) ADMIN
         $admin = User::query()->updateOrCreate(
-            ['email' => 'admin@rausyanfikr.test'],
+            ['email' => 'arif@rausyanfikr.com'],
             [
-                'name' => 'Admin',
+                'name' => 'Arif Husain',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => $now,
                 'phone' => '081200000002',
@@ -77,7 +77,7 @@ class UserSeeder extends Seeder
                 'wilayah_id' =>2,
                 'level_id' => 2,
                 'status' => 'active',
-                'tempat_lahir' => 'Palopo',
+                'tempat_lahir' => 'Mamuju',
                 'tanggal_lahir' => '1992-05-15',
                 'pendidikan_terakhir' => 'S1 Teknik Informatika',
                 'kampus' => 'Universitas Islam Makassar',
