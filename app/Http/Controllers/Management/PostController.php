@@ -14,7 +14,7 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::latest()->paginate(10);
-        return view('management.berita.index', compact('posts'));
+        return view('management.refleksi.index', compact('posts'));
     }
 
     public function store(Request $request)
@@ -40,7 +40,7 @@ class PostController extends Controller
             'published_at' => now(),
         ]);
 
-        return redirect()->back()->with('success', 'Berita berhasil ditambahkan!');
+        return redirect()->back()->with('success', 'Refleksi berhasil ditambahkan!');
     }
 
     public function update(Request $request, Post $post)
@@ -63,7 +63,7 @@ class PostController extends Controller
         }
 
         $post->update($data);
-        return redirect()->back()->with('success', 'Berita berhasil diperbarui!');
+        return redirect()->back()->with('success', 'Refleksi berhasil diperbarui!');
     }
 
     public function destroy(Post $post)
@@ -72,6 +72,6 @@ class PostController extends Controller
             Storage::disk('public')->delete($post->cover_url);
         }
         $post->delete();
-        return redirect()->back()->with('success', 'Berita berhasil dihapus!');
+        return redirect()->back()->with('success', 'Refleksi berhasil dihapus!');
     }
 }

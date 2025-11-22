@@ -10,7 +10,7 @@
         {{-- ================= FORM INPUT BERITA ================= --}}
         <section class="col-span-4 rounded-xl bg-white p-4 shadow">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="font-semibold">Input Berita</h3>
+                <h3 class="font-semibold">Input Refleksi</h3>
                 <span class="text-sm text-gray-400">Tambah</span>
             </div>
 
@@ -20,21 +20,21 @@
                     <label class="block text-sm mb-1">Judul</label>
                     <input type="text" name="title" required
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                        placeholder="Judul berita...">
+                        placeholder="Judul refleksi ..">
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Ringkasan</label>
                     <textarea name="excerpt" rows="3"
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                        placeholder="Isi singkat berita..."></textarea>
+                        placeholder="Isi singkat refleksi .."></textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm mb-1">Isi Berita Lengkap</label>
+                    <label class="block text-sm mb-1">Isi Refleksi Lengkap</label>
                     <textarea name="content" rows="6"
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                        placeholder="Tulis isi berita lengkap di sini..."></textarea>
+                        placeholder="Tulis isi refleksi lengkap di sini..."></textarea>
                 </div>
 
                 <div>
@@ -45,7 +45,7 @@
 
                 <button type="submit"
                     class="bg-indigo-600 text-white rounded-lg px-4 py-2 w-full font-semibold hover:bg-indigo-700 transition">
-                    Simpan Berita
+                    Simpan Refleksi
                 </button>
             </form>
         </section>
@@ -53,7 +53,7 @@
         {{-- ================= DAFTAR BERITA ================= --}}
         <section class="col-span-8 rounded-xl bg-white p-4 shadow">
             <div class="flex items-center justify-between mb-3">
-                <h3 class="font-semibold">Daftar Berita</h3>
+                <h3 class="font-semibold">Daftar Refleksi</h3>
                 <div class="text-sm text-slate-500">{{ $totalRows }} item</div>
             </div>
 
@@ -89,7 +89,7 @@
                                         </button>
 
                                         <form action="{{ route('management.post.destroy', $post->id) }}" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus berita ini?')">
+                                            onsubmit="return confirm('Yakin ingin menghapus refleksi ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="text-red-600 hover:underline">Hapus</button>
@@ -99,7 +99,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" class="py-4 text-center text-slate-500">Belum ada berita.</td>
+                                <td colspan="4" class="py-4 text-center text-slate-500">Belum ada refleksi </td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -115,7 +115,7 @@
 {{-- ===================== MODAL EDIT ===================== --}}
 <div id="editModal" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
-        <h2 class="text-lg font-semibold mb-3">Edit Berita</h2>
+        <h2 class="text-lg font-semibold mb-3">Edit Refleksi</h2>
         <form id="editForm" method="POST" enctype="multipart/form-data" class="space-y-3">
             @csrf
             @method('PUT')
@@ -135,7 +135,7 @@
             </div>
 
             <div>
-                <label class="block text-sm mb-1">Isi Berita Lengkap</label>
+                <label class="block text-sm mb-1">Isi Refleksi Lengkap</label>
                 <textarea name="content" id="editContent" rows="6"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2"></textarea>
             </div>
