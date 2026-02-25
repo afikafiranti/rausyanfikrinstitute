@@ -16,7 +16,7 @@ class UserSeeder extends Seeder
         $now = Carbon::now();
 
         // Pastikan role tersedia (fallback jika RoleSeeder belum pernah jalan)
-        $roleNames = ['alumni','koorda','admin','super_admin'];
+        $roleNames = ['alumni', 'koorda', 'admin', 'super_admin'];
         foreach ($roleNames as $name) {
             Role::query()->firstOrCreate(
                 ['name' => $name],
@@ -74,7 +74,7 @@ class UserSeeder extends Seeder
                 'phone' => '081200000002',
                 'angkatan' => 2021,
                 'pekerjaan' => 'Administrator',
-                'wilayah_id' =>2,
+                'wilayah_id' => 2,
                 'level_id' => 2,
                 'status' => 'active',
                 'tempat_lahir' => 'Mamuju',
@@ -93,7 +93,7 @@ class UserSeeder extends Seeder
         $koorda = User::query()->updateOrCreate(
             ['email' => 'koorda@rausyanfikr.test'],
             [
-                'name' => 'Kahar Ali Husain',
+                'name' => 'Diah Eka Pratika',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => $now,
                 'phone' => '081200000003',
@@ -102,11 +102,11 @@ class UserSeeder extends Seeder
                 'wilayah_id' => 3,
                 'level_id' => 3,
                 'status' => 'active',
-                'tempat_lahir' => 'Luwu',
+                'tempat_lahir' => 'Gowa',
                 'tanggal_lahir' => '1993-09-09',
-                'pendidikan_terakhir' => 'S1 Hukum',
+                'pendidikan_terakhir' => 'S1 Manajemen',
                 'kampus' => 'Universitas Negeri Makassar',
-                'status_pernikahan' => 'Janda',
+                'status_pernikahan' => 'Menikah',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -138,7 +138,7 @@ class UserSeeder extends Seeder
             ]
         );
         $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
-        
+
         // 5) ALUMNI
         $alumni = User::query()->updateOrCreate(
             ['email' => 'wawan@rausyanfikr.test'],
@@ -163,7 +163,7 @@ class UserSeeder extends Seeder
             ]
         );
         $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
-        
+
         // 6) ALUMNI
         $alumni = User::query()->updateOrCreate(
             ['email' => 'fatryan@rausyanfikr.test'],
@@ -188,6 +188,55 @@ class UserSeeder extends Seeder
             ]
         );
         $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
-        
+
+        // 7) ALUMNI
+        $alumni = User::query()->updateOrCreate(
+            ['email' => 'Paslan@rausyanfikr.com'],
+            [
+                'name' => 'Paslan',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => $now,
+                'phone' => '081200000004',
+                'angkatan' => 2023,
+                'pekerjaan' => 'Karyawan Swasta',
+                'wilayah_id' => 2,
+                'level_id' => 4,
+                'status' => 'active',
+                'tempat_lahir' => 'Luwu Timur',
+                'tanggal_lahir' => '1998-08-20',
+                'pendidikan_terakhir' => 'S1',
+                'kampus' => null,
+                'status_pernikahan' => 'Lajang',
+                'consent_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        );
+        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
+
+        // 8) ALUMNI
+        $alumni = User::query()->updateOrCreate(
+            ['email' => 'Bambang@rausyanfikr.com'],
+            [
+                'name' => 'Bambang',
+                'password' => Hash::make('password123'),
+                'email_verified_at' => $now,
+                'phone' => '081200004948',
+                'angkatan' => 2023,
+                'pekerjaan' => 'Karyawan Swasta',
+                'wilayah_id' => 2,
+                'level_id' => 4,
+                'status' => 'active',
+                'tempat_lahir' => 'Bone',
+                'tanggal_lahir' => '1997-05-20',
+                'pendidikan_terakhir' => 'S1',
+                'kampus' => null,
+                'status_pernikahan' => 'Lajang',
+                'consent_at' => $now,
+                'created_at' => $now,
+                'updated_at' => $now,
+            ]
+        );
+        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
     }
 }

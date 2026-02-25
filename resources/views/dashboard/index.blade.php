@@ -34,7 +34,7 @@
                     <div class="flex items-center justify-between">
                         <div>
                             <div class="text-black font-semibold">Verifikasi Pending</div>
-                            <div class="text-sm text-slate-800">Akun menunggu persetujuan Koorda</div>
+                            <div class="text-sm text-slate-800">Akun menunggu persetujuan Koordonator Daerah</div>
                         </div>
                         <div class="flex items-center gap-3">
                             <div class="rf-badge bg-yellow-100 text-yellow-800">{{ $pendingCount }} akun</div>
@@ -76,7 +76,7 @@
             <div class="col-span-6 rounded-lg bg-white p-4 shadow">
                 <h3 class="font-semibold mb-3">Status Pernikahan Alumni</h3>
                 <div class="relative h-350-px">
-                    <div id="chartStatusPernikahan" class="w-full h-72"></div>
+                    <div id="chartStatusPernikahan" class="w-full h-96"></div>
                 </div>
             </div>
 
@@ -408,131 +408,84 @@
     </script>
 
     {{-- ========================= PIE CHART STATUS PERNIKAHAN ========================= --}}
-    <script>
-        (function() {
-            fetch('/charts/alumni/status-pernikahan')
-                .then(res => res.json())
-                .then(res => {
 
-                    const optionsStatus = {
+    <script>
+        window.addEventListener('load', function() {
+
+            fetch('/charts/alumni/status-pernikahan')
+                .then(response => response.json())
+                .then(data => {
+
+                    const el = document.querySelector("#chartStatusPernikahan");
+
+                    const chart = new ApexCharts(el, {
                         chart: {
                             type: 'pie',
-                            height: 300,
-                            toolbar: {
-                                show: false
-                            }
+                            height: 300
                         },
-
-                        labels: res.labels,
-
-                        series: res.values,
-
-                        colors: [
-                            '#ef4444', // merah pastel
-                            '#60a5fa', // biru pastel
-                            '#fbbf24', // kuning pastel
-                            '#34d399', // hijau pastel
-                            '#a78bfa' // ungu pastel
-                        ],
-
+                        labels: data.labels,
+                        series: data.values,
                         legend: {
                             show: true,
-                            position: 'bottom',
-                            horizontalAlign: 'center',
-                            fontSize: '13px',
-                            itemMargin: {
-                                horizontal: 10,
-                                vertical: 0
-                            },
-                            markers: {
-                                width: 10,
-                                height: 10,
-                                radius: 12
-                            }
-                        },
-
-                        dataLabels: {
-                            enabled: true,
-                            formatter: val => val.toFixed(1) + "%"
-                        },
-
-                        tooltip: {
-                            y: {
-                                formatter: val => val + " orang"
-                            }
+                            position: 'bottom'
                         }
-                    };
+                    });
 
-                    new ApexCharts(
-                        document.querySelector("#chartStatusPernikahan"),
-                        optionsStatus
-                    ).render();
-
+                    chart.render();
                 });
-        })();
+
+        });
     </script>
+
+    {{-- <script>
+        window.addEventListener('load', function() {
+
+            const options = {
+                chart: {
+                    type: 'pie',
+                    height: 300
+                },
+                labels: ['Duda', 'Janda', 'Lajang', 'Menikah'],
+                series: [1, 1, 5, 1],
+                legend: {
+                    show: true,
+                    position: 'bottom'
+                }
+            };
+
+            new ApexCharts(
+                document.querySelector("#chartStatusPernikahan"),
+                options
+            ).render();
+
+        });
+    </script> --}}
 
 
     {{-- ========================= PIE CHART STATUS AB ========================= --}}
     <script>
-        (function() {
+        window.addEventListener('load', function() {
             fetch('/charts/alumni/ab')
                 .then(res => res.json())
-                .then(res => {
+                .then(data => {
 
-                    const optionsAB = {
-                        chart: {
-                            type: 'pie',
-                            height: 300,
-                            toolbar: {
-                                show: false
-                            }
-                        },
-
-                        labels: res.labels,
-                        series: res.values,
-
-                        colors: [
-                            '#4ade80', // hijau pastel lebih cerah
-                            '#93c5fd' // biru pastel lebih jelas
-                        ],
-
-                        legend: {
-                            show: true,
-                            position: 'bottom',
-                            horizontalAlign: 'center',
-                            fontSize: '13px',
-                            itemMargin: {
-                                horizontal: 10
+                    const chart = new ApexCharts(
+                        document.querySelector("#chartAb"), {
+                            chart: {
+                                type: 'pie',
+                                height: 300
                             },
-                            markers: {
-                                width: 10,
-                                height: 10,
-                                radius: 12
-                            },
-                            labels: {
-                                colors: "#475569"
-                            }
-                        },
-
-                        dataLabels: {
-                            enabled: true,
-                            formatter: val => val.toFixed(1) + "%"
-                        },
-
-                        tooltip: {
-                            y: {
-                                formatter: val => val + " orang"
+                            labels: data.labels,
+                            series: data.values,
+                            legend: {
+                                show: true,
+                                position: 'bottom'
                             }
                         }
-                    };
+                    );
 
-                    new ApexCharts(
-                        document.querySelector("#chartAb"),
-                        optionsAB
-                    ).render();
-
+                    chart.render();
                 });
-        })();
+        });
     </script>
 @endsection
