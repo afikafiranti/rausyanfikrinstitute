@@ -30,11 +30,13 @@ class UserSeeder extends Seeder
             ['name' => 'Luwu', 'parent_id' => null, 'kode' => 'LUW', 'updated_at' => $now, 'created_at' => $now]
         );
 
-        // Pastikan Level ID=1 ada (fallback)
-        DB::table('levels')->updateOrInsert(
-            ['id' => 1],
-            ['name' => 'Level 1', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now]
-        );
+        // Pastikan level materi tersedia (fallback jika LevelSeeder belum pernah jalan)
+        DB::table('levels')->upsert([
+            ['id' => 1, 'name' => 'Level 1', 'description' => 'dasar', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
+            ['id' => 2, 'name' => 'Level 2', 'description' => 'menengah', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
+            ['id' => 3, 'name' => 'Level 3', 'description' => 'lanjutan', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
+            ['id' => 4, 'name' => 'Level 4', 'description' => 'akhir', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
+        ], ['id'], ['name', 'description', 'is_active', 'updated_at']);
 
         // Helper ambil id role
         $roleId = fn(string $r) => Role::query()->where('name', $r)->value('id');
@@ -50,7 +52,7 @@ class UserSeeder extends Seeder
                 'angkatan' => 2020,
                 'pekerjaan' => 'Admin Sistem',
                 'wilayah_id' => 1,
-                'level_id' => 1,
+                'level_id' => 4,
                 'status' => 'active',
                 'tempat_lahir' => 'Palopo',
                 'tanggal_lahir' => '1990-01-01',
@@ -75,7 +77,7 @@ class UserSeeder extends Seeder
                 'angkatan' => 2021,
                 'pekerjaan' => 'Administrator',
                 'wilayah_id' => 2,
-                'level_id' => 2,
+                'level_id' => 4,
                 'status' => 'active',
                 'tempat_lahir' => 'Mamuju',
                 'tanggal_lahir' => '1992-05-15',

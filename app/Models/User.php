@@ -45,6 +45,11 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->roles()->whereIn('name', $roles)->exists();
     }
 
+    public function hasAnyRole(string|array $roles): bool
+    {
+        return $this->hasRole($roles);
+    }
+
     public function isAdminLike(): bool
     {
         // sesuaikan dengan data DB Anda: super_admin, admin, koorda
@@ -54,8 +59,20 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function getAvatarUrlAttribute(): ?string
     {
-        $url  = $this->attributes['avatar_url'] ?? null;
-        if ($url && Str::startsWith($url, ['http://','https://'])) return $url;
+        $url = $this->attributes['avatar_url'] ?? $this->attributes['photo_url'] ?? null;
+        if ($url) {
+            if (Str::startsWith($url, ['http://','https://','/storage/'])) {
+                return $url;
+            }
+
+            if (Str::startsWith($url, 'storage/')) {
+                return "/{$url}";
+            }
+
+            if (Storage::disk('public')->exists($url)) {
+                return Storage::url($url);
+            }
+        }
 
         $path = $this->attributes['avatar_path'] ?? $this->attributes['avatar'] ?? $this->attributes['photo'] ?? null;
         if ($path) {
