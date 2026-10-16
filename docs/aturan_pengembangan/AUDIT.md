@@ -14,6 +14,37 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 
 ## Audit Status Saat Ini
 
+### Baseline Audit dan Pemilik Perbaikan — 2026-10-16
+
+Catatan ini menjadi acuan risiko terbaru. Label terkendali pada catatan lama hanya berlaku untuk skenario yang dahulu diuji; label itu tidak membuktikan batas wilayah, status, dan semua workflow sudah aman. Seluruh perbaikan di bawah masih TODO.
+
+| Prioritas | Risiko teridentifikasi dari kode | Pemilik/task |
+|---|---|---|
+| P0 | Koorda melewati pembatasan wilayah pada daftar/verifikasi; detail alumni tidak memeriksa wilayah | A0 |
+| P0 | Materi tanpa level tidak difilter; kelayakan status akun belum diperiksa | A0 |
+| P0 | Dashboard tidak memiliki middleware auth | B0 |
+| P0 | CI menyiapkan SQLite, PHPUnit menunjuk MySQL; query MONTH() memerlukan penyesuaian bila memakai SQLite | B0 |
+| P0 | File environment ter-track berisi APP_KEY; pemakaian kunci pada server nyata belum diketahui | B0 |
+| P0 | Seeder akun dapat menimpa password/profil akun yang sudah ada; wajib selesai sebelum seed/rilis dengan data nyata | A0 |
+| P1 | Registrasi publik terhalang auth; register dari sesi aktif mengganti pengguna yang login; akun baru perlu role/wilayah yang benar | A1 |
+| P1 | Field profil belum seluruhnya divalidasi sesuai schema; sorting relasi tanpa join dapat gagal | A1 |
+| P1 | Payload audit di-encode dua kali; sebagian perubahan/audit tidak atomik; notifikasi reject mendahului pemeriksaan status | A1 |
+| P1 | File post/galeri lama dihapus sebelum pembaruan berhasil; slug dari judul dapat berbenturan | B1 |
+| P1 | Dashboard memiliki angka demo/perhitungan bulan tanpa tahun; homepage aktif belum terhubung CRUD konten | B1 |
+| P2 | Form laporan belum menyimpan; middleware alias/view review belum tersedia; alur review masih placeholder | B2; sembunyikan aksi belum berfungsi dalam B1 |
+| P2 | Materi, impor/ekspor alumni, dan laporan belum lengkap sesuai target produk | A2/B2 |
+
+Guardrail kerja paralel:
+
+- Ikuti pembagian file dan blok routes/web.php dalam PLAN.md; jangan melakukan format ulang file bersama.
+- Gunakan role/status/schema existing agar implementasi masing-masing tidak menunggu helper atau migration jalur lain.
+- B memakai kelas ScopeWilayah langsung bila alias belum tersedia; A tetap memiliki middleware/bootstrap dan gate.
+- Hasil test per branch tidak menggantikan test hasil merge, terutama gate A terhadap dashboard/konten/laporan B.
+- Jangan menjalankan test dengan RefreshDatabase atau migration destruktif pada database bersama/produksi.
+- Rotasi kunci lingkungan nyata memerlukan penilaian data terenkripsi; menghapus file dari Git saja tidak membatalkan kunci yang sudah tersebar.
+
+Verifikasi baseline: lint 108 file PHP pada PHP 8.4 dan validasi composer.json berhasil. Test aplikasi terhalang vendor yang belum tersedia; build frontend terhalang dependensi Vite yang belum terpasang. Browser, PHP 8.3 runtime, dan server aktif belum diuji. Tidak ada kode aplikasi yang diubah pada audit maupun penyusunan pembagian ini.
+
 ### Alumni Store
 Status: terkendali dan sudah memiliki automated test.
 

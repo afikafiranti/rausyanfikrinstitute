@@ -11,6 +11,42 @@ Status yang digunakan:
 
 ## Ringkasan Status Saat Ini
 
+### Pembagian Aktif Dua Orang — 2026-10-16
+
+Rencana aktif dan batas file ada di PLAN.md pada bagian Rencana Aktif: Dua Orang Bekerja Paralel. Tidak ada perbaikan kode yang dinyatakan selesai oleh pencatatan ini.
+
+| ID | Pemilik | Prioritas | Status | Pekerjaan |
+|---|---|---|---|---|
+| A0 | Pengembang A / dev-A | P0 | TODO | Scope koorda pada daftar/detail/tindakan; gate konten; akses materi menurut status/level; seeder akun aman; test negatif |
+| B0 | Pengembang B / dev-B | P0 | TODO | PHP 8.3, database test dan CI konsisten, konfigurasi lingkungan aman, auth dashboard |
+| A1 | Pengembang A / dev-A | P1 | TODO | Registrasi/role/wilayah, validasi, sorting, audit/transaksi/notifikasi |
+| B1 | Pengembang B / dev-B | P1 | TODO | Dashboard nyata, grafik, upload aman, slug/route konten, integrasi homepage |
+| A2 | Pengembang A / dev-A | P2 | TODO | CRUD dan penggunaan materi, pencarian, impor/ekspor alumni |
+| B2 | Pengembang B / dev-B | P2 | TODO | Submit/review/rekap laporan, export, QA publik dan kesiapan rilis |
+| MERGE | Penggabung PR | Per batch | TODO | Resolusi blok route, test gabungan PHP 8.3, cek migration/lockfile, sinkronisasi dokumen |
+
+Selama paralel, masing-masing orang membuat CATATAN_JALUR_A.md atau CATATAN_JALUR_B.md di folder dokumentasi ini untuk status task, risiko, dan hasil test. Dokumen pusat diperbarui oleh penggabung setelah merge. Pekerjaan tiap jalur dapat dimulai dari commit dasar yang sama; urutan penggabungan B0 lalu A0 hanya untuk integrasi.
+
+### DONE: Penyusunan Pembagian Kerja Paralel
+
+Tanggal: 2026-10-16.
+
+- Membagi perbaikan hasil audit ke dua pemilik dengan prioritas P0/P1/P2.
+- Menetapkan kepemilikan controller/model/view/test/toolchain serta blok route bersama.
+- Menetapkan kontrak role/status/schema existing dan larangan perubahan kontrak sepihak.
+- Menentukan kriteria selesai, pengujian mandiri, dan pemeriksaan hasil merge.
+- Verifikasi tugas ini terbatas pada konsistensi dokumen dan diff; tidak mengubah atau menguji ulang kode aplikasi.
+
+### DONE: Aturan Pembuka Sesi Agen A/B
+
+Tanggal: 2026-10-16.
+
+- Menambahkan AGENTS.md pada root agar agen baru membaca penugasan, prioritas, kepemilikan file, kontrak, dan prosedur merge.
+- Menetapkan dev-A untuk pengguna dan dev-B untuk rekan pengembang; branch dev-B belum dibuat lokal.
+- Menetapkan default Jalur B untuk sesi baru tanpa penugasan di luar dev-A, dengan pemeriksaan branch/status sebelum mengedit.
+- Menyelaraskan SOP pencatatan per jalur agar dokumen pusat tidak diedit bersamaan.
+- File aturan dan rencana perlu di-commit serta dibagikan melalui baseline develop sebelum tersedia di checkout rekan.
+
 Project berada pada fase:
 - V1 Data Alumni: berjalan dan sebagian besar sudah aktif.
 - V2 Materi Kajian: awal dan perlu perapian schema.

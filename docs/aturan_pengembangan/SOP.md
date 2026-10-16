@@ -32,6 +32,16 @@ Setelah coding:
 4. Update `AUDIT.md` jika ada risiko tersisa.
 5. Pastikan dokumen tidak saling bertentangan.
 
+## 2A. Pengecualian Pencatatan Saat Dua Jalur Paralel
+
+Berlaku untuk pembagian A/B sejak 2026-10-16 dan menggantikan kewajiban mengedit dokumen pusat pada bagian 2 selama implementasi paralel.
+
+- Baca AGENTS.md pada root saat memulai sesi. dev-A adalah Jalur A; dev-B adalah Jalur B. Ikuti kepemilikan file dan prioritas aktif dalam PLAN.md.
+- Sebelum coding dan setelah verifikasi, catat status task, perubahan, risiko, serta hasil test pada CATATAN_JALUR_A.md atau CATATAN_JALUR_B.md di folder ini. Buat file jalur sendiri saat mulai implementasi.
+- PLAN/PRD/TASK/AUDIT/SOP dan AGENTS.md tidak diedit kedua jalur selama implementasi. Pembaruan atas permintaan eksplisit pengguna tetap diperbolehkan.
+- Penggabung menyinkronkan dokumen pusat dari catatan kedua jalur setelah merge dan mencatat hasil pengujian gabungan.
+- Perubahan scope/kontrak lintas jalur dicatat untuk integrasi; jangan mengubah kepemilikan file atau kontrak bersama secara sepihak.
+
 ## 3. Workflow Sub-Agen
 
 Pengembangan dikelola sebagai tim sub-agen spesialis. Dalam praktik kerja, sub-agen dapat bekerja simultan pada area yang tidak saling menimpa.
