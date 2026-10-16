@@ -58,7 +58,7 @@ class AlumniDetailTest extends TestCase
             'is_active' => true,
         ]);
 
-        $admin = User::factory()->create();
+        $admin = User::factory()->create(['status' => User::STATUS_ACTIVE]);
         $admin->roles()->attach($adminRole->id);
 
         $alumni = User::factory()->create([
@@ -192,8 +192,9 @@ class AlumniDetailTest extends TestCase
 
     public function test_koorda_does_not_see_level_update_form(): void
     {
-        $koordaActor = $this->userWithRole('koorda');
-        $alumni = $this->userWithRole('alumni', ['level_id' => $this->level('Level 1', 'Dasar')->id]);
+        $this->seed(WilayahSeeder::class);
+        $koordaActor = $this->userWithRole('koorda', ['wilayah_id' => 1]);
+        $alumni = $this->userWithRole('alumni', ['wilayah_id' => 1, 'level_id' => $this->level('Level 1', 'Dasar')->id]);
 
         $response = $this
             ->actingAs($koordaActor)

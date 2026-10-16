@@ -8,11 +8,13 @@
     <div class="rounded-xl bg-white p-6 shadow max-w-7xl mx-auto">
         <h2 class="text-2xl font-semibold mb-6">Daftar Alumni</h2>
 
-        <div class="mb-4">
+        <div class="mb-4 flex flex-wrap gap-2">
             <button onclick="document.getElementById('modal-register-alumni').classList.remove('hidden')"
                 class="rf-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-2">
                 <i class="fas fa-plus"></i> Tambah Alumni
             </button>
+            <a href="{{ route('alumni.csv.index', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Impor Excel</a>
+            <a href="{{ route('alumni.excel.export', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Ekspor Excel sesuai filter</a>
         </div>
 
         @if (session('success'))
@@ -285,6 +287,19 @@
                         <input type="email" name="email" value="{{ old('email') }}" required class="w-full rounded-lg border-slate-300">
                         @error('email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label for="new-alumni-wilayah" class="block text-sm mb-1">Wilayah</label>
+                        <select id="new-alumni-wilayah" name="wilayah_id" required class="w-full rounded-lg border-slate-300">
+                            <option value="">Pilih wilayah</option>
+                            @foreach ($wilayah as $region)
+                                <option value="{{ $region->id }}" @selected(old('wilayah_id', auth()->user()->wilayah_id) == $region->id)>{{ $region->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('wilayah_id')
+                            <p class="mt-1 text-sm text-red-600" role="alert">{{ $message }}</p>
                         @enderror
                     </div>
 

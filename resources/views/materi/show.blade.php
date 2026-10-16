@@ -22,13 +22,18 @@
             <p class="mb-6 text-sm leading-6 text-slate-600">{{ $playlist->description }}</p>
         @endif
 
+        <a href="https://www.youtube.com/playlist?list={{ rawurlencode($playlist->youtube_playlist_id) }}"
+            class="mb-6 inline-block text-indigo-600 underline" target="_blank" rel="noopener noreferrer">
+            Buka playlist di YouTube (tab baru)
+        </a>
+
         <div class="overflow-x-auto">
             <table class="min-w-full text-sm">
                 <thead class="border-b text-left text-slate-600">
                     <tr>
                         <th class="py-2 pr-4">No</th>
                         <th class="py-2 pr-4">Judul Video</th>
-                        <th class="py-2 pr-4">YouTube ID</th>
+                        <th class="py-2 pr-4">Tonton</th>
                         <th class="py-2">Durasi</th>
                     </tr>
                 </thead>
@@ -37,7 +42,11 @@
                         <tr>
                             <td class="py-2 pr-4">{{ $loop->iteration }}</td>
                             <td class="py-2 pr-4 font-medium text-slate-800">{{ $video->title }}</td>
-                            <td class="py-2 pr-4">{{ $video->youtube_video_id }}</td>
+                            <td class="py-2 pr-4">
+                                <a href="https://www.youtube.com/watch?v={{ rawurlencode($video->youtube_video_id) }}"
+                                    class="text-indigo-600 underline" target="_blank" rel="noopener noreferrer"
+                                    aria-label="Tonton {{ $video->title }} di YouTube (tab baru)">Tonton di YouTube (tab baru)</a>
+                            </td>
                             <td class="py-2">{{ $video->duration_sec ? gmdate('H:i:s', $video->duration_sec) : '-' }}</td>
                         </tr>
                     @empty
