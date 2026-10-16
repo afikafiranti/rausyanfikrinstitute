@@ -4,7 +4,6 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Carbon;
 use App\Models\User;
 use App\Models\Role;
@@ -13,36 +12,19 @@ class UserSeeder extends Seeder
 {
     public function run(): void
     {
-        $now = Carbon::now();
-
-        // Pastikan role tersedia (fallback jika RoleSeeder belum pernah jalan)
-        $roleNames = ['alumni', 'koorda', 'admin', 'super_admin'];
-        foreach ($roleNames as $name) {
-            Role::query()->firstOrCreate(
-                ['name' => $name],
-                ['created_at' => $now, 'updated_at' => $now]
-            );
+        if (! app()->environment(['local', 'testing'])) {
+            return;
         }
 
-        // Pastikan Wilayah ID=1 ada (fallback)
-        DB::table('wilayah')->updateOrInsert(
-            ['id' => 1],
-            ['name' => 'Luwu', 'parent_id' => null, 'kode' => 'LUW', 'updated_at' => $now, 'created_at' => $now]
-        );
+        $now = Carbon::now();
 
-        // Pastikan level materi tersedia (fallback jika LevelSeeder belum pernah jalan)
-        DB::table('levels')->upsert([
-            ['id' => 1, 'name' => 'Level 1', 'description' => 'dasar', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
-            ['id' => 2, 'name' => 'Level 2', 'description' => 'menengah', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
-            ['id' => 3, 'name' => 'Level 3', 'description' => 'lanjutan', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
-            ['id' => 4, 'name' => 'Level 4', 'description' => 'akhir', 'is_active' => true, 'updated_at' => $now, 'created_at' => $now],
-        ], ['id'], ['name', 'description', 'is_active', 'updated_at']);
+        $this->call([RoleSeeder::class, LevelSeeder::class, WilayahSeeder::class]);
 
         // Helper ambil id role
         $roleId = fn(string $r) => Role::query()->where('name', $r)->value('id');
 
         // 1) SUPER ADMIN
-        $super = User::query()->updateOrCreate(
+        $super = User::query()->firstOrCreate(
             ['email' => 'afika@rausyanfikr.com'],
             [
                 'name' => 'Nur Afika Firanti',
@@ -64,10 +46,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $super->roles()->syncWithoutDetaching([$roleId('super_admin')]);
+        if ($super->wasRecentlyCreated) {
+            $super->roles()->attach($roleId('super_admin'));
+        }
 
         // 2) ADMIN
-        $admin = User::query()->updateOrCreate(
+        $admin = User::query()->firstOrCreate(
             ['email' => 'arif@rausyanfikr.com'],
             [
                 'name' => 'Arif Husain',
@@ -89,10 +73,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $admin->roles()->syncWithoutDetaching([$roleId('admin')]);
+        if ($admin->wasRecentlyCreated) {
+            $admin->roles()->attach($roleId('admin'));
+        }
 
         // 3) KOORDA
-        $koorda = User::query()->updateOrCreate(
+        $koorda = User::query()->firstOrCreate(
             ['email' => 'koorda@rausyanfikr.test'],
             [
                 'name' => 'Diah Eka Pratika',
@@ -114,10 +100,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $koorda->roles()->syncWithoutDetaching([$roleId('koorda')]);
+        if ($koorda->wasRecentlyCreated) {
+            $koorda->roles()->attach($roleId('koorda'));
+        }
 
         // 4) ALUMNI
-        $alumni = User::query()->updateOrCreate(
+        $alumni = User::query()->firstOrCreate(
             ['email' => 'nadia@rausyanfikr.test'],
             [
                 'name' => 'Nadia Waris',
@@ -139,10 +127,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
+        if ($alumni->wasRecentlyCreated) {
+            $alumni->roles()->attach($roleId('alumni'));
+        }
 
         // 5) ALUMNI
-        $alumni = User::query()->updateOrCreate(
+        $alumni = User::query()->firstOrCreate(
             ['email' => 'wawan@rausyanfikr.test'],
             [
                 'name' => 'Wawan',
@@ -164,10 +154,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
+        if ($alumni->wasRecentlyCreated) {
+            $alumni->roles()->attach($roleId('alumni'));
+        }
 
         // 6) ALUMNI
-        $alumni = User::query()->updateOrCreate(
+        $alumni = User::query()->firstOrCreate(
             ['email' => 'fatryan@rausyanfikr.test'],
             [
                 'name' => 'Fatryan',
@@ -189,10 +181,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
+        if ($alumni->wasRecentlyCreated) {
+            $alumni->roles()->attach($roleId('alumni'));
+        }
 
         // 7) ALUMNI
-        $alumni = User::query()->updateOrCreate(
+        $alumni = User::query()->firstOrCreate(
             ['email' => 'Paslan@rausyanfikr.com'],
             [
                 'name' => 'Paslan',
@@ -214,10 +208,12 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
+        if ($alumni->wasRecentlyCreated) {
+            $alumni->roles()->attach($roleId('alumni'));
+        }
 
         // 8) ALUMNI
-        $alumni = User::query()->updateOrCreate(
+        $alumni = User::query()->firstOrCreate(
             ['email' => 'Bambang@rausyanfikr.com'],
             [
                 'name' => 'Bambang',
@@ -239,6 +235,8 @@ class UserSeeder extends Seeder
                 'updated_at' => $now,
             ]
         );
-        $alumni->roles()->syncWithoutDetaching([$roleId('alumni')]);
+        if ($alumni->wasRecentlyCreated) {
+            $alumni->roles()->attach($roleId('alumni'));
+        }
     }
 }

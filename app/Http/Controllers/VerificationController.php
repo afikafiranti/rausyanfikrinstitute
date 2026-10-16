@@ -22,8 +22,8 @@ class VerificationController extends Controller
             ->where('status', User::STATUS_PENDING)
             ->with(['wilayah:id,name', 'level:id,name']);
 
-        if (!$me->isAdminLike()) {
-            // Koorda hanya lihat user di wilayahnya
+        if (!$me->hasAnyRole(['super_admin', 'admin'])) {
+            abort_unless($me->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
             $query->where('wilayah_id', $me->wilayah_id);
         }
 
@@ -43,7 +43,8 @@ class VerificationController extends Controller
         }
 
         // Koorda hanya wilayahnya sendiri
-        if (!$me->isAdminLike() && $user->wilayah_id !== $me->wilayah_id) {
+        if (!$me->hasAnyRole(['super_admin', 'admin'])
+            && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
             abort(403);
         }
 
@@ -98,7 +99,8 @@ class VerificationController extends Controller
             return back()->withErrors(['msg' => 'Tidak boleh menolak akun sendiri.']);
         }
 
-        if (!$me->isAdminLike() && $user->wilayah_id !== $me->wilayah_id) {
+        if (!$me->hasAnyRole(['super_admin', 'admin'])
+            && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
             abort(403);
         }
         $user->notify(new AccountStatusNotification('rejected', [

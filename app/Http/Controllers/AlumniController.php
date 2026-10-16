@@ -17,7 +17,11 @@ class AlumniController extends Controller
 {
     public function index(Request $request)
     {
-        $me = $request->user(); 
+        $me = $request->user();
+        $canViewAll = $me->hasAnyRole(['super_admin', 'admin']);
+        abort_if(!$canViewAll && !$me->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
+        $scopedUsers = User::query()
+            ->when(!$canViewAll, fn ($query) => $query->where('wilayah_id', $me->wilayah_id));
 
         $q          = trim((string) $request->input('q'));
         $angkatan   = trim((string) $request->input('angkatan'));
@@ -43,7 +47,7 @@ class AlumniController extends Controller
         // ==========================
         // QUERY UTAMA + RELASI ROLES
         // ==========================
-        $query = User::with([
+        $query = (clone $scopedUsers)->with([
             'wilayah:id,name',
             'level:id,description',
             'roles:id,name'    // <-- WAJIB AGAR ROLE TAMPIL
@@ -52,11 +56,6 @@ class AlumniController extends Controller
         // Filter level
         if ($levelId) {
             $query->where('level_id', $levelId);
-        }
-
-        // Batasi wilayah untuk non-admin
-        if (!$me->isAdminLike()) {
-            $query->where('wilayah_id', $me->wilayah_id);
         }
 
         // Filter pencarian
@@ -87,9 +86,11 @@ class AlumniController extends Controller
         $alumni = $query->paginate($perPage)->appends($request->query());
 
         // Dropdown data
-        $wilayah = Wilayah::select('id', 'name')->orderBy('name')->get();
+        $wilayah = Wilayah::select('id', 'name')
+            ->when(!$canViewAll, fn ($query) => $query->whereKey($me->wilayah_id))
+            ->orderBy('name')->get();
         $level   = Level::select('id', 'description')->orderBy('description')->get();
-        $totalAlumni = User::count();
+        $totalAlumni = (clone $scopedUsers)->count();
 
         $activeFilters = [];
         if ($q !== '') {
@@ -115,7 +116,7 @@ class AlumniController extends Controller
         }
 
         // List angkatan
-        $angkatanList = User::whereNotNull('angkatan')
+        $angkatanList = (clone $scopedUsers)->whereNotNull('angkatan')
                             ->distinct()
                             ->orderBy('angkatan')
                             ->pluck('angkatan');
@@ -156,11 +157,16 @@ class AlumniController extends Controller
 
     public function show($id)
     {
+        $me = request()->user();
+        $canViewAll = $me->hasAnyRole(['super_admin', 'admin']);
+        abort_if(!$canViewAll && !$me->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
+
         $alumni = User::with([
             'wilayah:id,name',
             'level:id,description',
             'roles:id,name'   // <-- AGAR ROLE TAMPIL DI HALAMAN DETAIL
-        ])->findOrFail($id);
+        ])->when(!$canViewAll, fn ($query) => $query->where('wilayah_id', $me->wilayah_id))
+            ->findOrFail($id);
 
         $levels = Level::where('is_active', true)
             ->orderBy('id')
