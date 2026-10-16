@@ -8,11 +8,13 @@
     <div class="rounded-xl bg-white p-6 shadow max-w-7xl mx-auto">
         <h2 class="text-2xl font-semibold mb-6">Daftar Alumni</h2>
 
-        <div class="mb-4">
+        <div class="mb-4 flex flex-wrap gap-2">
             <button onclick="document.getElementById('modal-register-alumni').classList.remove('hidden')"
                 class="rf-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-2">
                 <i class="fas fa-plus"></i> Tambah Alumni
             </button>
+            <a href="{{ route('alumni.csv.index', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Impor Excel</a>
+            <a href="{{ route('alumni.excel.export', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Ekspor Excel sesuai filter</a>
         </div>
 
         @if (session('success'))

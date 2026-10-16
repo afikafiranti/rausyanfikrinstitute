@@ -8,19 +8,20 @@ final class AlumniIndexRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->exists();
+        return $this->user() !== null;
     }
 
     public function rules(): array
     {
         return [
             'q'          => ['nullable','string','max:100'],
-            'angkatan'   => ['nullable','string','max:20'],
+            'angkatan'   => ['nullable','integer','between:0,65535'],
             'wilayah_id' => ['nullable','integer','min:1'],
             'level_id'   => ['nullable','integer','min:1'],
-            'status'     => ['nullable','in:pending,active,suspended'],
-            'sort_by'    => ['nullable','in:name,email,angkatan,level_id,wilayah_id,status,created_at'],
-            'sort_dir'   => ['nullable','in:asc,desc'],
+            'ab'         => ['nullable','in:iya,tidak'],
+            'sort'       => ['nullable','in:name,email,angkatan,wilayah,level,status,created_at'],
+            'dir'        => ['nullable','in:asc,desc'],
+            'per_page'   => ['nullable','integer','between:5,100'],
         ];
     }
 }

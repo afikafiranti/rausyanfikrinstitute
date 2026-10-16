@@ -95,4 +95,81 @@ Commit A0: 283cb46 (belum dipush).
 - Audit lama yang sudah tersimpan sebagai JSON berlapis tidak dimigrasikan; catatan baru memakai struktur array yang benar.
 - A0 dan A1 belum dipush pada akhir batch A1; publikasi dan penggabungan menjadi langkah terpisah.
 
-A2 belum dimulai. Dokumen pusat tetap dibekukan sesuai aturan paralel dan disinkronkan oleh penggabung saat merge.
+## A2 — P2: Materi dan Operasi Alumni
+
+Status: DONE pada implementasi dan pengujian lokal; belum di-commit/push.
+Mulai: 2026-10-16.
+
+- A2.1: pencarian judul/deskripsi playlist, tautan menonton video/playlist YouTube, serta hapus aksi edit yang belum tersedia. Test pada GET materi index/detail dengan filter status/level existing tetap berlaku.
+- A2.2: pengelolaan playlist/video oleh admin, DONE pada pengujian lokal.
+- A2.3: impor/ekspor Excel dan CSV alumni beserta template, validasi, dan scope wilayah, DONE pada pengujian lokal.
+- Progress menonton dan sinkronisasi metadata otomatis tetap ditunda sesuai PLAN.
+
+### A2.1 — DONE: Pencarian dan Penggunaan Materi
+
+- Query pencarian judul/deskripsi dikelompokkan di bawah filter playlist aktif dan batas level; input q harus string maksimal 150 karakter. Urutan pagination stabil dan parameter pencarian dipertahankan.
+- Form desktop/mobile memakai label terhubung input, tombol cari, hasil kosong, dan reset pencarian. Tombol edit/tambah tanpa endpoint dihilangkan.
+- Detail menyediakan tautan playlist dan video pada domain YouTube tetap, dengan ID di-URL-encode dan atribut keamanan tab baru. Video mengikuti order_index yang sudah tersedia.
+- Test pencarian dan tautan teramati gagal sebelum implementasi lalu lulus. Target materi: 8 tests/43 assertions. Full suite: PHP 8.3.30, SQLite :memory:, **112 tests passed, 581 assertions**. Lint controller/test dan git diff --check lulus.
+- Review independen tidak menemukan masalah konkret pada scope A2.1. MySQL, browser, pemutaran di layanan YouTube, dan build frontend belum diperiksa; batas akses aplikasi tidak membatasi tautan YouTube setelah diketahui pengguna.
+- File berubah hanya MateriController, view materi index/show, MateriIndexTest, dan catatan jalur ini. Tidak ada perubahan schema, dependensi, route, atau file milik B.
+- A2.1 belum di-commit/push. A2.2 CRUD materi dan A2.3 CSV alumni tetap TODO, sehingga A2 keseluruhan belum selesai.
+
+Dokumen pusat tetap dibekukan sesuai aturan paralel dan disinkronkan oleh penggabung saat merge.
+
+### A2.2 — DONE: CRUD Playlist dan Video
+
+- Admin/super admin aktif mengelola playlist/video melalui gate manage-content existing. Halaman pengelolaan terpisah dari halaman alumni, sehingga draft dan level tinggi dapat dikelola tanpa membuka aksesnya ke alumni.
+- Route baru hanya dalam blok materi milik A; controller/view/test baru tetap pada domain materi. Tidak ada schema/dependensi/file milik B yang diubah.
+- Validasi ID YouTube, level aktif, panjang judul, boolean publikasi, durasi, dan urutan sesuai schema. Route video memeriksa induk playlist untuk mencegah perubahan video milik playlist lain.
+- Form playlist dan video memakai POST/PATCH/DELETE, CSRF, label, dan pesan validasi/sukses existing. Penghapusan playlist memerlukan checkbox konfirmasi karena cascade menghapus video dan progres terkait.
+- Test HTTP: CRUD admin/super admin, penolakan role/status lain, draft tidak bocor ke alumni, validasi ID/level/duplikat, batas parent video, serta cascade delete.
+
+Hasil dan keputusan:
+
+- Halaman kelola dan edit menggunakan controller terpisah MateriManagementController, tanpa mengubah kontrak controller baca materi alumni. Route baru di dalam blok materi sebelum route dinamis /{id}.
+- Level yang dipilih wajib aktif. Bila playlist lama memakai level nonaktif, form menandainya nonaktif dan meminta admin memilih level aktif sebelum menyimpan; tidak melonggarkan aturan publikasi.
+- Input lama dipulihkan hanya pada form yang gagal, dengan penanda form ditentukan server; judul video tidak mengisi ulang judul playlist. Konfirmasi server dan checkbox diperlukan untuk menghapus video maupun playlist karena progres terkait ikut terhapus.
+- Review menemukan admin tanpa level tidak dapat mencapai kelola dari navigasi materi. Regresi dibuktikan gagal lalu diperbaiki: admin aktif tanpa level diarahkan dari materi.index ke materi.manage. Akun alumni tanpa level tetap ditolak sesuai A0.
+- Test materi pada PHP 8.3.30/SQLite :memory: **18 tests passed, 142 assertions**. Full suite final: **121 tests passed, 659 assertions**, tanpa skip. Tidak ada kegagalan tersisa.
+- Pemeriksaan sintaks controller/test dan git diff --check lulus. Form kelola/edit dirender oleh test HTTP; browser, MySQL, CSS build, dan layanan YouTube belum diuji.
+- Review independen mengecek gate, induk video, dan pemisahan draft; temuan navigasi serta kejelasan level nonaktif telah ditangani. Tidak ada schema/dependensi atau file milik B yang berubah.
+- A2.1 dan A2.2 belum di-commit/push. A2.3 impor/ekspor CSV tetap TODO; A2 keseluruhan belum selesai.
+
+### A2.3 — DONE: Impor/Ekspor Alumni
+
+- Impor menambah akun baru saja, dengan enam kolom tetap: name, email, wilayah_id, phone, angkatan, pekerjaan. Header lain (termasuk role/status/level/password) ditolak sebelum penulisan. Batas berkas 1 MiB, UTF-8 dengan BOM opsional, maksimal 200 record data.
+- Setiap baris divalidasi sesuai schema; email/telepon duplikat dan wilayah koorda yang berbeda menjadi laporan kegagalan baris. Baris valid tetap disimpan. Angkatan 0 dipertahankan. Header, encoding, atau jumlah record yang tidak sesuai menolak berkas sebelum akun ditambah.
+- Akun hasil impor berstatus pending, role alumni, tanpa level/verifikasi email, memakai password acak yang tidak ditampilkan atau diekspor. Pemilik akun menyetel kata sandi melalui fitur lupa kata sandi existing; pengiriman email membutuhkan konfigurasi mail operasional.
+- Pembuatan akun, relasi role, dan audit alumni.import berada dalam transaksi per baris. Kegagalan audit membatalkan baris tersebut; baris sebelumnya yang berhasil tetap tersimpan. Gangguan database tak terduga tetap diteruskan sebagai error, bukan diklaim sebagai impor berhasil.
+- Daftar dan ekspor memakai User::alumniListing serta AlumniIndexRequest yang sama. Scope wilayah koorda, pencarian, angkatan, wilayah, level, AB, dan sorting konsisten. Input filter yang salah tipe ditolak melalui validasi, bukan error 500. Ekspor mencakup seluruh hasil filter tanpa batas halaman dan hanya enam kolom profil tersebut.
+- Ekspor menetralkan awalan formula spreadsheet dengan petik tunggal. Nilai tersebut berubah saat diekspor; CSV bukan mekanisme pemulihan data atau pembaruan akun existing.
+- Tautan impor/ekspor ditambahkan pada daftar alumni. Endpoint memakai auth dan gate view-alumni existing, dengan penolakan koorda tanpa wilayah serta akun pending/suspended/alumni biasa. Route statis berada sebelum detail dinamis.
+- Review menemukan kutip CSV yang tidak ditutup dapat menelan record berikutnya. Regresi dibuktikan gagal lalu diperbaiki dengan validasi struktur record mentah sebelum penulisan. Kutip rusak menolak seluruh berkas; koma, kutip ganda, dan newline sah tetap diterima. UI menjelaskan nomor baris sebagai urutan record CSV. Review ulang tidak menemukan masalah baru.
+- Test CSV: **15 tests, 90 assertions**. Full suite PHP 8.3.30 dengan SQLite :memory:: **137 tests passed, 754 assertions**, tanpa skip. Pemeriksaan sintaks file PHP A2.3, route:list alumni, dan git diff --check lulus.
+- Browser, MySQL, pengiriman email nyata, dan build frontend belum diuji. Tidak ada schema/dependensi/file milik B yang diubah sampai tahap CSV. A2.1–A2.3 belum di-commit/push.
+
+#### Perubahan arah A2.3: Excel untuk admin — DONE
+
+- Atas permintaan pengguna, .xlsx menjadi format utama admin, dengan unduh template, unggah Excel, dan ekspor Excel sesuai filter. CSV existing tetap kompatibel.
+- Template satu worksheet Alumni berisi enam header existing; kolom telepon bertipe teks agar nol awal tidak hilang. Halaman menyediakan referensi ID/nama wilayah sesuai izin aktor.
+- Impor tetap menambah akun pending, validasi dan audit transaksi yang sama; formula tidak dihitung, kolom role/level/password ditolak, dan batas wilayah tetap berlaku. Template kosong tidak membuat akun contoh.
+- Pengguna menyetujui pengecualian terbatas composer.json/lock untuk Excel. PhpSpreadsheet **5.10.0** ditambahkan bersama empat dependency wajib (composer/pcre, maennchen/zipstream-php, markbaker/complex, markbaker/matrix): **5 installs, 0 updates, 0 removals**. Tidak ada pembaruan paket lama atau perubahan konfigurasi PHP.
+- Composer check-platform-reqs lulus pada PHP 8.3.30 dengan `-d extension=zip`. ZIP pada PHP 8.4 lokal sudah aktif; PHP 8.3 lokal membutuhkan opsi tersebut saat pengujian atau aktivasi ekstensi pada runtime server. Runtime tim wajib memenuhi kebutuhan Composer.
+- Audit Composer sesudah instalasi melaporkan **48 advisory pada 14 paket existing**; kelima paket baru tidak tercantum. Tindak lanjut jalur B: tinjau pembaruan keamanan paket lama secara terpisah, termasuk Laravel/Symfony/Guzzle/CommonMark dan dependency dev. Paket tersebut sengaja tidak diperbarui dalam pengecualian Excel.
+- Implementasi selesai: template .xlsx kosong satu worksheet Alumni, header tebal/freeze/filter, kolom telepon teks; halaman impor menampilkan urutan langkah serta referensi wilayah sesuai hak aktor. Ekspor Excel menjadi pilihan utama di daftar alumni; CSV tetap tersedia.
+- Pembaca Xlsx khusus memeriksa ZIP maksimal 1000 entry/10 MiB data terurai, lalu listWorksheetInfo bawaan library memeriksa satu sheet, maksimal 201 baris termasuk header dan enam kolom sebelum workbook dimuat. Berkas rusak, sheet tambahan, kolom tambahan, atau batas terlampaui ditolak sebelum akun ditulis.
+- Formula pada data ditolak per baris tanpa evaluasi. Telepon numerik ditolak dengan penjelasan memakai format teks. Nilai ekspor seluruhnya ditulis sebagai teks eksplisit agar nol awal dan teks menyerupai formula tetap aman.
+- Pengujian CSV+Excel: **25 tests, 129 assertions**. Full suite akhir: **148 tests passed, 798 assertions**, PHP 8.3.30 dengan ZIP dan SQLite :memory:, tanpa skip. Sintaks support/controller/test, Composer validate/check-platform-reqs, serta git diff --check lulus. Route baru tetap dalam blok alumni milik A.
+- Review independen akhir tidak menemukan masalah konkret pada akses, formula, kolom tersembunyi, atau pemotongan baris. Batas skala: workbook ekspor Excel dibangun di memori; gunakan CSV streaming untuk data besar, atau ganti writer saat volume melebihi memori PHP. Batas ini dicatat pada kode.
+- A2.1–A2.3 **DONE pada implementasi dan verifikasi lokal**. Belum di-commit/push; browser, MySQL, pengiriman email nyata, dan build frontend belum diuji. Pengecualian file jalur B hanya composer.json/lock yang disetujui pengguna; tidak ada paket existing diperbarui.
+
+#### A2.3 lanjutan: nama wilayah — DONE pada pengujian lokal
+
+- Pengguna sudah membuka halaman melalui browser; impor Excel belum sempat dicoba, bukan laporan kegagalan impor.
+- Atas permintaan pengguna, ekspor Excel/CSV dan template baru memakai kolom wilayah berisi nama, menggantikan ID. Impor mendukung nama wilayah dan tetap menerima template legacy wilayah_id.
+- Nama wilayah dicocokkan terhadap master wilayah sesuai akses aktor, tanpa membuat wilayah baru; nama tidak ditemukan atau ambigu dilaporkan per baris. Koorda tetap terbatas pada wilayah akunnya.
+- UI referensi wilayah menampilkan nama, dan penjelasan template diperbarui. Pencocokan nama mengabaikan huruf besar/kecil dan spasi di awal/akhir. Ekspor memuat relasi wilayah per batch agar tidak membuat query tambahan untuk tiap alumni.
+- Test CSV/Excel: **29 tests, 148 assertions**. Full suite PHP 8.3.30 + ZIP, SQLite :memory:: **152 tests passed, 817 assertions**. Lint keempat file PHP domain impor/ekspor serta git diff --check lulus. Review independen tidak menemukan masalah konkret pada scope wilayah, pemetaan nama, atau kompatibilitas format lama.
+- Uji browser berikutnya: unduh template baru, isi wilayah dengan nama seperti Makassar (telepon sebagai teks), unggah dengan email/telepon baru; coba unggah ulang untuk melihat penolakan duplikat. Coba ekspor setelah filter wilayah dan pastikan nama wilayah tampil.
+- Impor melalui browser/MySQL belum diuji oleh agen; belum ada commit/push tambahan.

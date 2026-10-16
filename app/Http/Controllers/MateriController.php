@@ -10,15 +10,25 @@ class MateriController extends Controller
     public function index()
     {
         $user = auth()->user();
+        if (!$user->level_id && $user->can('manage-content')) {
+            return redirect()->route('materi.manage');
+        }
         abort_unless($user->status === User::STATUS_ACTIVE && $user->level_id, 403, 'Akun aktif dan level materi diperlukan.');
+
+        $validated = request()->validate(['q' => ['nullable', 'string', 'max:150']]);
+        $q = trim($validated['q'] ?? '');
 
         $items = Playlist::with('level')
             ->where('is_active', true)
             ->where('level_id', '<=', $user->level_id)
+            ->when($q !== '', fn ($query) => $query->where(fn ($search) => $search
+                ->where('title', 'like', "%{$q}%")
+                ->orWhere('description', 'like', "%{$q}%")))
             ->orderBy('order_index')
-            ->paginate(10);
+            ->orderBy('id')
+            ->paginate(10)->withQueryString();
 
-        return view('materi.index', compact('items'));
+        return view('materi.index', compact('items', 'q'));
     }
 
     public function show($id)

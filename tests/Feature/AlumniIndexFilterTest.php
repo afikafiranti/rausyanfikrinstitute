@@ -151,6 +151,26 @@ class AlumniIndexFilterTest extends TestCase
         return [['wilayah'], ['level']];
     }
 
+    public function test_malformed_listing_filters_are_rejected(): void
+    {
+        $this->actingAs($this->adminUser())->getJson(route('alumni.index', [
+            'q' => ['unexpected'], 'sort' => 'password', 'ab' => 'invalid',
+        ]))->assertUnprocessable()->assertJsonValidationErrors(['q', 'sort', 'ab']);
+    }
+
+    public function test_excel_import_page_shows_template_and_only_coordinator_region_reference(): void
+    {
+        $own = Wilayah::create(['name' => 'Wilayah Referensi Sendiri']);
+        Wilayah::create(['name' => 'Wilayah Referensi Lain']);
+        $koorda = User::factory()->create(['status' => User::STATUS_ACTIVE, 'wilayah_id' => $own->id]);
+        $koorda->roles()->attach(Role::firstOrCreate(['name' => 'koorda']));
+
+        $this->actingAs($koorda)->get(route('alumni.csv.index'))
+            ->assertOk()->assertSee('Unduh template Excel (.xlsx)')
+            ->assertSee(route('alumni.excel.template'))
+            ->assertSee('Wilayah Referensi Sendiri')->assertDontSee('Wilayah Referensi Lain');
+    }
+
     private function adminUser(): User
     {
         $adminRole = Role::firstOrCreate(['name' => 'admin']);

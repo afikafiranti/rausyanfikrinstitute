@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Http\Requests\AlumniIndexRequest;
 use App\Models\AuditLog;
 use App\Models\User;
 use App\Models\Wilayah;
@@ -15,80 +16,24 @@ use Illuminate\Validation\Rules;
 
 class AlumniController extends Controller
 {
-    public function index(Request $request)
+    public function index(AlumniIndexRequest $request)
     {
         $me = $request->user();
         $canViewAll = $me->hasAnyRole(['super_admin', 'admin']);
-        abort_if(!$canViewAll && !$me->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
-        $scopedUsers = User::query()
-            ->when(!$canViewAll, fn ($query) => $query->where('wilayah_id', $me->wilayah_id));
-
-        $q          = trim((string) $request->input('q'));
-        $angkatan   = trim((string) $request->input('angkatan'));
-        $wilayahId  = $request->integer('wilayah_id');
-        $levelId    = $request->integer('level_id');
-        $ab         = trim((string) $request->input('ab'));
-        $perPage    = min(max((int) $request->input('per_page', 15), 5), 100);
+        $scopedUsers = User::alumniListing($me, [])->reorder();
+        $filters = $request->validated();
+        $q = trim($filters['q'] ?? '');
+        $angkatan = (string) ($filters['angkatan'] ?? '');
+        $wilayahId = (int) ($filters['wilayah_id'] ?? 0);
+        $levelId = (int) ($filters['level_id'] ?? 0);
+        $ab = $filters['ab'] ?? '';
+        $perPage = (int) ($filters['per_page'] ?? 15);
         $hasFilters = $q !== '' || $angkatan !== '' || $wilayahId > 0 || $levelId > 0 || $ab !== '';
-
-        // Kolom yang diizinkan untuk sorting
-        $sortMap = [
-            'name'       => 'users.name',
-            'email'      => 'users.email',
-            'angkatan'   => 'users.angkatan',
-            'wilayah'    => 'wilayah.name',
-            'level'      => 'levels.description',
-            'status'     => 'users.status',
-            'created_at' => 'users.created_at',
-        ];
-        $sort = $sortMap[$request->input('sort', 'created_at')] ?? 'users.created_at';
-        $dir  = $request->input('dir') === 'asc' ? 'asc' : 'desc';
-
-        // ==========================
-        // QUERY UTAMA + RELASI ROLES
-        // ==========================
-        $query = (clone $scopedUsers)->with([
-            'wilayah:id,name',
-            'level:id,description',
-            'roles:id,name'    // <-- WAJIB AGAR ROLE TAMPIL
-        ]);
-
-        // Filter level
-        if ($levelId) {
-            $query->where('level_id', $levelId);
-        }
-
-        // Filter pencarian
-        if ($q !== '') {
-            $query->where(function ($x) use ($q) {
-                $x->where('users.name', 'like', "%{$q}%")
-                  ->orWhere('users.email', 'like', "%{$q}%");
-            });
-        }
-
-        // Filter angkatan
-        if ($angkatan !== '') {
-            $query->where('angkatan', $angkatan);
-        }
-
-        // Filter wilayah
-        if ($wilayahId) {
-            $query->where('wilayah_id', $wilayahId);
-        }
-
-        // Filter AB
-        if ($ab !== '') {
-            $query->where('ab', $ab);
-        }
-
-        // Sorting & pagination
-        if ($sort === 'wilayah.name') {
-            $query->leftJoin('wilayah', 'wilayah.id', '=', 'users.wilayah_id')->select('users.*');
-        } elseif ($sort === 'levels.description') {
-            $query->leftJoin('levels', 'levels.id', '=', 'users.level_id')->select('users.*');
-        }
-        $query = $query->orderBy($sort, $dir);
-        $alumni = $query->paginate($perPage)->appends($request->query());
+        $sort = $filters['sort'] ?? 'created_at';
+        $dir = ($filters['dir'] ?? '') === 'asc' ? 'asc' : 'desc';
+        $alumni = User::alumniListing($me, $filters)
+            ->with(['wilayah:id,name', 'level:id,description', 'roles:id,name'])
+            ->paginate($perPage)->appends($request->query());
 
         // Dropdown data
         $wilayah = Wilayah::select('id', 'name')
