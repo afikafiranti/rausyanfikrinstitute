@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\Validation\Rules\Password;
 use App\Http\Requests\ProfileUpdateRequest;
 
 
@@ -30,80 +31,76 @@ class ProfileController extends Controller
     public function update(ProfileUpdateRequest $request)
     {
         $user = $request->user();
-
-        $before = $user->only([
+        $fields = [
             'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
-            'tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan','ab' // <-- AB
-        ]);
+            'tempat_lahir', 'tanggal_lahir', 'pendidikan_terakhir', 'kampus', 'status_pernikahan', 'ab',
+        ];
+        $before = $user->only($fields);
+        $oldPhotoUrl = $user->photo_url;
+        $newPhotoPath = null;
 
-        // Upload foto (opsional)
-        $photoUrl = $user->photo_url;
-        if ($request->hasFile('photo')) {
-            $path = $request->file('photo')->store('avatars', 'public');
-            $photoUrl = Storage::url($path);
-        }
-
-        $newEmail = (string) $request->input('email');
-
-        // Isi data baru
-        $user->fill([
-            'name'       => (string) $request->input('name'),
-            'email'      => $newEmail,
-            'phone'      => $request->input('phone'),
-            'tempat_lahir'      => $request->input('tempat_lahir'),
-            'tanggal_lahir'      => $request->input('tanggal_lahir'),
-            'pendidikan_terakhir'      => $request->input('pendidikan_terakhir'),
-            'kampus'      => $request->input('kampus'),
-            'status_pernikahan'      => $request->input('status_pernikahan'),
-            'ab'          => $request->input('ab'), // <-- AB
-            'angkatan'   => $request->input('angkatan'),
-            'pekerjaan'  => $request->input('pekerjaan'),
-            'wilayah_id' => $request->integer('wilayah_id') ?: null,
-            'photo_url'  => $photoUrl,
-        ]);
-
-        // Reset verifikasi jika email berubah
-        if ($user->isDirty('email')) {
-            $user->email_verified_at = null;
-        }
-
-        // Jika wilayah/angkatan berubah → pending
-        $criticalChanged = $user->isDirty('wilayah_id') || $user->isDirty('angkatan');
-        if ($criticalChanged) {
-            $user->status = User::STATUS_PENDING;
-        }
-
-        $user->save();
-
-        if ($criticalChanged) {
-            $user->notify(new \App\Notifications\AccountStatusNotification('pending', [
-                'by' => $request->user()->name,
-            ]));
-        }
-
-        // Audit perubahan
-        $after = $user->only([
-            'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
-            'tempat_lahir','tanggal_lahir','pendidikan_terakhir','kampus','status_pernikahan','ab' // <-- AB
-        ]);
-
-        $changes = [];
-        foreach ($after as $k => $v) {
-            $old = $before[$k] ?? null;
-            if ($old != $v) {
-                $changes[$k] = ['before' => $old, 'after' => $v];
+        try {
+            if ($request->hasFile('photo')) {
+                $newPhotoPath = $request->file('photo')->store('avatars', 'public');
+                if (!$newPhotoPath) {
+                    throw new \RuntimeException('Gagal menyimpan foto profil.');
+                }
             }
+
+            $criticalChanged = DB::transaction(function () use ($request, $user, $fields, $before, $newPhotoPath) {
+                $data = $request->safe()->except('photo');
+                if ($newPhotoPath !== null) {
+                    $data['photo_url'] = Storage::url($newPhotoPath);
+                }
+                $user->fill($data);
+
+                if ($user->isDirty('email')) {
+                    $user->email_verified_at = null;
+                }
+
+                $criticalChanged = $user->isDirty('wilayah_id') || $user->isDirty('angkatan');
+                if ($criticalChanged) {
+                    $user->status = User::STATUS_PENDING;
+                }
+
+                $user->save();
+
+                $changes = [];
+                foreach ($user->only($fields) as $field => $value) {
+                    if (($before[$field] ?? null) != $value) {
+                        $changes[$field] = ['before' => $before[$field] ?? null, 'after' => $value];
+                    }
+                }
+
+                if ($changes) {
+                    AuditLog::create([
+                        'actor_id' => $user->id,
+                        'action' => 'profile.update',
+                        'entity_type' => 'user',
+                        'entity_id' => $user->id,
+                        'payload_json' => $changes,
+                        'created_at' => now(),
+                    ]);
+                }
+
+                if ($criticalChanged) {
+                    $user->notify(new \App\Notifications\AccountStatusNotification('pending', [
+                        'by' => $user->name,
+                    ]));
+                }
+
+                return $criticalChanged;
+            });
+        } catch (\Throwable $error) {
+            if ($newPhotoPath !== null) {
+                Storage::disk('public')->delete($newPhotoPath);
+            }
+            throw $error;
         }
 
-        if ($changes) {
-            AuditLog::create([
-                'actor_id'     => $user->id,
-                'action'       => 'profile.update',
-                'entity_type'  => 'user',
-                'entity_id'    => $user->id,
-                'payload_json' => json_encode($changes),
-                'created_at'   => now(),
-            ]);
+        if ($newPhotoPath !== null && is_string($oldPhotoUrl)
+            && preg_match('#^/storage/avatars/[^/]+$#', $oldPhotoUrl)) {
+            Storage::disk('public')->delete(substr($oldPhotoUrl, strlen('/storage/')));
         }
 
         return Redirect::to('/profile')->with(
@@ -116,21 +113,13 @@ class ProfileController extends Controller
 
     public function updatePassword(Request $request)
     {
-        $user = auth()->user();
-
-        $request->validate([
-            'current_password' => 'required',
-            'password' => 'required|confirmed|min:8',
+        $validated = $request->validate([
+            'current_password' => ['bail', 'required', 'string', 'current_password'],
+            'password' => ['required', Password::defaults(), 'confirmed'],
         ]);
 
-        if (!Hash::check($request->current_password, $user->password)) {
-            return back()->withErrors([
-                'current_password' => 'Password saat ini tidak cocok.',
-            ]);
-        }
-
-        $user->update([
-            'password' => Hash::make($request->password),
+        $request->user()->update([
+            'password' => Hash::make($validated['password']),
         ]);
 
         return back()->with('success', 'Password berhasil diperbarui.');
@@ -144,8 +133,19 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-        Auth::logout();
-        $user->delete();
+        DB::transaction(function () use ($user) {
+            AuditLog::create([
+                'actor_id' => $user->id,
+                'action' => 'profile.delete',
+                'entity_type' => 'user',
+                'entity_id' => $user->id,
+                'payload_json' => $user->only(['name', 'email']),
+                'created_at' => now(),
+            ]);
+            $user->delete();
+        });
+
+        Auth::logoutCurrentDevice();
 
         $request->session()->invalidate();
         $request->session()->regenerateToken();

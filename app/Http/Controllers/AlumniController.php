@@ -37,7 +37,7 @@ class AlumniController extends Controller
             'email'      => 'users.email',
             'angkatan'   => 'users.angkatan',
             'wilayah'    => 'wilayah.name',
-            'level'      => 'level.description',
+            'level'      => 'levels.description',
             'status'     => 'users.status',
             'created_at' => 'users.created_at',
         ];
@@ -61,8 +61,8 @@ class AlumniController extends Controller
         // Filter pencarian
         if ($q !== '') {
             $query->where(function ($x) use ($q) {
-                $x->where('name', 'like', "%{$q}%")
-                  ->orWhere('email', 'like', "%{$q}%");
+                $x->where('users.name', 'like', "%{$q}%")
+                  ->orWhere('users.email', 'like', "%{$q}%");
             });
         }
 
@@ -82,7 +82,12 @@ class AlumniController extends Controller
         }
 
         // Sorting & pagination
-        $query = $query->orderByRaw("$sort $dir");
+        if ($sort === 'wilayah.name') {
+            $query->leftJoin('wilayah', 'wilayah.id', '=', 'users.wilayah_id')->select('users.*');
+        } elseif ($sort === 'levels.description') {
+            $query->leftJoin('levels', 'levels.id', '=', 'users.level_id')->select('users.*');
+        }
+        $query = $query->orderBy($sort, $dir);
         $alumni = $query->paginate($perPage)->appends($request->query());
 
         // Dropdown data
@@ -130,18 +135,24 @@ class AlumniController extends Controller
 
     public function store(Request $request)
     {
+        $actor = $request->user();
+        $canChooseRegion = $actor->hasAnyRole(['super_admin', 'admin']);
+        abort_if(!$canChooseRegion && !$actor->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
+
         $validated = $request->validate([
             'name'     => ['required', 'string', 'max:255'],
             'email'    => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'wilayah_id' => [$canChooseRegion ? 'required' : 'nullable', 'integer', 'exists:wilayah,id'],
         ]);
 
-        $user = DB::transaction(function () use ($validated) {
+        $user = DB::transaction(function () use ($validated, $actor, $canChooseRegion) {
             $user = User::create([
                 'name'     => $validated['name'],
                 'email'    => $validated['email'],
                 'password' => Hash::make($validated['password']),
                 'status'   => User::STATUS_PENDING,
+                'wilayah_id' => $canChooseRegion ? $validated['wilayah_id'] : $actor->wilayah_id,
             ]);
 
             $alumni = Role::firstOrCreate(['name' => 'alumni']);
@@ -203,11 +214,11 @@ class AlumniController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', Rule::unique('users', 'email')->ignore($user->id)],
             'phone' => ['nullable', 'string', 'max:30', Rule::unique('users', 'phone')->ignore($user->id)],
-            'angkatan' => ['nullable', 'string', 'max:20'],
+            'angkatan' => ['nullable', 'integer', 'between:0,65535'],
             'pekerjaan' => ['nullable', 'string', 'max:100'],
             'wilayah_id' => ['nullable', 'integer', 'exists:wilayah,id'],
             'tempat_lahir' => ['nullable', 'string', 'max:100'],
-            'tanggal_lahir' => ['nullable', 'date'],
+            'tanggal_lahir' => ['nullable', 'date_format:Y-m-d'],
             'pendidikan_terakhir' => ['nullable', 'string', 'max:100'],
             'kampus' => ['nullable', 'string', 'max:150'],
             'status_pernikahan' => ['nullable', 'in:lajang,menikah,duda/janda'],
@@ -217,36 +228,52 @@ class AlumniController extends Controller
         $fields = [
             'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id',
             'tempat_lahir', 'tanggal_lahir', 'pendidikan_terakhir', 'kampus',
-            'status_pernikahan', 'ab',
+            'status_pernikahan', 'ab', 'email_verified_at', 'status',
         ];
-        $before = $user->only($fields);
-
-        $user->fill($validated);
-        $user->save();
-
-        $after = $user->fresh()->only($fields);
-        $changes = [];
-        foreach ($after as $key => $value) {
-            $old = $before[$key] ?? null;
-            if ($old != $value) {
-                $changes[$key] = ['before' => $old, 'after' => $value];
+        $criticalChanged = DB::transaction(function () use ($user, $actor, $validated, $fields) {
+            $before = $user->only($fields);
+            $user->fill($validated);
+            if ($user->isDirty('email')) {
+                $user->email_verified_at = null;
             }
-        }
+            $criticalChanged = $user->isDirty('wilayah_id') || $user->isDirty('angkatan');
+            if ($criticalChanged) {
+                $user->status = User::STATUS_PENDING;
+            }
+            $user->save();
 
-        if ($changes) {
-            AuditLog::create([
-                'actor_id' => $actor->id,
-                'action' => 'alumni.update',
-                'entity_type' => 'user',
-                'entity_id' => $user->id,
-                'payload_json' => json_encode($changes),
-                'created_at' => now(),
-            ]);
-        }
+            $after = $user->fresh()->only($fields);
+            $changes = [];
+            foreach ($after as $key => $value) {
+                $old = $before[$key] ?? null;
+                if ($old != $value) {
+                    $changes[$key] = ['before' => $old, 'after' => $value];
+                }
+            }
+
+            if ($changes) {
+                AuditLog::create([
+                    'actor_id' => $actor->id,
+                    'action' => 'alumni.update',
+                    'entity_type' => 'user',
+                    'entity_id' => $user->id,
+                    'payload_json' => $changes,
+                    'created_at' => now(),
+                ]);
+            }
+
+            if ($criticalChanged) {
+                $user->notify(new \App\Notifications\AccountStatusNotification('pending', ['by' => $actor->name]));
+            }
+
+            return $criticalChanged;
+        });
 
         return redirect()
             ->route('alumni.show', $user)
-            ->with('success', "Data alumni {$user->name} berhasil diperbarui.");
+            ->with('success', $criticalChanged
+                ? "Data alumni {$user->name} diperbarui. Perubahan wilayah/angkatan menunggu verifikasi."
+                : "Data alumni {$user->name} berhasil diperbarui.");
     }
 
     public function updateLevel(Request $request, User $user)
@@ -262,23 +289,25 @@ class AlumniController extends Controller
         }
 
         $validated = $request->validate([
-            'level_id' => ['required', 'integer', 'exists:levels,id'],
+            'level_id' => ['required', 'integer', Rule::exists('levels', 'id')->where('is_active', true)],
         ]);
 
-        $before = $user->level_id;
-        $user->forceFill(['level_id' => (int) $validated['level_id']])->save();
+        DB::transaction(function () use ($user, $actor, $validated) {
+            $before = $user->level_id;
+            $user->forceFill(['level_id' => (int) $validated['level_id']])->save();
 
-        AuditLog::create([
-            'actor_id' => $actor->id,
-            'action' => 'alumni.level.update',
-            'entity_type' => 'user',
-            'entity_id' => $user->id,
-            'payload_json' => json_encode([
-                'before' => ['level_id' => $before],
-                'after' => ['level_id' => $user->level_id],
-            ]),
-            'created_at' => now(),
-        ]);
+            AuditLog::create([
+                'actor_id' => $actor->id,
+                'action' => 'alumni.level.update',
+                'entity_type' => 'user',
+                'entity_id' => $user->id,
+                'payload_json' => [
+                    'before' => ['level_id' => $before],
+                    'after' => ['level_id' => $user->level_id],
+                ],
+                'created_at' => now(),
+            ]);
+        });
 
         return redirect()
             ->route('alumni.show', $user)
@@ -307,7 +336,15 @@ class AlumniController extends Controller
 
         $name = $user->name;
 
-        DB::transaction(function () use ($user) {
+        DB::transaction(function () use ($user, $actor) {
+            AuditLog::create([
+                'actor_id' => $actor->id,
+                'action' => 'alumni.delete',
+                'entity_type' => 'user',
+                'entity_id' => $user->id,
+                'payload_json' => ['before' => $user->only(['name', 'email', 'status', 'wilayah_id', 'level_id'])],
+                'created_at' => now(),
+            ]);
             $user->roles()->detach();
             $user->delete();
         });

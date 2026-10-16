@@ -288,6 +288,19 @@
                         @enderror
                     </div>
 
+                    <div>
+                        <label for="new-alumni-wilayah" class="block text-sm mb-1">Wilayah</label>
+                        <select id="new-alumni-wilayah" name="wilayah_id" required class="w-full rounded-lg border-slate-300">
+                            <option value="">Pilih wilayah</option>
+                            @foreach ($wilayah as $region)
+                                <option value="{{ $region->id }}" @selected(old('wilayah_id', auth()->user()->wilayah_id) == $region->id)>{{ $region->name }}</option>
+                            @endforeach
+                        </select>
+                        @error('wilayah_id')
+                            <p class="mt-1 text-sm text-red-600" role="alert">{{ $message }}</p>
+                        @enderror
+                    </div>
+
                     <div class="grid grid-cols-2 gap-3">
                         <div>
                             <label class="block text-sm mb-1">Password</label>

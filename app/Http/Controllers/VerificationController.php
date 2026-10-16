@@ -42,17 +42,18 @@ class VerificationController extends Controller
             return back()->withErrors(['msg' => 'Tidak boleh memverifikasi akun sendiri.']);
         }
 
-        // Koorda hanya wilayahnya sendiri
-        if (!$me->hasAnyRole(['super_admin', 'admin'])
-            && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
-            abort(403);
-        }
+        $approved = DB::transaction(function () use ($request, $user, $me) {
+            $user = User::query()->lockForUpdate()->findOrFail($user->id);
 
-        if ($user->status !== User::STATUS_PENDING) {
-            return back()->withErrors(['msg' => 'Akun ini tidak dalam status pending.']);
-        }
+            if (!$me->hasAnyRole(['super_admin', 'admin'])
+                && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
+                abort(403);
+            }
 
-        DB::transaction(function () use ($request, $user, $me) {
+            if ($user->status !== User::STATUS_PENDING) {
+                return false;
+            }
+
             $levelId = (int) $request->input('level_id');
 
             // set level & aktifkan
@@ -79,14 +80,20 @@ class VerificationController extends Controller
                 'action'      => 'verification.approve',
                 'entity_type' => 'user',
                 'entity_id'   => $user->id,
-                'payload_json'=> json_encode([
+                'payload_json'=> [
                     'before' => $before,
                     'after'  => ['level_id' => $user->level_id, 'status' => $user->status],
                     'note'   => $request->input('note'),
-                ]),
+                ],
                 'created_at'  => now(),
             ]);
+
+            return true;
         });
+
+        if (!$approved) {
+            return back()->withErrors(['msg' => 'Akun ini tidak dalam status pending.']);
+        }
 
         return back()->with('success', "Akun {$user->name} disetujui & diaktifkan.");
     }
@@ -99,29 +106,38 @@ class VerificationController extends Controller
             return back()->withErrors(['msg' => 'Tidak boleh menolak akun sendiri.']);
         }
 
-        if (!$me->hasAnyRole(['super_admin', 'admin'])
-            && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
-            abort(403);
-        }
-        $user->notify(new AccountStatusNotification('rejected', [
-            'reason' => (string) $request->input('reason'),
-            'by'     => $me->name,
-        ]));
+        $rejected = DB::transaction(function () use ($request, $user, $me) {
+            $user = User::query()->lockForUpdate()->findOrFail($user->id);
 
-        if ($user->status !== User::STATUS_PENDING) {
+            if (!$me->hasAnyRole(['super_admin', 'admin'])
+                && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
+                abort(403);
+            }
+
+            if ($user->status !== User::STATUS_PENDING) {
+                return false;
+            }
+
+            AuditLog::create([
+                'actor_id'    => $me->id,
+                'action'      => 'verification.reject',
+                'entity_type' => 'user',
+                'entity_id'   => $user->id,
+                'payload_json' => ['reason' => $request->input('reason')],
+                'created_at'  => now(),
+            ]);
+
+            $user->notify(new AccountStatusNotification('rejected', [
+                'reason' => $request->input('reason'),
+                'by'     => $me->name,
+            ]));
+
+            return true;
+        });
+
+        if (!$rejected) {
             return back()->withErrors(['msg' => 'Akun ini tidak dalam status pending.']);
         }
-        
-
-        // Catat alasan di audit; status biarkan tetap pending (user bisa perbaiki profil)
-        AuditLog::create([
-            'actor_id'    => $me->id,
-            'action'      => 'verification.reject',
-            'entity_type' => 'user',
-            'entity_id'   => $user->id,
-            'payload_json'=> json_encode(['reason' => $request->string('reason')]),
-            'created_at'  => now(),
-        ]);
 
         return back()->with('success', "Akun {$user->name} ditolak. Alasan tersimpan.");
     }

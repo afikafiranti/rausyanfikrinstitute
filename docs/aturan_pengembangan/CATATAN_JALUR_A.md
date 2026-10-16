@@ -53,6 +53,46 @@ $env:DB_URL=''
 - Seed produksi sekarang hanya membuat data master; penyediaan akun pengelola produksi harus memakai prosedur aman, bukan akun/password demo.
 - Bug audit/notifikasi penolakan serta registrasi/validasi berada pada A1 dan belum dinyatakan selesai oleh A0.
 
-## Tahap Berikutnya
+## A1 — P1: Siklus Data Alumni Konsisten
 
-A1 masih TODO. Sesuai permintaan pengembangan bertahap, batch ini berhenti setelah A0; A1/A2 belum dimulai. Dokumen pusat tetap dibekukan sesuai aturan paralel dan disinkronkan oleh penggabung saat merge.
+Status: DONE (implementasi dan pengujian lokal; penggabungan diverifikasi terpisah).
+Mulai: 2026-10-16.
+Selesai: 2026-10-16.
+Commit A0: 283cb46 (belum dipush).
+
+- Registrasi publik melalui GET/POST register, role alumni/status pending, lalu melengkapi profil; sesi pengelola tetap aman.
+- POST alumni menetapkan wilayah koorda dari akun aktor dan mewajibkan admin memilih wilayah valid.
+- PATCH profil/alumni memvalidasi field sesuai schema; sorting relasi dan audit perubahan level/profil/penghapusan konsisten.
+- Approve/reject memeriksa status sebelum tindakan, memakai audit terstruktur dan transaksi.
+- Penggantian foto profil menjaga file lama saat gagal; aturan password mengikuti kebijakan auth.
+- Test dilakukan bertahap pada endpoint HTTP existing dengan PHP 8.3 dan SQLite :memory: seperti perintah di atas. Kontrak pengujian ini mengikuti A1 dalam PLAN yang sudah disetujui.
+
+### Hasil Implementasi A1
+
+- Route register dipindah ke guest dengan throttle; akun baru dibuat dalam transaksi dengan role alumni/status pending, lalu diarahkan ke profil. Input status/role/level dari pendaftar tidak dipakai. Pengelola yang sudah login tidak dapat mengganti sesinya melalui register.
+- Form tambah alumni memiliki pilihan wilayah. Admin wajib memilih wilayah valid; koorda selalu memakai wilayah akun aktor, termasuk bila request mengirim wilayah lain. Koorda tanpa wilayah ditolak.
+- Sorting wilayah/level memakai join yang sesuai dan hanya memilih kolom users; pencarian tetap tidak ambigu ketika join aktif.
+- Update profil dan data alumni memakai validasi tipe, batas panjang, tanggal Y-m-d, serta enum yang sesuai. PATCH profil mempertahankan field opsional yang tidak dikirim. Perubahan email menghapus penanda verifikasi email lama.
+- Perubahan wilayah/angkatan melalui profil sendiri maupun edit admin membuat status pending, menulis audit, dan mengirim notifikasi dalam transaksi yang sama. Hak koorda di wilayah baru menunggu persetujuan ulang.
+- Update data/level dan penghapusan alumni disatukan dengan audit terstruktur. Test kegagalan audit membuktikan data dan role tidak berubah/terhapus bila pencatatan gagal. Level yang tidak aktif ditolak.
+- Approve/reject membaca ulang dan mengunci target dalam transaksi, memeriksa wilayah/status sebelum efek, serta menyimpan audit/notifikasi secara atomik. Akun aktif yang ditolak tidak menerima notifikasi palsu.
+- Foto profil baru dibersihkan bila transaksi gagal; file lama lokal baru dihapus setelah pembaruan berhasil. URL foto eksternal tidak diperlakukan sebagai path lokal untuk penghapusan.
+- Ganti password memakai kebijakan Password::defaults dan validasi current_password bawaan. Hapus akun sendiri mencatat audit sebelum delete, lalu logoutCurrentDevice agar guard tidak menyimpan ulang model pengguna yang sudah dihapus.
+
+### Verifikasi dan Review A1
+
+- Red -> green dijalankan pada registrasi publik/sesi admin, penetapan wilayah, sorting relasi, audit terstruktur/rollback, validasi data, reject akun aktif, level nonaktif, dan koreksi hasil review.
+- Test gabungan melalui HTTP: daftar -> lengkapi profil/wilayah -> login koorda -> approve -> login alumni -> buka materi, lulus.
+- Full suite final: PHP 8.3.30, SQLite :memory:, **109 tests passed, 556 assertions, 0 skipped**. Dua test registrasi yang dahulu dilewati kini aktif dan lulus.
+- Pemeriksaan sintaks PHP yang berubah dan git diff --check lulus. Form wilayah juga dirender oleh test endpoint alumni.
+- Review Standards: tidak ada temuan konkret. Review Spec: satu temuan perubahan wilayah melalui admin belum membuat pending ditemukan, direproduksi, diperbaiki, dan ditutup melalui test serta review ulang.
+- Pemeriksaan akhir independen atas hapus akun/password tidak menemukan masalah baru. Tidak ada perubahan file implementasi milik B atau dokumen pusat.
+
+### Risiko dan Integrasi A1
+
+- MySQL/MariaDB, perilaku lock pada permintaan bersamaan, browser, email produksi, dan build frontend belum diuji pada batch ini. Konfigurasi CI/database dan aset frontend tetap mengikuti B0/B1.
+- Reject mempertahankan status pending sesuai kontrak; pengulangan reject dapat menghasilkan notifikasi baru karena belum ada penanda siklus pengajuan terpisah.
+- Audit lama yang sudah tersimpan sebagai JSON berlapis tidak dimigrasikan; catatan baru memakai struktur array yang benar.
+- A0 dan A1 belum dipush pada akhir batch A1; publikasi dan penggabungan menjadi langkah terpisah.
+
+A2 belum dimulai. Dokumen pusat tetap dibekukan sesuai aturan paralel dan disinkronkan oleh penggabung saat merge.
