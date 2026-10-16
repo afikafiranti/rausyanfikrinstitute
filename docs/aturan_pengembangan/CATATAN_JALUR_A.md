@@ -173,3 +173,11 @@ Hasil dan keputusan:
 - Test CSV/Excel: **29 tests, 148 assertions**. Full suite PHP 8.3.30 + ZIP, SQLite :memory:: **152 tests passed, 817 assertions**. Lint keempat file PHP domain impor/ekspor serta git diff --check lulus. Review independen tidak menemukan masalah konkret pada scope wilayah, pemetaan nama, atau kompatibilitas format lama.
 - Uji browser berikutnya: unduh template baru, isi wilayah dengan nama seperti Makassar (telepon sebagai teks), unggah dengan email/telepon baru; coba unggah ulang untuk melihat penolakan duplikat. Coba ekspor setelah filter wilayah dan pastikan nama wilayah tampil.
 - Impor melalui browser/MySQL belum diuji oleh agen; belum ada commit/push tambahan.
+
+#### Verifikasi Excel pada MySQL — DONE
+
+- Atas permintaan pengguna, AlumniCsvTest dan AlumniExcelTest dijalankan pada **PHP 8.3.30 dengan ZIP dan MySQL 8.4.3**, bukan SQLite: **29 tests passed, 148 assertions**, tanpa skip.
+- Database khusus rf_a2_excel_test_20261016_c83e dipastikan belum ada, dibuat hanya untuk test, dan dipakai melalui environment proses (APP_ENV=testing, DB_CONNECTION=mysql, DB_URL kosong). Tidak ada perubahan .env atau penggunaan database pengembangan.
+- Koneksi nyata dikonfirmasi melalui MySQL: database uji berisi 21 tabel hasil migration dan nol akun setelah rollback test. Database yang dibuat untuk pengujian ini dihapus setelah selesai.
+- Cakupan: impor nama wilayah/legacy ID, validasi dan duplikat, audit rollback, pembatasan wilayah/role/status, formula dan nomor telepon teks, header/struktur/ukuran workbook, template, serta ekspor sesuai filter/wilayah.
+- Tidak ada perubahan kode yang dibutuhkan. Impor lewat browser dan pengiriman email nyata tetap belum diuji; hasil ini merupakan pengujian HTTP otomatis yang memakai MySQL.
