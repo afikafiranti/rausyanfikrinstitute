@@ -14,9 +14,17 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 
 ## Audit Status Saat Ini
 
+### Integrasi A0/A1/A2 — 2026-10-16
+
+- Jalur A sudah digabung ke develop: batas wilayah/gate/materi dan seeder (A0), registrasi/profil/validasi/audit atomik/verifikasi (A1), pengelolaan materi serta impor/ekspor Excel/CSV (A2). Temuan milik A pada baseline berikut sudah ditangani dengan regression test; baseline tetap menjadi riwayat audit awal.
+- Pengujian integrasi memakai PHP 8.3.30 + ZIP, MySQL 8.4.3 pada database sementara terpisah, serta build frontend. Tidak menggunakan database pengembangan dan tidak mengubah .env.
+- MySQL dapat mengubah urutan key JSON; tiga test audit diperbaiki dengan normalisasi urutan key sebelum pembandingan ketat. Nilai dan tipe audit tidak dilonggarkan.
+- Belum menjadi persetujuan rilis: pekerjaan B0/B1/B2 dan pengujian gabungan A+B belum selesai. Advisory pada 14 dependency lama (48 laporan saat audit Composer A2), keamanan lingkungan/dashboard dan kesiapan CI tetap tindak lanjut B.
+- Risiko tersisa A: QA browser impor Excel dan email nyata belum dilakukan; ekspor XLSX besar masih memakai memori sesuai jumlah data; pembatasan level aplikasi tidak mencegah tautan YouTube dibagikan. Progress menonton/sinkronisasi metadata tetap ditunda.
+
 ### Baseline Audit dan Pemilik Perbaikan — 2026-10-16
 
-Catatan ini menjadi acuan risiko terbaru. Label terkendali pada catatan lama hanya berlaku untuk skenario yang dahulu diuji; label itu tidak membuktikan batas wilayah, status, dan semua workflow sudah aman. Seluruh perbaikan di bawah masih TODO.
+Catatan ini merekam risiko pada baseline awal. Label terkendali pada catatan lama hanya berlaku untuk skenario yang dahulu diuji; label itu tidak membuktikan seluruh workflow sudah aman. Pada saat baseline seluruh perbaikan di bawah masih TODO; status sesudah integrasi A mengikuti pembaruan di atas dan TASK.md.
 
 | Prioritas | Risiko teridentifikasi dari kode | Pemilik/task |
 |---|---|---|

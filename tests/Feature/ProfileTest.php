@@ -178,10 +178,9 @@ class ProfileTest extends TestCase
 
         $this->assertSame(User::STATUS_PENDING, $user->fresh()->status);
         $this->assertSame(1, $user->notifications()->count());
-        $this->assertSame(
-            ['before' => 2020, 'after' => 2021],
-            AuditLog::where('action', 'profile.update')->firstOrFail()->payload_json['angkatan']
-        );
+        $angkatanChange = AuditLog::where('action', 'profile.update')->firstOrFail()->payload_json['angkatan'];
+        ksort($angkatanChange);
+        $this->assertSame(['after' => 2021, 'before' => 2020], $angkatanChange);
     }
 
     public function test_replacing_local_photo_removes_old_file(): void

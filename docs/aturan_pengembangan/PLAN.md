@@ -6,14 +6,14 @@ Dokumen ini menetapkan prioritas, pembagian kerja paralel, dan urutan pengembang
 
 Tanggal penetapan: 2026-10-16.
 
-Rencana ini menggantikan urutan dan prioritas tahap lama di bagian referensi modul. Pekerjaan masih berstatus TODO; audit dan penyusunan rencana tidak berarti bug telah diperbaiki.
+Rencana ini menggantikan urutan dan prioritas tahap lama di bagian referensi modul. Pembaruan integrasi 2026-10-16: A0/A1/A2 selesai dan digabung ke develop atas instruksi pengguna; jalur B belum diintegrasikan. Hasil implementasi dan verifikasi ada di CATATAN_JALUR_A.md serta TASK.md. Daftar risiko awal di bawah dipertahankan sebagai konteks penugasan, bukan status TODO untuk A.
 
 | Jalur | Penanggung jawab | Hasil utama | Branch |
 |---|---|---|---|
 | A | Pengembang A (pengguna) | Akses akun dan wilayah aman; data alumni, profil, verifikasi, dan materi konsisten | dev-A |
 | B | Pengembang B (rekan pengguna) | Pengujian tim konsisten; dashboard, konten publik, dan laporan dapat dipakai | dev-B |
 
-Penugasan Jalur A dikonfirmasi pengguna pada 2026-10-16. Branch dev-A dibuat dari develop; pekerjaan implementasi A0-A2 masih TODO. Commit dokumentasi pembagian kerja menjadi baseline bersama di develop sebelum pengembang B membuat branch kerjanya.
+Penugasan Jalur A dikonfirmasi pengguna pada 2026-10-16. Branch dev-A dibuat dari develop; implementasi A0-A2 telah selesai. Baseline pembagian kerja dan hasil A kini tersedia di develop agar pengembang B dapat mengambilnya.
 
 Aturan pembuka sesi agen disimpan di AGENTS.md pada root repo. Agen pada dev-A mengenali Jalur A; agen pada dev-B mengenali Jalur B. Sesi baru tanpa penugasan di luar dev-A diarahkan ke B, dengan pemeriksaan branch/status sebelum mengedit. Branch dev-B belum dibuat pada workspace ini.
 
@@ -57,7 +57,7 @@ Pemilik: pengembang A (pengguna). Branch: dev-A.
 
 - Lengkapi pengelolaan playlist/video oleh admin dan akses video yang benar-benar dapat digunakan alumni, mengikuti schema yang ada.
 - Pencarian materi harus benar-benar memfilter data; hapus tombol edit/tambah yang belum mempunyai action.
-- Lengkapi impor/ekspor CSV alumni setelah aturan validasi dan wilayah stabil. Sertakan laporan baris gagal dan pencegahan perubahan role/level tanpa izin.
+- Lengkapi impor/ekspor Excel .xlsx dan CSV alumni setelah aturan validasi dan wilayah stabil. Template/ekspor menampilkan nama wilayah; impor juga menerima ID pada template legacy. Sertakan laporan baris gagal dan pencegahan perubahan role/level tanpa izin.
 - Progress menonton dan sinkronisasi metadata otomatis ditunda sampai akses dan pengelolaan materi selesai.
 
 **Kriteria selesai jalur A:** pengelola tetap pada sesinya; akun baru memiliki role/status/wilayah yang tepat; akses lintas wilayah ditolak; status dan level membatasi materi; validasi gagal tidak menghasilkan error database; perubahan kritikal memiliki audit yang dapat dibaca. Test baru dan test alumni/auth/profile/materi yang terdampak harus lulus pada PHP 8.3.

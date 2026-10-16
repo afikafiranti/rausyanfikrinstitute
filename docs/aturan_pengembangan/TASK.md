@@ -13,17 +13,25 @@ Status yang digunakan:
 
 ### Pembagian Aktif Dua Orang — 2026-10-16
 
-Rencana aktif dan batas file ada di PLAN.md pada bagian Rencana Aktif: Dua Orang Bekerja Paralel. Tidak ada perbaikan kode yang dinyatakan selesai oleh pencatatan ini.
+Rencana aktif dan batas file ada di PLAN.md pada bagian Rencana Aktif: Dua Orang Bekerja Paralel. Status berikut telah disinkronkan saat integrasi jalur A pada 2026-10-16; rincian bukti ada di CATATAN_JALUR_A.md.
 
 | ID | Pemilik | Prioritas | Status | Pekerjaan |
 |---|---|---|---|---|
-| A0 | Pengembang A / dev-A | P0 | TODO | Scope koorda pada daftar/detail/tindakan; gate konten; akses materi menurut status/level; seeder akun aman; test negatif |
+| A0 | Pengembang A / dev-A | P0 | DONE | Scope koorda pada daftar/detail/tindakan; gate konten; akses materi menurut status/level; seeder akun aman; test negatif |
 | B0 | Pengembang B / dev-B | P0 | TODO | PHP 8.3, database test dan CI konsisten, konfigurasi lingkungan aman, auth dashboard |
-| A1 | Pengembang A / dev-A | P1 | TODO | Registrasi/role/wilayah, validasi, sorting, audit/transaksi/notifikasi |
+| A1 | Pengembang A / dev-A | P1 | DONE | Registrasi/role/wilayah, validasi, sorting, audit/transaksi/notifikasi |
 | B1 | Pengembang B / dev-B | P1 | TODO | Dashboard nyata, grafik, upload aman, slug/route konten, integrasi homepage |
-| A2 | Pengembang A / dev-A | P2 | TODO | CRUD dan penggunaan materi, pencarian, impor/ekspor alumni |
+| A2 | Pengembang A / dev-A | P2 | DONE | CRUD dan penggunaan materi, pencarian, impor/ekspor Excel/CSV alumni dengan nama wilayah |
 | B2 | Pengembang B / dev-B | P2 | TODO | Submit/review/rekap laporan, export, QA publik dan kesiapan rilis |
 | MERGE | Penggabung PR | Per batch | TODO | Resolusi blok route, test gabungan PHP 8.3, cek migration/lockfile, sinkronisasi dokumen |
+
+### Integrasi Jalur A ke develop — 2026-10-16
+
+- A0/A1/A2 selesai dan digabung ke develop atas instruksi pengguna tanpa menunggu B. Status DONE di atas berlaku pada implementasi dan automated test; QA browser impor Excel dan email nyata masih tertunda.
+- MERGE keseluruhan tetap TODO sampai jalur B selesai dan diuji bersama; status B belum diverifikasi melalui repo ini. Jangan mengulang pekerjaan A sebagai TODO.
+- Pemeriksaan integrasi: seluruh suite pada PHP 8.3.30 + ZIP dan database MySQL khusus, build frontend, validasi Composer/platform, route dan migration. Hasil final dicatat di CATATAN_JALUR_A.md.
+- Pengujian MySQL penuh menemukan tiga assertion audit yang bergantung urutan key JSON. Key diurutkan sebelum assertSame agar isi, struktur, dan tipe tetap diperiksa ketat pada MySQL maupun SQLite; tidak mengubah perilaku aplikasi.
+- Dev-B mengambil origin/develop lalu menyelesaikan konflik pada blok route dan Composer bila ada. Dependency Excel ditambahkan dengan persetujuan pengguna, tanpa memperbarui paket lama.
 
 Selama paralel, masing-masing orang membuat CATATAN_JALUR_A.md atau CATATAN_JALUR_B.md di folder dokumentasi ini untuk status task, risiko, dan hasil test. Dokumen pusat diperbarui oleh penggabung setelah merge. Pekerjaan tiap jalur dapat dimulai dari commit dasar yang sama; urutan penggabungan B0 lalu A0 hanya untuk integrasi.
 

@@ -4,6 +4,8 @@ Dokumen ini wajib diikuti sebelum, selama, dan setelah pengembangan fitur.
 
 ## 1. Dokumen Wajib
 
+Catatan integrasi 2026-10-16: pengguna mengizinkan jalur A digabung lebih dulu ke develop. Setelah mengambil perubahan ini, pengembang B menjalankan git fetch origin, git switch dev-B, git merge origin/develop, lalu composer install. Selesaikan konflik per kepemilikan file; jangan mengganti lockfile dengan versi lama. A0/A1/A2 tidak perlu dikerjakan ulang. Integrasi B dan pengujian A+B tetap dilakukan kemudian sebelum rilis.
+
 Semua pengembangan harus mengacu pada:
 - `PRD.md`: kebutuhan produk, role, fitur, acceptance criteria.
 - `PLAN.md`: urutan pengembangan dan prioritas.

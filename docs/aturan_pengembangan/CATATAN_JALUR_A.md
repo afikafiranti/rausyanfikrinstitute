@@ -181,3 +181,13 @@ Hasil dan keputusan:
 - Koneksi nyata dikonfirmasi melalui MySQL: database uji berisi 21 tabel hasil migration dan nol akun setelah rollback test. Database yang dibuat untuk pengujian ini dihapus setelah selesai.
 - Cakupan: impor nama wilayah/legacy ID, validasi dan duplikat, audit rollback, pembatasan wilayah/role/status, formula dan nomor telepon teks, header/struktur/ukuran workbook, template, serta ekspor sesuai filter/wilayah.
 - Tidak ada perubahan kode yang dibutuhkan. Impor lewat browser dan pengiriman email nyata tetap belum diuji; hasil ini merupakan pengujian HTTP otomatis yang memakai MySQL.
+
+#### Integrasi dev-A ke develop — 2026-10-16
+
+- Atas instruksi pengguna, dev-A digabung ke develop tanpa menunggu B, melalui merge commit fc94567. Merge tidak memiliki konflik; branch dev-A dipertahankan untuk pekerjaan lanjutan.
+- Pengujian penuh pertama di MySQL menemukan tiga assertion yang membandingkan urutan key objek JSON. MySQL dapat menyimpan key dengan urutan berbeda. Test AlumniAuditTest, ProfileTest dan VerificationWorkflowTest kini mengurutkan key sebelum assertSame; isi, struktur dan tipe tetap diperiksa ketat, tanpa perubahan kode aplikasi.
+- Hasil akhir hasil merge: **152 tests passed, 817 assertions**, PHP 8.3.30 + ZIP, **MySQL 8.4.3**. Ketiga kelas test terdampak juga lulus pada SQLite :memory:: **26 tests, 131 assertions**.
+- Database rf_merge_a_test_20261016_b67d dibuat hanya untuk verifikasi integrasi lalu dihapus; .env dan database pengembangan tidak disentuh.
+- `npm.cmd run build` lulus (167 modules). Peringatan data Browserslist/baseline yang lama dicatat untuk pemeliharaan jalur B; paket frontend tidak diperbarui. Composer validate/check-platform-reqs, route:list materi, dan git diff --check lulus.
+- PLAN/PRD/TASK/AUDIT/SOP disinkronkan oleh penggabung sesuai pengecualian SOP. A0/A1/A2 ditandai DONE; B0/B1/B2 dan merge akhir A+B tetap belum dinyatakan selesai.
+- QA impor melalui browser, email nyata, dan kesiapan rilis akhir tetap tertunda. Penerimaan tautan YouTube lengkap belum diimplementasikan; pengelolaan materi memakai ID.

@@ -57,11 +57,15 @@ class VerificationWorkflowTest extends TestCase
         $this->assertSame($level->id, $target->level_id);
         $this->assertTrue($target->hasRole('alumni'));
         $this->assertSame('approved', $target->notifications()->sole()->data['kind']);
+        $payload = AuditLog::where('entity_id', $target->id)->sole()->payload_json;
+        ksort($payload);
+        ksort($payload['before']);
+        ksort($payload['after']);
         $this->assertSame([
-            'before' => ['level_id' => null, 'status' => User::STATUS_PENDING],
             'after' => ['level_id' => $level->id, 'status' => User::STATUS_ACTIVE],
+            'before' => ['level_id' => null, 'status' => User::STATUS_PENDING],
             'note' => 'Disetujui',
-        ], AuditLog::where('entity_id', $target->id)->sole()->payload_json);
+        ], $payload);
     }
 
     public function test_inactive_level_cannot_be_assigned_during_approval(): void

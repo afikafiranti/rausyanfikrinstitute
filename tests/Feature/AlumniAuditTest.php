@@ -57,8 +57,9 @@ class AlumniAuditTest extends TestCase
         ])->assertSessionHasNoErrors()->assertRedirect();
 
         $this->assertSame(User::STATUS_PENDING, $koorda->fresh()->status);
-        $this->assertSame(['before' => User::STATUS_ACTIVE, 'after' => User::STATUS_PENDING],
-            AuditLog::where('action', 'alumni.update')->sole()->payload_json['status']);
+        $statusChange = AuditLog::where('action', 'alumni.update')->sole()->payload_json['status'];
+        ksort($statusChange);
+        $this->assertSame(['after' => User::STATUS_PENDING, 'before' => User::STATUS_ACTIVE], $statusChange);
         $this->assertSame('pending', $koorda->notifications()->sole()->data['kind']);
         $this->actingAs($koorda->fresh())->get(route('verification.index'))->assertForbidden();
     }

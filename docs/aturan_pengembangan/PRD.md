@@ -2,6 +2,8 @@
 
 ## 1. Ringkasan Produk
 
+Status implementasi 2026-10-16: jalur A0/A1/A2 telah diintegrasikan ke develop; jalur B belum diintegrasikan. Impor/ekspor alumni menyediakan Excel .xlsx sebagai format utama dan CSV sebagai alternatif. Template/ekspor memakai nama wilayah; impor juga menerima template legacy wilayah_id. Impor hanya menambah akun pending, tanpa mengubah role/level akun existing. Status ini bukan penetapan kesiapan rilis; rincian verifikasi dan risiko ada di TASK.md dan AUDIT.md.
+
 Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
 
 Produk ini harus mengutamakan:
