@@ -13,7 +13,7 @@ Pengembangan dilakukan bertahap dalam versi (incremental release):
 - **V2** — Materi YouTube
 - **V3** — Rekap Laporan Kajian
 
-Status 2026-10-17: fitur inti V1–V3 sudah tersedia pada hasil integrasi A+B di `develop`. A0–A2 berstatus DONE; B0–B2 dan integrasi berstatus REVIEW untuk tindak lanjut rilis. Ketersediaan fitur belum menjadi bukti kesiapan produksi.
+Status 2026-10-17: fitur inti V1–V3 tersedia pada hasil integrasi A+B di `develop`, termasuk A3-VERIFY, A4-AUTH dan A5-FIX. Suite gabungan PHP 8.3/MySQL terbaru lulus 260 test/1921 assertion; QA browser lokal impor Excel/batas wilayah dan SMTP lokal Mailpit juga lulus. B0–B2, A5-QA operasional dan rilis tetap REVIEW; SMTP eksternal, staging, CI remote dan risiko B3 belum ditutup. Rincian bukti ada pada catatan Jalur A/B.
 
 Matriks cakupan dan batas fitur ada di [PRD](docs/aturan_pengembangan/PRD.md#cakupan-dan-status-implementasi), urutan pekerjaan di [PLAN](docs/aturan_pengembangan/PLAN.md#tindak-lanjut-setelah-integrasi), dan bukti penyelesaian di [TASK](docs/aturan_pengembangan/TASK.md).
 

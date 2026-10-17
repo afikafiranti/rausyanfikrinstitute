@@ -4,6 +4,8 @@ Dokumen ini wajib diikuti sebelum, selama, dan setelah pengembangan fitur.
 
 ## 1. Dokumen Wajib
 
+Pembaruan A3–A5 2026-10-17: pengguna mengizinkan penggabung mengintegrasikan hasil dev-A ke develop dan menyinkronkan dokumen pusat. Merge ecee5b4 mempertahankan seluruh hasil A+B; suite terbaru 260 test/1921 assertion serta build/Composer/platform/route lulus pada PHP 8.3/MySQL dengan database baru terisolasi. QA browser memakai database sintetis terpisah tanpa migrate:fresh. SMTP lokal Mailpit bukan pengiriman eksternal. Staging/SMTP organisasi belum tersedia menurut pengguna; pertahankan REVIEW rilis dan tindak lanjut B3.
+
 Pembaruan integrasi 2026-10-17: penggabung menyinkronkan hasil A+B atas instruksi pengguna. Target bersama PHP 8.3/MySQL atau MariaDB; test gabungan memakai database terisolasi dengan akhiran _testing melalui guard B. Instal dependency mengikuti lockfile gabungan (termasuk Excel A), jangan mengganti dengan lockfile salah satu jalur. Bukti merge lokal tidak menggantikan CI remote, QA staging dan persetujuan rilis.
 
 Catatan historis integrasi 2026-10-16: pengguna mengizinkan jalur A digabung lebih dulu ke develop. Pengembang B kemudian mengambil hasil A dan mengintegrasikannya pada 2026-10-17. A0/A1/A2 tidak perlu dikerjakan ulang; status implementasi serta bukti terbaru mengikuti TASK dan catatan integrasi A+B.

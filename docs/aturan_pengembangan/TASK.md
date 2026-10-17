@@ -11,6 +11,15 @@ Status yang digunakan:
 
 ## Ringkasan Status Saat Ini
 
+### DONE: A35-INTEGRATE — Integrasi A3–A5 dan QA lokal
+
+Tanggal: 2026-10-17. Owner: penggabung Jalur A atas instruksi pengguna.
+
+- A3–A5 digabung ke develop melalui ecee5b4 tanpa konflik. Tree hasil merge identik dengan abd815b yang diuji.
+- Suite gabungan PHP 8.3.30/MySQL 8.4.3 pada database baru terisolasi: 260 test, 1921 assertion lulus; build frontend, 80 route, Composer validate --strict dan check-platform-reqs lulus.
+- Review independen tidak menemukan regresi konkret. Dokumen pusat disinkronkan; QA browser unggah XLSX/duplikat/filter/ekspor serta batas wilayah/endpoint koorda lulus. Bukti rinci ada pada CATATAN_JALUR_A bagian A35-INTEGRATE.
+- Pengguna mengonfirmasi staging dan SMTP organisasi belum tersedia; selesaikan integrasi dan QA lokal, tanpa mengklaim pengiriman email eksternal atau persetujuan rilis.
+
 ### DONE: NEXT-PLAN — Penetapan arah berikutnya dan serah terima Jalur B
 
 Tanggal mulai/selesai: 2026-10-17. Owner: penggabung dokumentasi pada develop, atas persetujuan pengguna.
@@ -19,14 +28,20 @@ Tanggal mulai/selesai: 2026-10-17. Owner: penggabung dokumentasi pada develop, a
 - Arahan pemilik Jalur B dicatat pada PLAN dan CATATAN_JALUR_B; status implementasi task berikut tetap TODO.
 - Verifikasi: konsistensi ID/urutan/tautan lokal dan git diff --check; hasil akhir dicatat pada CATATAN_JALUR_B.
 
-### TODO: A3-VERIFY — Batas Role Target Verifikasi
+### DONE: A3-VERIFY — Batas Role Target Verifikasi
 
 Prioritas: P0 sebelum rilis. Owner: Jalur A.
 
-- [ ] Tegaskan matriks pemberi/target persetujuan akun pengelola; koorda tidak boleh mengaktifkan admin/super_admin, termasuk akun pending setelah perubahan profil.
-- [ ] Terapkan aturan pada endpoint approve/reject dan tampilan antrean/tindakan yang terkait sesuai kebijakan; pertahankan scope wilayah existing.
-- [ ] Tambahkan regression test target pengelola pada wilayah sama/berbeda, akun tanpa wilayah dan status tidak memenuhi syarat; pastikan verifikasi alumni yang sah tetap berjalan.
-- [ ] Catat kebijakan, hasil test domain A dan review independen sebelum integrasi.
+- [x] Koorda hanya memverifikasi target non-pengelola di wilayahnya; role koorda/admin/super_admin termasuk multi-role ditolak. Admin/super_admin dapat meninjau akun lain lintas wilayah, termasuk pemulihan super_admin pending; verifikasi diri sendiri tetap ditolak.
+- [x] Aturan berlaku pada antrean dan endpoint approve/reject, dengan scope wilayah serta syarat status tetap berlaku.
+- [x] Regression test wilayah, target pengelola, role ganda, tanpa wilayah, status, dan alur alumni sah lulus.
+- [x] Kebijakan dan bukti ada pada CATATAN_JALUR_A; review independen dan suite gabungan 260 test/1921 assertion lulus. Terintegrasi pada ecee5b4.
+
+### DONE: A4-AUTH dan A5-FIX — Auth dan aksesibilitas profil
+
+- A4 menangani kegagalan transport email pada registrasi/kirim ulang/reset, validasi token dan aksesibilitas form auth. Akun pending/sesi dipertahankan saat transport gagal; email terverifikasi belum menjadi syarat akses modul.
+- A5-FIX menutup label profil dan overflow foto mobile: 32 kontrol berlabel, ID unik, viewport 320/390 px serta desktop dan fokus keyboard diverifikasi. Build dan pemeriksaan diff lulus.
+- A5-QA tetap REVIEW untuk batas operasional: SMTP lokal Mailpit lulus; SMTP eksternal dan staging belum tersedia. Rincian QA lokal ada pada catatan integrasi A35.
 
 ### TODO: B3-RELEASE — Penutupan Risiko dan Bukti Rilis
 

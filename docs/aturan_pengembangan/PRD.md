@@ -2,7 +2,7 @@
 
 ## 1. Ringkasan Produk
 
-Status implementasi 2026-10-17: A0/A1/A2 dan B0/B1/B2 sudah digabung pada develop; bukti pengujian gabungan ada pada CATATAN_JALUR_B.md. A0–A2 DONE; B0–B2 dan integrasi tetap REVIEW untuk tindak lanjut rilis. Staging belum tersedia; hasil integrasi bukan penetapan kesiapan rilis dan CI remote/advisory dependency tetap perlu ditindaklanjuti. Pengguna mengonfirmasi agenda, tim, kontak, artikel dan pelengkapan tampilan publik tetap akan dibuat.
+Status implementasi 2026-10-17: A0–A5 dan B0/B1/B2 sudah digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite gabungan terbaru PHP 8.3/MySQL lulus 260 test/1921 assertion; bukti A3–A5 ada pada CATATAN_JALUR_A.md, integrasi sebelumnya pada CATATAN_JALUR_B.md. A0–A4 dan A5-FIX DONE secara lokal; A5-QA, B0–B2 dan rilis tetap REVIEW untuk tindak lanjut operasional. Staging dan SMTP organisasi belum tersedia; CI remote/advisory dependency tetap perlu bukti. Agenda, tim, kontak, artikel dan pelengkapan publik tetap akan dibuat oleh B.
 
 Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
 
@@ -18,8 +18,8 @@ Matriks ini menjadi acuan cakupan fitur per 2026-10-17. Tersedia berarti impleme
 
 | Fitur | Status | Bukti dan batas saat ini |
 |---|---|---|
-| Akun, profil, verifikasi, data alumni dan audit | Tersedia | A0/A1; registrasi pending, pembatasan wilayah, validasi dan audit. Email nyata masih perlu QA operasional |
-| Impor/ekspor alumni CSV dan Excel .xlsx | Tersedia | A2; template/nama wilayah dan laporan baris gagal; QA impor Excel melalui browser masih tertunda |
+| Akun, profil, verifikasi, data alumni dan audit | Tersedia | A0/A1/A3/A4/A5-FIX; registrasi pending, scope wilayah/role verifikasi, transport email gagal tertangani dan label profil aksesibel. SMTP lokal lulus; pengiriman eksternal masih perlu QA |
+| Impor/ekspor alumni CSV dan Excel .xlsx | Tersedia | A2/A35; template/nama wilayah, laporan baris gagal, unggah XLSX nyata/duplikat/filter/ekspor lulus QA browser lokal. Staging belum diuji |
 | Dashboard dan grafik alumni | Tersedia | B1 REVIEW; data database dan scope wilayah. Hitungan saat ini mencakup seluruh akun dalam scope |
 | Playlist/video, pencarian dan akses materi berdasarkan status/level | Tersedia | A2; pengelolaan admin dan tautan YouTube, metadata judul/durasi manual |
 | Pengambilan/cache metadata YouTube otomatis | Ditunda | Belum ada integrasi otomatis; PLAN A2 menundanya |
@@ -154,8 +154,8 @@ Fitur:
 
 Kriteria:
 - User tidak boleh memverifikasi akun sendiri.
-- Koorda hanya boleh memverifikasi wilayahnya.
-- Admin dan super admin dapat mengelola lintas wilayah sesuai policy.
+- Koorda hanya boleh memverifikasi target non-pengelola di wilayahnya. Target dengan role koorda/admin/super_admin, termasuk role ganda, tidak muncul di antrean dan ditolak pada approve/reject.
+- Admin dan super admin dapat memverifikasi akun lain lintas wilayah, termasuk akun super_admin pending agar pemulihan tetap tersedia; diri sendiri dan target non-pending tetap ditolak. Akun legacy tanpa role tetap dapat disetujui dan mendapat role alumni.
 
 ### Modul Dashboard
 Status: tersedia pada hasil integrasi; B1 REVIEW untuk tindak lanjut rilis.

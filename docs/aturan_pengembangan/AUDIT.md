@@ -14,12 +14,21 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 
 ## Audit Status Saat Ini
 
+### Integrasi A3–A5 dan QA lokal — 2026-10-17
+
+- A3-VERIFY, A4-AUTH dan A5-FIX digabung ke develop pada ecee5b4 tanpa konflik; tree identik dengan abd815b yang diuji. Review independen tidak menemukan regresi konkret.
+- Celah koorda memverifikasi akun pengelola pada catatan sinkronisasi di bawah sudah ditutup: target koorda/admin/super_admin, termasuk multi-role, diblokir di antrean dan approve/reject. Admin/super_admin tetap dapat memulihkan akun pengelola lain yang pending; diri sendiri ditolak.
+- Suite PHP 8.3.30/MySQL 8.4.3 pada database baru rf_merge_a35_20261017_833410_testing lulus 260 test/1921 assertion. Build, Composer strict/platform dan 80 route lulus; database kerja, QA browser dan .env tidak digunakan untuk RefreshDatabase.
+- QA browser lokal mengunggah XLSX nyata: satu akun pending/alumni dibuat, baris duplikat ditolak, filter memuat satu hasil dan ekspor XLSX valid. Koorda hanya melihat wilayahnya; detail lintas wilayah 404 dan endpoint pengelolaan konten 403. Fixture sintetis tambahan hanya di database QA pilihan pengguna, tanpa reset data existing.
+- Dua temuan profil ditutup oleh A5-FIX: 32 kontrol berlabel/ID unik dan tidak ada overflow pada 320/390 px. SMTP lokal Mailpit serta tautan verifikasi/reset lulus. Bukti lokal ini belum membuktikan penerimaan Gmail atau kondisi staging.
+- Pengguna mengonfirmasi staging/SMTP organisasi belum tersedia. Advisory dependency, penilaian kunci historis, CI remote dan bukti staging/backup tetap mengikuti B3-RELEASE; tidak menyatakan siap produksi.
+
 ### Sinkronisasi Cakupan dan Rencana Publik — 2026-10-17
 
 - Atas instruksi pengguna, DOC-SYNC menyelaraskan README/PRD/PLAN/TASK/SOP dengan kode hasil integrasi. Matriks PRD membedakan tersedia, sebagian, direncanakan dan ditunda; tidak mengubah status REVIEW rilis B0–B2.
 - Agenda, tim, kontak, artikel dan navigasi/CTA publik tetap bagian pekerjaan yang akan dibuat melalui PUB-01–PUB-04. Agenda saat ini placeholder; tim/kontak belum terpasang; artikel belum memiliki halaman daftar/detail tersendiri. Konten resmi/cara pengelolaan perlu ditetapkan saat implementasi.
 - Pekerjaan materi lama sudah ditutup oleh A0/A2; workflow laporan tersedia dalam B2. Metadata otomatis/progres menonton, revisi rejected dan CRUD master web khusus belum tersedia sesuai batas pada PRD.
-- Risiko yang tetap terbuka dari analisis kode: verifikasi membatasi wilayah/status target, belum role target, sehingga koorda dapat mengaktifkan akun admin pending di wilayahnya. Tetapkan kebijakan akun pengelola dan regression test sebelum menutup review akses; sinkronisasi dokumen tidak memperbaiki endpoint.
+- Temuan saat sinkronisasi awal: verifikasi belum membatasi role target, sehingga koorda dapat mengaktifkan admin pending di wilayahnya. Temuan ini kemudian ditutup oleh A3-VERIFY pada integrasi A3–A5 di atas; catatan ini dipertahankan sebagai riwayat.
 - Advisory Composer masih 48 pada 14 paket saat analisis sesi ini; rincian tambahan audit dan audit npm tidak dilanjutkan karena pembatasan pengiriman metadata/keputusan pengguna. CI remote, penilaian kunci historis dan staging tetap tindak lanjut.
 
 ### Integrasi A+B — 2026-10-17

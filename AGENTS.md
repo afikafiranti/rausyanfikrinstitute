@@ -8,14 +8,14 @@
 
    | Konteks | Jalur | Urutan pekerjaan |
    |---|---|---|
-   | Branch `dev-A` | A, milik pengguna yang memulai pembagian ini | Setelah A0–A2: A3-VERIFY, lalu QA A tersisa |
+   | Branch `dev-A` | A, milik pengguna yang memulai pembagian ini | A3/A4/A5-FIX selesai dan terintegrasi; lanjut QA operasional ketika staging/SMTP organisasi tersedia |
    | Branch `dev-B` | B, milik rekan pengembang | PUB-04 -> PUB-01 -> PUB-02 -> PUB-03; B3-RELEASE paralel bila independen |
    | Sesi baru tanpa penugasan, di luar `dev-A` | Default Jalur B | Baca arahan terbaru CATATAN_JALUR_B, pastikan branch kerja B, lalu mulai PUB-04 |
 
 4. Sebutkan jalur dan task aktif pada update awal. Jika pengguna memberi penugasan eksplisit yang berbeda, ikuti penugasan tersebut dan selaraskan branch secara aman. Jangan menganggap teman harus melanjutkan Jalur A.
 5. Branch kerja B adalah `dev-B`. Buat dari commit baseline bersama di `develop` yang sudah berisi aturan dan rencana ini, bukan dari perubahan implementasi A. Jangan berpindah branch dengan membawa perubahan jalur lain yang belum di-commit; tetap lakukan analisis yang aman sambil menjelaskan kondisi branch.
 
-Arahan setelah integrasi disetujui pengguna pada 2026-10-17: [PLAN — Tindak Lanjut](docs/aturan_pengembangan/PLAN.md#tindak-lanjut-setelah-integrasi) dan [serah terima Jalur B](docs/aturan_pengembangan/CATATAN_JALUR_B.md#arahan-berikutnya-untuk-pemilik-jalur-b). Daftar A0–A2/B0–B2 di bawah adalah cakupan awal, bukan perintah mengulang pekerjaan selesai. A3-VERIFY menutup batas role verifikasi; B memulai artikel publik dan menyiapkan bukti rilis. Rilis tetap menunggu penutupan risiko dan pengujian gabungan.
+Arahan setelah integrasi disetujui pengguna pada 2026-10-17: [PLAN — Tindak Lanjut](docs/aturan_pengembangan/PLAN.md#tindak-lanjut-setelah-integrasi) dan [serah terima Jalur B](docs/aturan_pengembangan/CATATAN_JALUR_B.md#arahan-berikutnya-untuk-pemilik-jalur-b). Daftar A0–A2/B0–B2 di bawah adalah cakupan awal, bukan perintah mengulang pekerjaan selesai. A3-VERIFY, A4-AUTH dan A5-FIX sudah terintegrasi pada ecee5b4; suite gabungan 260 test/1921 assertion dan QA lokal lulus. B melanjutkan artikel publik dan bukti rilis. Rilis tetap menunggu risiko B3, CI remote, email eksternal dan QA staging; staging/SMTP organisasi belum tersedia.
 
 ## Tugas Jalur A
 

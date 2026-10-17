@@ -12,16 +12,18 @@ Pembaruan cakupan 2026-10-17: pengguna meminta sinkronisasi dokumentasi dan meng
 
 ### Tindak Lanjut Setelah Integrasi
 
+Pembaruan A3–A5 pada 2026-10-17: A3-VERIFY, A4-AUTH dan A5-FIX sudah digabung ke develop pada ecee5b4. Suite gabungan 260 test/1921 assertion serta build/Composer/platform/route lulus; review independen tanpa temuan konkret. QA lokal dilengkapi pada A35-INTEGRATE. Staging dan SMTP organisasi belum tersedia menurut pengguna; bukti lokal tidak menggantikan keduanya. Urutan B tetap PUB-04 -> PUB-01 -> PUB-02 -> PUB-03.
+
 Keputusan pengguna 2026-10-17: arah pengembangan berikut disetujui. Urutan pengerjaan adalah **pengamanan verifikasi akun pengelola -> PUB-04 artikel -> PUB-01 agenda -> PUB-02 tim/kontak -> PUB-03 navigasi final -> staging/rilis**. Nomor PUB tetap dipertahankan sebagai identitas task, bukan urutan eksekusi.
 
-- **Jalur A:** kerjakan A3-VERIFY terlebih dahulu: tetapkan batas role target verifikasi akun pengelola, tutup akses koorda ke aktivasi admin/super_admin, dan tambahkan test negatif. Lanjutkan QA profil, email dan impor Excel yang masih terbuka.
+- **Jalur A:** A3-VERIFY, A4-AUTH dan A5-FIX selesai pada hasil integrasi; jangan ulangi implementasi. Lanjutkan penutupan QA operasional saat staging/SMTP organisasi tersedia, mengikuti bukti lokal pada CATATAN_JALUR_A.
 - **Jalur B:** mulai PUB-04 sebagai batch fitur berikutnya; gunakan pola pengelolaan Post existing bila sesuai, tentukan pembeda artikel/refleksi dan aturan publikasinya sebelum mengubah schema. Pertahankan URL/refleksi dan hindari dua sistem konten yang menduplikasi alur yang sama. Setelah itu lanjut PUB-01, PUB-02 dan PUB-03.
 - **Jalur B, persiapan rilis:** tangani B3-RELEASE secara paralel bila independen: triase advisory Composer, penilaian pemakaian kunci historis, CI remote dan persiapan staging. Audit npm tetap dilewati sesuai keputusan pengguna; jangan rotasi kunci server tanpa inventarisasi dampak.
-- **Penggabung A+B:** verifikasi integrasi per batch; rilis menunggu A3-VERIFY dan B3-RELEASE selesai. Pekerjaan fitur B pada lingkungan terisolasi tidak perlu menunggu seluruh pekerjaan rilis selesai.
+- **Penggabung A+B:** A3-VERIFY sudah tertutup; verifikasi integrasi per batch dan selesaikan B3-RELEASE, email eksternal serta QA staging sebelum rilis. Pekerjaan fitur B pada lingkungan terisolasi tidak perlu menunggu seluruh pekerjaan rilis selesai.
 
 Arahan serah terima Jalur B tersedia di [CATATAN_JALUR_B.md](CATATAN_JALUR_B.md#arahan-berikutnya-untuk-pemilik-jalur-b). Periksa branch/status sebelum mulai; jangan memindahkan perubahan dokumentasi develop yang belum di-commit ke dev-B. Ambil baseline gabungan setelah tersimpan pada branch bersama, lalu catat task IN_PROGRESS pada catatan jalur sendiri.
 
-1. Tindak lanjuti advisory dependency, penilaian kunci historis, batas verifikasi akun pengelola, CI remote, QA impor Excel/email dan staging/backup nyata sebelum menetapkan kesiapan rilis.
+1. Tindak lanjuti advisory dependency, penilaian kunci historis, CI remote, email eksternal dan staging/backup nyata sebelum menetapkan kesiapan rilis. Batas verifikasi akun pengelola sudah ditangani A3; hasil QA lokal terbaru mengikuti catatan integrasi A35.
 2. Lengkapi tampilan publik melalui PUB-01–PUB-04. Cakupannya dikonfirmasi pengguna; statusnya TODO, belum diimplementasikan dan belum memiliki tanggal rilis. Pekerjaan dapat disiapkan tanpa menunggu staging; penggunaan data nyata tetap mengikuti syarat rilis.
 
 | ID | Pemilik | Prioritas | Hasil yang akan dibuat |
