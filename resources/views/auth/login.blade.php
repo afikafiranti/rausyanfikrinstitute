@@ -11,17 +11,17 @@
     <form method="POST" action="{{ route('login') }}" class="space-y-3">
       @csrf
       <div>
-        <label class="block text-sm mb-1">Email</label>
-        <input type="email" name="email" value="{{ old('email') }}" required autofocus class="w-full rounded-lg">
+        <label for="email" class="block text-sm mb-1">Email</label>
+        <input id="email" type="email" name="email" autocomplete="username" value="{{ old('email') }}" required autofocus class="w-full rounded-lg">
         @error('email') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
       </div>
 
       <div>
-        <label class="block text-sm mb-1">Password</label>
+        <label for="password" class="block text-sm mb-1">Password</label>
         <div class="relative">
-          <input type="password" name="password" id="password" required
+          <input type="password" name="password" id="password" autocomplete="current-password" required
                  class="w-full rounded-lg pr-10">
-          <button type="button" id="togglePassword"
+          <button type="button" id="togglePassword" aria-label="Tampilkan password" aria-controls="password" aria-pressed="false"
                   class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
             <!-- Mata default tertutup -->
             <svg id="iconEyeClosed" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -42,8 +42,8 @@
       </div>
 
       <div class="flex items-center justify-between text-sm">
-        <label class="inline-flex items-center gap-2">
-          <input type="checkbox" name="remember" class="rounded"> Ingat saya
+        <label for="remember" class="inline-flex items-center gap-2">
+          <input id="remember" type="checkbox" name="remember" class="rounded"> Ingat saya
         </label>
         <a href="{{ route('password.request') }}" class="text-indigo-600">Lupa password?</a>
       </div>
@@ -63,6 +63,8 @@
     togglePassword.addEventListener('click', () => {
       const type = passwordInput.getAttribute('type') === 'password' ? 'text' : 'password';
       passwordInput.setAttribute('type', type);
+      togglePassword.setAttribute('aria-pressed', String(type === 'text'));
+      togglePassword.setAttribute('aria-label', type === 'text' ? 'Sembunyikan password' : 'Tampilkan password');
 
       // toggle icon
       iconEyeOpen.classList.toggle('hidden');
