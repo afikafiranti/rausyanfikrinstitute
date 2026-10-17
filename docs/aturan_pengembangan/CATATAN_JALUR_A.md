@@ -1,5 +1,12 @@
 # Catatan Jalur A
 
+## A5-QA — IN_PROGRESS (2026-10-17)
+
+- Lanjutkan QA browser operasional impor Excel, profil dan notifikasi atas instruksi pengguna. Live Preview VS Code terpasang, tetapi belum terhubung ke alat UI; halaman Laravel tetap memerlukan server PHP. Gunakan browser terisolasi dan data sintetis untuk memeriksa alur melalui server aplikasi, bukan membuka file Blade langsung.
+- Database, akun, kunci/sesi, berkas serta proses QA dipisahkan dari lingkungan kerja. Tidak melakukan uji kesiapan rilis/SMTP nyata pada batch ini; hasil dan batas verifikasi dicatat setelah pengujian.
+- Insiden setup: PowerShell menolak pemuatan env.ps1 karena execution policy, tetapi perintah migrasi berikutnya tetap berjalan. Runner memakai environment path direktori QA tanpa .env; fallback konfigurasi SQLite membuat `database/database.sqlite` pada 2026-10-17 17:03:29–17:03:30 WIB. Pemeriksaan SQLite read-only: 21 tabel aplikasi semuanya 0 baris, migrations 22 baris batch 1. Database MySQL khusus QA masih kosong; environment proyek asli tidak dimuat oleh runner. Seluruh mutasi dihentikan saat ditemukan; tidak ada rollback atau penghapusan file SQLite. Pengguna diberi tahu. Guard konfigurasi eksplisit dan review runner diwajibkan sebelum melanjutkan migrasi/seed khusus QA.
+- Pengguna kemudian menetapkan database `rausyan_fikr_test` untuk QA browser. Pemeriksaan read-only MySQL 8.4.3 pada 127.0.0.1:3306 membuktikan schema tersebut ada dan belum memiliki tabel sebelum persiapan. Runner QA diarahkan secara eksplisit ke database ini dengan guard nama/driver/host/port; tanpa migrate:fresh dan tanpa mengubah .env kerja atau default PHPUnit milik B. Database pilihan pengguna tidak dihapus saat cleanup.
+
 ## Pengiriman Batch A3/A4 — 2026-10-17
 
 - Pengguna meminta commit dan push hasil A3-VERIFY/A4-AUTH ke dev-A. Uji kesiapan rilis dilakukan bersama pada tahap akhir setelah website siap menuju produksi; tidak menghalangi pengiriman batch pengembangan ini.
