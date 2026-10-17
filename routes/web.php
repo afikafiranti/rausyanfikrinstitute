@@ -55,6 +55,16 @@ Route::middleware(['auth'])
     ->name('materi.')
     ->group(function () {
         Route::get('/', [MateriController::class, 'index'])->name('index');
+        Route::middleware('can:manage-content')->group(function () {
+            Route::get('/kelola', [\App\Http\Controllers\MateriManagementController::class, 'index'])->name('manage');
+            Route::post('/playlists', [\App\Http\Controllers\MateriManagementController::class, 'storePlaylist'])->name('playlists.store');
+            Route::get('/playlists/{playlist}/edit', [\App\Http\Controllers\MateriManagementController::class, 'editPlaylist'])->name('playlists.edit');
+            Route::patch('/playlists/{playlist}', [\App\Http\Controllers\MateriManagementController::class, 'updatePlaylist'])->name('playlists.update');
+            Route::delete('/playlists/{playlist}', [\App\Http\Controllers\MateriManagementController::class, 'destroyPlaylist'])->name('playlists.destroy');
+            Route::post('/playlists/{playlist}/videos', [\App\Http\Controllers\MateriManagementController::class, 'storeVideo'])->name('videos.store');
+            Route::patch('/playlists/{playlist}/videos/{video}', [\App\Http\Controllers\MateriManagementController::class, 'updateVideo'])->name('videos.update');
+            Route::delete('/playlists/{playlist}/videos/{video}', [\App\Http\Controllers\MateriManagementController::class, 'destroyVideo'])->name('videos.destroy');
+        });
         Route::get('/{id}', [MateriController::class, 'show'])->name('show');
     });
 Route::middleware(['auth', \App\Http\Middleware\ScopeWilayah::class])->prefix('laporan')->name('laporan.')->group(function () {
@@ -85,6 +95,11 @@ Route::middleware(['auth'])->group(function () {
 
 Route::middleware(['auth', 'can:view-alumni'])->get('/alumni', [\App\Http\Controllers\AlumniController::class, 'index'])->name('alumni.index');
 Route::middleware(['auth', 'can:view-alumni'])->post('/alumni', [\App\Http\Controllers\AlumniController::class, 'store'])->name('alumni.store');
+Route::middleware(['auth', 'can:view-alumni'])->get('/alumni/csv', [\App\Http\Controllers\AlumniCsvController::class, 'index'])->name('alumni.csv.index');
+Route::middleware(['auth', 'can:view-alumni'])->post('/alumni/csv', [\App\Http\Controllers\AlumniCsvController::class, 'import'])->name('alumni.csv.import');
+Route::middleware(['auth', 'can:view-alumni'])->get('/alumni/export', [\App\Http\Controllers\AlumniCsvController::class, 'export'])->name('alumni.csv.export');
+Route::middleware(['auth', 'can:view-alumni'])->get('/alumni/template.xlsx', [\App\Http\Controllers\AlumniCsvController::class, 'template'])->name('alumni.excel.template');
+Route::middleware(['auth', 'can:view-alumni'])->get('/alumni/export.xlsx', [\App\Http\Controllers\AlumniCsvController::class, 'exportExcel'])->name('alumni.excel.export');
 Route::middleware(['auth', 'can:view-alumni'])->get('/alumni/{user}/edit', [\App\Http\Controllers\AlumniController::class, 'edit'])->name('alumni.edit');
 Route::middleware(['auth', 'can:view-alumni'])->patch('/alumni/{user}', [\App\Http\Controllers\AlumniController::class, 'update'])->name('alumni.update');
 Route::middleware(['auth', 'can:view-alumni'])->patch('/alumni/{user}/level', [\App\Http\Controllers\AlumniController::class, 'updateLevel'])->name('alumni.level.update');

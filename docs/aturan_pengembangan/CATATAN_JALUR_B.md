@@ -328,10 +328,21 @@
   - Hash .env/.env.dev/.env.staging/.env.testing dan package-lock.json tetap cocok baseline preservasi. Build frontend tidak diulang karena batch ini tidak mengubah frontend/dependensi; bukti build terakhir B2.5 tetap berlaku dalam batas perubahan tersebut.
 - Batas/lanjutan: belum ada target/akses staging yang diterima pada sesi ini. Belum deploy, uji MariaDB dump/client, pemulihan staging/offsite terenkripsi, retensi/RTO/RPO nyata, CI remote atau integrasi A. Key/env aktual tidak dicadangkan oleh drill. Rilis tetap menunggu P0 A0/B0, advisory dependency dan verifikasi hasil merge. Detail hasil tersimpan pada BUKTI_PEMULIHAN_B26.md.
 
+## Integrasi Jalur B ke develop bersama Jalur A — 2026-10-17
+
+- Atas instruksi pengguna, target development dipetakan ke branch develop yang memang tersedia. Fetch menemukan origin/develop c411747 sudah berisi A0/A1/A2, termasuk Excel. Commit B a31cecf menyimpan B0–B2.6; perubahan asli pengguna package-lock.json (23 baris dihapus) dikecualikan dan tetap sebagai working change.
+- origin/develop digabung ke B terlebih dahulu. Blok route menyatu otomatis dan tetap memuat alumni/materi A serta dashboard/chart/publik/konten/laporan B. Satu konflik composer.lock hanya metadata hash/platform; seluruh paket/versi Excel A dipertahankan bersama PHP ^8.3 dan config.platform.php 8.3.0 B. Tidak ada paket lama diperbarui; lima paket Excel dipasang mengikuti lockfile.
+- Review integrasi menemukan dashboard masih mengizinkan managerial pending/suspended membaca statistik. Test baru gagal menerima 200, kemudian controller memeriksa gate view-alumni sebelum query dan test lulus pada ketiga role pengelola serta kedua status. Redirect alumni ke profil dipertahankan. CI menambahkan gd/zip eksplisit untuk Excel.
+- Verifikasi snapshot gabungan PHP 8.3.33/MySQL 8.4.3 pada rf_b_testing: **239 test lulus, 1686 assertion, tanpa skip**. Termasuk test A untuk seeder, scope wilayah, audit, registrasi, materi, CSV/Excel dan gate konten, serta seluruh test B.
+- `npm.cmd run build`: lulus 162 modul. Composer install mengikuti lockfile, optimized autoload 6888 kelas, package discovery, composer validate --strict, check-platform-reqs dan route:list lulus. Network filter advisory Composer tidak diperbarui dalam pemeriksaan offline; ini bukan bukti advisory tertutup.
+- Drill migration/dump/restore pada dua database acak baru juga lulus: 22 migration, relasi role, metadata laporan, 3 file/checksum/dekripsi/cleanup PASS. Database kerja dan environment nyata tidak digunakan untuk drill/test. Direktori SQL sementara tidak masuk Git.
+- PLAN/PRD/TASK/AUDIT/SOP disinkronkan oleh penggabung sesuai pengecualian aturan paralel. Identitas commit memakai Codex <codex@localhost> per perintah karena mesin belum memiliki user Git; konfigurasi global tidak diubah.
+- Integrasi hanya lokal; tidak push, tidak deploy dan tidak menjalankan CI remote. Branch dev-B dipertahankan. Staging belum tersedia, advisory/penilaian kunci historis serta QA browser A/email nyata tetap tindak lanjut sebelum rilis.
+
 ## Tahap berikutnya
 
 - B0.2 masuk REVIEW; tunggu verifikasi CI remote saat perubahan diajukan.
 - B0.3 masuk REVIEW; runner lokal lulus, tracking environment rahasia dihentikan.
 - Sebelum rilis: jalankan CI remote, triase advisory dependency, dan inventarisasi pemakaian kunci server sebelum menetapkan rotasi.
 - B1.1–B1.4 masuk REVIEW; hasil lokal B1 lulus, verifikasi gabungan/CI/browser tetap diperlukan sebelum rilis.
-- B2.1–B2.6 bagian lokal masuk REVIEW. Tahap berikutnya: integrasi hasil A/B, CI remote dan penerapan runbook/drill pada staging yang teridentifikasi; jangan menyatakan siap rilis sebelum bukti lingkungan nyata serta seluruh P0 terpenuhi.
+- B2.1–B2.6 dan integrasi lokal A+B masuk REVIEW. Tahap berikutnya: push/CI remote bila diminta serta penerapan runbook/drill pada staging setelah lingkungannya tersedia; jangan menyatakan siap rilis sebelum bukti lingkungan nyata dan risiko tersisa ditutup.

@@ -15,6 +15,7 @@ class DashboardController extends Controller
         if (! $viewer->hasAnyRole(['admin', 'super_admin', 'koorda'])) {
             return redirect()->route('profile.edit');
         }
+        abort_unless($viewer->can('view-alumni'), 403);
 
         $canViewAll = $viewer->hasAnyRole(['admin', 'super_admin']);
         abort_if(! $canViewAll && ! $viewer->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');

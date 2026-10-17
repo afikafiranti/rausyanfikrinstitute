@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
@@ -29,6 +30,41 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'consent_at'        => 'datetime',
     ];
+
+    public function scopeAlumniListing(Builder $query, User $actor, array $filters): Builder
+    {
+        $canViewAll = $actor->hasAnyRole(['super_admin', 'admin']);
+        abort_if(!$canViewAll && !$actor->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
+        if (!$canViewAll) {
+            $query->where('users.wilayah_id', $actor->wilayah_id);
+        }
+
+        $search = trim($filters['q'] ?? '');
+        if ($search !== '') {
+            $query->where(fn ($match) => $match->where('users.name', 'like', "%{$search}%")
+                ->orWhere('users.email', 'like', "%{$search}%"));
+        }
+        foreach (['angkatan', 'wilayah_id', 'level_id', 'ab'] as $field) {
+            if (isset($filters[$field]) && $filters[$field] !== '') {
+                $query->where('users.'.$field, $filters[$field]);
+            }
+        }
+
+        $sortMap = [
+            'name' => 'users.name', 'email' => 'users.email', 'angkatan' => 'users.angkatan',
+            'wilayah' => 'wilayah.name', 'level' => 'levels.description',
+            'status' => 'users.status', 'created_at' => 'users.created_at',
+        ];
+        $sort = $sortMap[$filters['sort'] ?? 'created_at'] ?? 'users.created_at';
+        if ($sort === 'wilayah.name') {
+            $query->leftJoin('wilayah', 'wilayah.id', '=', 'users.wilayah_id');
+        } elseif ($sort === 'levels.description') {
+            $query->leftJoin('levels', 'levels.id', '=', 'users.level_id');
+        }
+
+        return $query->select('users.*')->orderBy($sort, ($filters['dir'] ?? '') === 'asc' ? 'asc' : 'desc')
+            ->orderBy('users.id');
+    }
 
     // Relations
     public function roles()

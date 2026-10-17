@@ -5,7 +5,9 @@ namespace Tests\Feature;
 use App\Models\Role;
 use App\Models\Level;
 use App\Models\User;
+use App\Models\Wilayah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class AlumniIndexFilterTest extends TestCase
@@ -126,6 +128,47 @@ class AlumniIndexFilterTest extends TestCase
             ->assertDontSee('<i class="fas fa-eye"></i> Detail', false)
             ->assertDontSee('<i class="fas fa-pen"></i> Edit', false)
             ->assertDontSee('<i class="fas fa-trash"></i> Hapus', false);
+    }
+
+    #[DataProvider('relationSorts')]
+    public function test_relation_sort_works_with_search_and_keeps_user_identity(string $sort): void
+    {
+        $admin = $this->adminUser();
+        $regionZ = Wilayah::create(['name' => 'Zeta']);
+        $regionA = Wilayah::create(['name' => 'Alfa']);
+        $levelZ = Level::create(['name' => 'Level Z', 'description' => 'Zeta']);
+        $levelA = Level::create(['name' => 'Level A', 'description' => 'Alfa']);
+        $first = User::factory()->create(['name' => 'Target Alfa', 'wilayah_id' => $regionZ->id, 'level_id' => $levelZ->id]);
+        $second = User::factory()->create(['name' => 'Target Zeta', 'wilayah_id' => $regionA->id, 'level_id' => $levelA->id]);
+
+        $this->actingAs($admin)->get(route('alumni.index', ['q' => 'Target', 'sort' => $sort, 'dir' => 'asc']))
+            ->assertOk()
+            ->assertViewHas('alumni', fn ($items) => $items->getCollection()->modelKeys() === [$second->id, $first->id]);
+    }
+
+    public static function relationSorts(): array
+    {
+        return [['wilayah'], ['level']];
+    }
+
+    public function test_malformed_listing_filters_are_rejected(): void
+    {
+        $this->actingAs($this->adminUser())->getJson(route('alumni.index', [
+            'q' => ['unexpected'], 'sort' => 'password', 'ab' => 'invalid',
+        ]))->assertUnprocessable()->assertJsonValidationErrors(['q', 'sort', 'ab']);
+    }
+
+    public function test_excel_import_page_shows_template_and_only_coordinator_region_reference(): void
+    {
+        $own = Wilayah::create(['name' => 'Wilayah Referensi Sendiri']);
+        Wilayah::create(['name' => 'Wilayah Referensi Lain']);
+        $koorda = User::factory()->create(['status' => User::STATUS_ACTIVE, 'wilayah_id' => $own->id]);
+        $koorda->roles()->attach(Role::firstOrCreate(['name' => 'koorda']));
+
+        $this->actingAs($koorda)->get(route('alumni.csv.index'))
+            ->assertOk()->assertSee('Unduh template Excel (.xlsx)')
+            ->assertSee(route('alumni.excel.template'))
+            ->assertSee('Wilayah Referensi Sendiri')->assertDontSee('Wilayah Referensi Lain');
     }
 
     private function adminUser(): User

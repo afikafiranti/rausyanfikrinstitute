@@ -47,7 +47,7 @@ jobs:
           php-version: '8.3'
           tools: composer:2
           coverage: none
-          extensions: mbstring, intl, pdo_mysql, bcmath, openssl
+          extensions: mbstring, intl, pdo_mysql, bcmath, openssl, gd, zip
 
       - name: Cache Composer
         uses: actions/cache@v4

@@ -4,6 +4,10 @@ Dokumen ini wajib diikuti sebelum, selama, dan setelah pengembangan fitur.
 
 ## 1. Dokumen Wajib
 
+Pembaruan integrasi 2026-10-17: penggabung menyinkronkan hasil A+B atas instruksi pengguna. Target bersama PHP 8.3/MySQL atau MariaDB; test gabungan memakai database terisolasi dengan akhiran _testing melalui guard B. Instal dependency mengikuti lockfile gabungan (termasuk Excel A), jangan mengganti dengan lockfile salah satu jalur. Bukti merge lokal tidak menggantikan CI remote, QA staging dan persetujuan rilis.
+
+Catatan integrasi 2026-10-16: pengguna mengizinkan jalur A digabung lebih dulu ke develop. Setelah mengambil perubahan ini, pengembang B menjalankan git fetch origin, git switch dev-B, git merge origin/develop, lalu composer install. Selesaikan konflik per kepemilikan file; jangan mengganti lockfile dengan versi lama. A0/A1/A2 tidak perlu dikerjakan ulang. Integrasi B dan pengujian A+B tetap dilakukan kemudian sebelum rilis.
+
 Semua pengembangan harus mengacu pada:
 - `PRD.md`: kebutuhan produk, role, fitur, acceptance criteria.
 - `PLAN.md`: urutan pengembangan dan prioritas.

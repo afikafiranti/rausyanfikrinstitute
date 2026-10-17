@@ -3,10 +3,6 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Database\Seeders\RoleSeeder;
-use Database\Seeders\UserSeeder;
-use Database\Seeders\LevelSeeder;
-use Database\Seeders\WilayahSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -16,9 +12,10 @@ class DatabaseSeeder extends Seeder
             LevelSeeder::class,
             RoleSeeder::class,
             WilayahSeeder::class,
-            UserSeeder::class,
-            PostSeeder::class,
-    GallerySeeder::class,
         ]);
+
+        if (app()->environment(['local', 'testing'])) {
+            $this->call([UserSeeder::class, PostSeeder::class, GallerySeeder::class]);
+        }
     }
 }

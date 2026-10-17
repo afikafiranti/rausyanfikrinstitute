@@ -1,15 +1,27 @@
 @extends('layouts.app')
 @section('page-content')
+    @can('manage-content')
+        <a href="{{ route('materi.manage') }}" class="rf-btn mb-4 inline-block">Kelola Materi</a>
+    @endcan
+    @error('q')
+        <p class="mb-4 text-red-600" role="alert">{{ $message }}</p>
+    @enderror
+    @if ($q !== '')
+        <p class="mb-4 text-sm">
+            Hasil pencarian: {{ $q }}.
+            <a href="{{ route('materi.index') }}" class="text-indigo-600 underline">Reset pencarian</a>
+        </p>
+    @endif
     {{-- ===================== DESKTOP (≥ md) ===================== --}}
     <div class="hidden md:block">
         <div class="grid grid-cols-12 gap-4">
             {{-- Sidebar Filter --}}
             <aside class="col-span-3 rounded-xl bg-white p-4">
                 <h3 class="font-semibold mb-3">Pencarian</h3>
-                <form action=" {{ route('materi.index') }}" method="GET" class="space-y-3">
+                <form action="{{ route('materi.index') }}" method="GET" class="space-y-3">
                     <div>
-                        <label class="block text-sm mb-1">Cari Materi</label>
-                        <input type="text" name="q" value="{{ request('q') }}"
+                        <label for="materi-search-desktop" class="block text-sm mb-1">Cari Materi</label>
+                        <input id="materi-search-desktop" type="text" name="q" value="{{ $q }}" maxlength="150"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="judul materi ..."
                             autocomplete="off">
                     </div>
@@ -21,10 +33,6 @@
             <section class="col-span-9 rounded-xl bg-white p-4 shadow">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-semibold">Daftar Materi</h3>
-                    @if (Route::has('materi.create'))
-                        <a href="{{ route('materi.create') }}" class="rf-btn"><i class="fas fa-plus mr-2"></i>Tambah
-                            Materi</a>
-                    @endif
                 </div>
 
                 <div class="overflow-x-auto">
@@ -59,24 +67,14 @@
                                     <td class="py-2 pr-4"><x-badge :color="$color">{{ $status }}</x-badge></td>
                                     <td class="py-2">
                                         <div class="flex gap-3">
-                                            @if (Route::has('materi.show') && isset($row->id))
-                                                <a href="{{ route('materi.show', $row->id) }}"
-                                                    class="text-indigo-600 hover:underline">Lihat</a>
-                                            @else
-                                                <a href="#" class="text-indigo-600 hover:underline">Lihat</a>
-                                            @endif
-                                            @if (Route::has('materi.edit') && isset($row->id))
-                                                <a href="{{ route('materi.edit', $row->id) }}"
-                                                    class="text-slate-600 hover:underline">Edit</a>
-                                            @else
-                                                <a href="#" class="text-slate-600 hover:underline">Edit</a>
-                                            @endif
+                                            <a href="{{ route('materi.show', $row->id) }}"
+                                                class="text-indigo-600 hover:underline">Lihat</a>
                                         </div>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="py-6 text-center text-slate-500">Belum ada materi.</td>
+                                    <td colspan="5" class="py-6 text-center text-slate-500">{{ $q !== '' ? 'Tidak ada materi yang cocok.' : 'Belum ada materi.' }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -96,9 +94,11 @@
         <h1 class="text-xl font-semibold">Materi</h1>
 
         <form action="{{ route('materi.index') }}" method="GET" class="mt-3">
-            <input type="text" name="q" value="{{ request('q') }}"
+            <label for="materi-search-mobile" class="block text-sm mb-1">Cari Materi</label>
+            <input id="materi-search-mobile" type="text" name="q" value="{{ $q }}" maxlength="150"
                 class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Cari materi..."
                 autocomplete="off">
+            <button class="rf-btn mt-2" type="submit">Cari</button>
         </form>
 
         <div class="mt-4 space-y-3">
@@ -119,20 +119,11 @@
                         <x-badge :color="$color">{{ $status }}</x-badge>
                     </div>
                     <div class="mt-3 flex gap-3 text-sm">
-                        @if (Route::has('materi.show') && isset($m->id))
-                            <a href="{{ route('materi.show', $m->id) }}" class="text-indigo-600">Buka</a>
-                        @else
-                            <a href="#" class="text-indigo-600">Buka</a>
-                        @endif
-                        @if (Route::has('materi.edit') && isset($m->id))
-                            <a href="{{ route('materi.edit', $m->id) }}" class="text-slate-600">Edit</a>
-                        @else
-                            <a href="#" class="text-slate-600">Edit</a>
-                        @endif
+                        <a href="{{ route('materi.show', $m->id) }}" class="text-indigo-600">Buka</a>
                     </div>
                 </div>
             @empty
-                <div class="rf-card text-slate-500">Belum ada materi.</div>
+                <div class="rf-card text-slate-500">{{ $q !== '' ? 'Tidak ada materi yang cocok.' : 'Belum ada materi.' }}</div>
             @endforelse
 
             @if (method_exists($items, 'links'))

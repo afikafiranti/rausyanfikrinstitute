@@ -2,6 +2,8 @@
 
 ## 1. Ringkasan Produk
 
+Status implementasi 2026-10-17: A0/A1/A2 dan B0/B1/B2 lokal digabung sesuai instruksi pengguna; bukti pengujian gabungan ada pada CATATAN_JALUR_B.md. Impor/ekspor alumni tetap menyediakan Excel .xlsx dan CSV dengan nama wilayah. Laporan mendukung draf, edit/kirim, review sesuai wilayah, rekap dan CSV; laporan rejected tetap terkunci tanpa alur revisi ulang. QA browser B dan latihan pemulihan sintetis lokal tersedia. Staging belum tersedia; merge lokal bukan penetapan kesiapan rilis dan CI remote/advisory dependency tetap perlu ditindaklanjuti.
+
 Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
 
 Produk ini harus mengutamakan:
