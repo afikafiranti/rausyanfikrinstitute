@@ -8,6 +8,33 @@ Tanggal penetapan: 2026-10-16.
 
 Rencana ini menggantikan urutan dan prioritas tahap lama di bagian referensi modul. Pembaruan integrasi 2026-10-17: A0/A1/A2 sudah berada di origin/develop; B0/B1/B2.1–B2.6 lokal digabung sesuai instruksi pengguna. Implementasi dan bukti masing-masing tercatat pada CATATAN_JALUR_A.md dan CATATAN_JALUR_B.md. Pengujian hasil gabungan dicatat pada bagian integrasi Jalur B; staging, CI remote, advisory dependency dan persetujuan rilis tetap terpisah dari merge lokal.
 
+Pembaruan cakupan 2026-10-17: pengguna meminta sinkronisasi dokumentasi dan mengonfirmasi pelengkapan fitur publik, termasuk artikel. Status ketersediaan fitur mengikuti matriks PRD; urutan tindak lanjut di bawah berlaku setelah integrasi tanpa mengulang A0–A2 yang sudah DONE. B0–B2 dan integrasi tetap REVIEW.
+
+### Tindak Lanjut Setelah Integrasi
+
+Keputusan pengguna 2026-10-17: arah pengembangan berikut disetujui. Urutan pengerjaan adalah **pengamanan verifikasi akun pengelola -> PUB-04 artikel -> PUB-01 agenda -> PUB-02 tim/kontak -> PUB-03 navigasi final -> staging/rilis**. Nomor PUB tetap dipertahankan sebagai identitas task, bukan urutan eksekusi.
+
+- **Jalur A:** kerjakan A3-VERIFY terlebih dahulu: tetapkan batas role target verifikasi akun pengelola, tutup akses koorda ke aktivasi admin/super_admin, dan tambahkan test negatif. Lanjutkan QA profil, email dan impor Excel yang masih terbuka.
+- **Jalur B:** mulai PUB-04 sebagai batch fitur berikutnya; gunakan pola pengelolaan Post existing bila sesuai, tentukan pembeda artikel/refleksi dan aturan publikasinya sebelum mengubah schema. Pertahankan URL/refleksi dan hindari dua sistem konten yang menduplikasi alur yang sama. Setelah itu lanjut PUB-01, PUB-02 dan PUB-03.
+- **Jalur B, persiapan rilis:** tangani B3-RELEASE secara paralel bila independen: triase advisory Composer, penilaian pemakaian kunci historis, CI remote dan persiapan staging. Audit npm tetap dilewati sesuai keputusan pengguna; jangan rotasi kunci server tanpa inventarisasi dampak.
+- **Penggabung A+B:** verifikasi integrasi per batch; rilis menunggu A3-VERIFY dan B3-RELEASE selesai. Pekerjaan fitur B pada lingkungan terisolasi tidak perlu menunggu seluruh pekerjaan rilis selesai.
+
+Arahan serah terima Jalur B tersedia di [CATATAN_JALUR_B.md](CATATAN_JALUR_B.md#arahan-berikutnya-untuk-pemilik-jalur-b). Periksa branch/status sebelum mulai; jangan memindahkan perubahan dokumentasi develop yang belum di-commit ke dev-B. Ambil baseline gabungan setelah tersimpan pada branch bersama, lalu catat task IN_PROGRESS pada catatan jalur sendiri.
+
+1. Tindak lanjuti advisory dependency, penilaian kunci historis, batas verifikasi akun pengelola, CI remote, QA impor Excel/email dan staging/backup nyata sebelum menetapkan kesiapan rilis.
+2. Lengkapi tampilan publik melalui PUB-01–PUB-04. Cakupannya dikonfirmasi pengguna; statusnya TODO, belum diimplementasikan dan belum memiliki tanggal rilis. Pekerjaan dapat disiapkan tanpa menunggu staging; penggunaan data nyata tetap mengikuti syarat rilis.
+
+| ID | Pemilik | Prioritas | Hasil yang akan dibuat |
+|---|---|---|---|
+| PUB-01 | Jalur B | P2 | Agenda publik berisi informasi kajian nyata dan empty state bila belum ada agenda |
+| PUB-02 | Jalur B | P2 | Profil tim dan informasi kontak resmi yang disetujui pengelola, ditampilkan pada halaman publik aktif |
+| PUB-03 | Jalur B, koordinasi A untuk view auth | P2 | Navigasi, CTA Daftar menuju register existing, dan konten publik final; semua tautan menuju halaman/section yang tersedia |
+| PUB-04 | Jalur B | P2 | Daftar/detail artikel publik dan tautan navigasi, dengan pengelolaan konten oleh admin; pertahankan refleksi existing |
+
+Kriteria selesai publik: konten resmi disetujui, tidak ada data/template fiktif yang tampil, tersedia empty/error state sesuai alur, tampilan mobile dan keyboard diuji, serta konten yang belum terbit tidak terbuka. Reuse alur post/galeri existing jika memenuhi kebutuhan; cara pengelolaan agenda/tim/kontak serta penyimpanan artikel ditetapkan sebelum coding. Rencana ini tidak otomatis menambah kalender, pendaftaran acara atau pengiriman formulir kontak.
+
+Metadata YouTube otomatis dan progres menonton tetap ditunda; revisi laporan rejected belum tersedia. CRUD web khusus master role/wilayah/level masih perlu rincian kebutuhan sebelum memiliki task implementasi. Fitur tersebut tidak menjadi bagian PUB-01–PUB-04.
+
 | Jalur | Penanggung jawab | Hasil utama | Branch |
 |---|---|---|---|
 | A | Pengembang A (pengguna) | Akses akun dan wilayah aman; data alumni, profil, verifikasi, dan materi konsisten | dev-A |
@@ -58,7 +85,7 @@ Pemilik: pengembang A (pengguna). Branch: dev-A.
 - Lengkapi pengelolaan playlist/video oleh admin dan akses video yang benar-benar dapat digunakan alumni, mengikuti schema yang ada.
 - Pencarian materi harus benar-benar memfilter data; hapus tombol edit/tambah yang belum mempunyai action.
 - Lengkapi impor/ekspor Excel .xlsx dan CSV alumni setelah aturan validasi dan wilayah stabil. Template/ekspor menampilkan nama wilayah; impor juga menerima ID pada template legacy. Sertakan laporan baris gagal dan pencegahan perubahan role/level tanpa izin.
-- Progress menonton dan sinkronisasi metadata otomatis ditunda sampai akses dan pengelolaan materi selesai.
+- Progress menonton dan sinkronisasi metadata otomatis berada di luar penyelesaian A2 dan tetap ditunda pada tindak lanjut saat ini; judul/durasi video diisi manual.
 
 **Kriteria selesai jalur A:** pengelola tetap pada sesinya; akun baru memiliki role/status/wilayah yang tepat; akses lintas wilayah ditolak; status dan level membatasi materi; validasi gagal tidak menghasilkan error database; perubahan kritikal memiliki audit yang dapat dibaca. Test baru dan test alumni/auth/profile/materi yang terdampak harus lulus pada PHP 8.3.
 
@@ -128,7 +155,7 @@ Aturan file bersama:
 6. Di hasil gabungan jalankan composer validate --strict, composer check-platform-reqs, php artisan route:list, migration/seed pada database uji baru, php artisan test, dan npm ci && npm run build pada PHP 8.3. Uji klik per role untuk login/register, alumni, verifikasi, materi, dashboard, konten, dan laporan yang sudah diaktifkan.
 7. Release hanya setelah semua P0 tertutup, test regresi lulus, dan dokumen pusat diperbarui. Fitur P2 yang belum selesai tetap disembunyikan atau diberi label belum tersedia.
 
-Catatan baseline audit: 108 file PHP lolos lint menggunakan PHP 8.4 dan composer validate --strict lolos. Runtime PHP 8.3, test aplikasi, build frontend, browser, dan deployment belum terverifikasi karena dependensi lokal belum terpasang. Hasil tersebut bukan bukti bahwa seluruh aplikasi sudah lulus test.
+Catatan historis baseline audit 2026-10-16: saat itu 108 file PHP lolos lint menggunakan PHP 8.4 dan composer validate --strict lolos, sedangkan runtime/test/build belum terverifikasi karena dependensi belum terpasang. Bukti terbaru hasil integrasi ada pada TASK dan CATATAN_JALUR_B; keterbatasan baseline ini tidak menggantikan hasil pengujian terbaru.
 
 ## Prinsip Prioritas
 

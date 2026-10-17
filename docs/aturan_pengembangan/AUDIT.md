@@ -14,6 +14,14 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 
 ## Audit Status Saat Ini
 
+### Sinkronisasi Cakupan dan Rencana Publik — 2026-10-17
+
+- Atas instruksi pengguna, DOC-SYNC menyelaraskan README/PRD/PLAN/TASK/SOP dengan kode hasil integrasi. Matriks PRD membedakan tersedia, sebagian, direncanakan dan ditunda; tidak mengubah status REVIEW rilis B0–B2.
+- Agenda, tim, kontak, artikel dan navigasi/CTA publik tetap bagian pekerjaan yang akan dibuat melalui PUB-01–PUB-04. Agenda saat ini placeholder; tim/kontak belum terpasang; artikel belum memiliki halaman daftar/detail tersendiri. Konten resmi/cara pengelolaan perlu ditetapkan saat implementasi.
+- Pekerjaan materi lama sudah ditutup oleh A0/A2; workflow laporan tersedia dalam B2. Metadata otomatis/progres menonton, revisi rejected dan CRUD master web khusus belum tersedia sesuai batas pada PRD.
+- Risiko yang tetap terbuka dari analisis kode: verifikasi membatasi wilayah/status target, belum role target, sehingga koorda dapat mengaktifkan akun admin pending di wilayahnya. Tetapkan kebijakan akun pengelola dan regression test sebelum menutup review akses; sinkronisasi dokumen tidak memperbaiki endpoint.
+- Advisory Composer masih 48 pada 14 paket saat analisis sesi ini; rincian tambahan audit dan audit npm tidak dilanjutkan karena pembatasan pengiriman metadata/keputusan pengguna. CI remote, penilaian kunci historis dan staging tetap tindak lanjut.
+
 ### Integrasi A+B — 2026-10-17
 
 - Blok route A dan B dipertahankan. Konflik Composer diselesaikan dengan seluruh dependency/versi Excel A tetap utuh, sementara PHP ^8.3 dan config.platform.php 8.3.0 B berlaku bersama.
@@ -26,7 +34,7 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 - Jalur A sudah digabung ke develop: batas wilayah/gate/materi dan seeder (A0), registrasi/profil/validasi/audit atomik/verifikasi (A1), pengelolaan materi serta impor/ekspor Excel/CSV (A2). Temuan milik A pada baseline berikut sudah ditangani dengan regression test; baseline tetap menjadi riwayat audit awal.
 - Pengujian integrasi memakai PHP 8.3.30 + ZIP, MySQL 8.4.3 pada database sementara terpisah, serta build frontend. Tidak menggunakan database pengembangan dan tidak mengubah .env.
 - MySQL dapat mengubah urutan key JSON; tiga test audit diperbaiki dengan normalisasi urutan key sebelum pembandingan ketat. Nilai dan tipe audit tidak dilonggarkan.
-- Belum menjadi persetujuan rilis: pekerjaan B0/B1/B2 dan pengujian gabungan A+B belum selesai. Advisory pada 14 dependency lama (48 laporan saat audit Composer A2), keamanan lingkungan/dashboard dan kesiapan CI tetap tindak lanjut B.
+- Pada integrasi A 2026-10-16, pekerjaan B0/B1/B2 dan pengujian A+B belum selesai. Hasil integrasi 2026-10-17 tercatat di atas; advisory dependency, penilaian kunci historis, CI remote dan staging tetap tindak lanjut rilis.
 - Risiko tersisa A: QA browser impor Excel dan email nyata belum dilakukan; ekspor XLSX besar masih memakai memori sesuai jumlah data; pembatasan level aplikasi tidak mencegah tautan YouTube dibagikan. Progress menonton/sinkronisasi metadata tetap ditunda.
 
 ### Baseline Audit dan Pemilik Perbaikan — 2026-10-16
@@ -59,6 +67,10 @@ Guardrail kerja paralel:
 - Rotasi kunci lingkungan nyata memerlukan penilaian data terenkripsi; menghapus file dari Git saja tidak membatalkan kunci yang sudah tersebar.
 
 Verifikasi baseline: lint 108 file PHP pada PHP 8.4 dan validasi composer.json berhasil. Test aplikasi terhalang vendor yang belum tersedia; build frontend terhalang dependensi Vite yang belum terpasang. Browser, PHP 8.3 runtime, dan server aktif belum diuji. Tidak ada kode aplikasi yang diubah pada audit maupun penyusunan pembagian ini.
+
+## Riwayat Temuan Modul Sebelum Integrasi A+B
+
+Catatan di bawah dipertahankan sebagai riwayat pemeriksaan awal. Status seperti awal/perlu review pada temuan lama tidak menggantikan matriks PRD, tabel TASK dan audit integrasi terbaru di atas.
 
 ### Alumni Store
 Status: terkendali dan sudah memiliki automated test.

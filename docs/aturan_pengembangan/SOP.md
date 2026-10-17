@@ -6,7 +6,7 @@ Dokumen ini wajib diikuti sebelum, selama, dan setelah pengembangan fitur.
 
 Pembaruan integrasi 2026-10-17: penggabung menyinkronkan hasil A+B atas instruksi pengguna. Target bersama PHP 8.3/MySQL atau MariaDB; test gabungan memakai database terisolasi dengan akhiran _testing melalui guard B. Instal dependency mengikuti lockfile gabungan (termasuk Excel A), jangan mengganti dengan lockfile salah satu jalur. Bukti merge lokal tidak menggantikan CI remote, QA staging dan persetujuan rilis.
 
-Catatan integrasi 2026-10-16: pengguna mengizinkan jalur A digabung lebih dulu ke develop. Setelah mengambil perubahan ini, pengembang B menjalankan git fetch origin, git switch dev-B, git merge origin/develop, lalu composer install. Selesaikan konflik per kepemilikan file; jangan mengganti lockfile dengan versi lama. A0/A1/A2 tidak perlu dikerjakan ulang. Integrasi B dan pengujian A+B tetap dilakukan kemudian sebelum rilis.
+Catatan historis integrasi 2026-10-16: pengguna mengizinkan jalur A digabung lebih dulu ke develop. Pengembang B kemudian mengambil hasil A dan mengintegrasikannya pada 2026-10-17. A0/A1/A2 tidak perlu dikerjakan ulang; status implementasi serta bukti terbaru mengikuti TASK dan catatan integrasi A+B.
 
 Semua pengembangan harus mengacu pada:
 - `PRD.md`: kebutuhan produk, role, fitur, acceptance criteria.
@@ -14,6 +14,10 @@ Semua pengembangan harus mengacu pada:
 - `TASK.md`: task yang sudah, sedang, dan akan dikerjakan.
 - `AUDIT.md`: risiko, guardrail, dan keputusan audit.
 - `SOP.md`: aturan kerja dan sinkronisasi dokumen.
+
+README menjadi ringkasan fitur/setup dan menautkan matriks cakupan PRD. Setiap pembaruan fitur menyelaraskan status pada README/PRD, urutan PLAN dan ID/status TASK; catatan historis diberi konteks tanggal. Tersedia/sebagian/direncanakan/ditunda menggambarkan cakupan implementasi, sedangkan DONE/REVIEW menggambarkan penyelesaian task berdasarkan bukti. Keduanya tidak menggantikan verifikasi rilis.
+
+Keputusan cakupan publik 2026-10-17: agenda, tim/kontak, navigasi/CTA Daftar dan artikel akan dibuat melalui PUB-01–PUB-04. Gunakan konten resmi; penentuan cara pengelolaan/reuse model dilakukan sebelum coding sesuai PRD/PLAN. Sinkronisasi dokumentasi diperbolehkan atas instruksi pengguna sesuai pengecualian bagian 2A.
 
 ## 2. Aturan Sinkronisasi
 
@@ -265,7 +269,7 @@ Setiap fitur harus melewati urutan ini:
 4. Nilai enum di form, seeder, dan database harus sama.
 5. Perubahan schema harus disertai audit dampak.
 6. Insert multi-tabel penting harus memakai transaksi.
-7. Automated test wajib memakai database testing terpisah, saat ini `rf_db_testing`.
+7. Automated test wajib memakai database sendiri berakhiran `_testing` pada MySQL/MariaDB; default PHPUnit/CI saat ini `rf_b_testing`. Jangan berbagi database test antar jalur.
 8. Jangan menjalankan `RefreshDatabase` pada database development `rf_db`.
 
 ## 7. Aturan Permission Wajib

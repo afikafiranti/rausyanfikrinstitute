@@ -339,7 +339,24 @@
 - PLAN/PRD/TASK/AUDIT/SOP disinkronkan oleh penggabung sesuai pengecualian aturan paralel. Identitas commit memakai Codex <codex@localhost> per perintah karena mesin belum memiliki user Git; konfigurasi global tidak diubah.
 - Integrasi hanya lokal; tidak push, tidak deploy dan tidak menjalankan CI remote. Branch dev-B dipertahankan. Staging belum tersedia, advisory/penilaian kunci historis serta QA browser A/email nyata tetap tindak lanjut sebelum rilis.
 
+## DOC-SYNC — Sinkronisasi dokumentasi setelah integrasi
+
+- Status: DONE (2026-10-17), atas instruksi pengguna pada develop.
+- Scope: README dan dokumen pusat; pengguna mengonfirmasi agenda, tim/kontak dan navigasi publik tetap akan dibuat, serta menambahkan artikel publik. Dicatat sebagai PUB-01–PUB-04; tidak mengimplementasikan UI atau mengubah pembagian kepemilikan kode.
+- File: README.md, docs/aturan_pengembangan/{PRD,PLAN,TASK,AUDIT,SOP}.md dan catatan ini.
+- Hasil: matriks cakupan PRD/README, tindak lanjut PLAN, task publik TODO, status materi/laporan, konteks riwayat audit dan aturan database test SOP diselaraskan. B0–B2 dan integrasi tetap REVIEW; tidak menetapkan fitur publik atau rilis selesai.
+- Verifikasi: 56 pemeriksaan ID task, cakupan artikel, tautan lokal/anchor, referensi seeder dan status task lulus; git diff --check lulus. Pemeriksaan kode sumber membedakan route/view aktif dari template yang belum dipasang. Test aplikasi/build tidak dijalankan ulang untuk perubahan dokumentasi.
+
 ## Tahap berikutnya
+
+### Arahan Berikutnya untuk Pemilik Jalur B
+
+- Keputusan pengguna 2026-10-17: arah lanjutan disetujui dan perlu diketahui pemilik B. Acuan aktif: [PLAN](PLAN.md#tindak-lanjut-setelah-integrasi) dan [TASK](TASK.md#ringkasan-status-saat-ini). Arahan ini menggantikan urutan mulai B0 historis untuk pekerjaan setelah integrasi; B0–B2 tetap REVIEW sesuai bukti sebelumnya.
+- **Task fitur pertama: PUB-04 (TODO), artikel publik.** Tentukan pembeda artikel/refleksi dan aturan penerbitan admin, evaluasi reuse Post existing, lalu buat pengelolaan serta daftar/detail publik. Pertahankan refleksi/URL existing dan uji konten belum terbit tidak dapat diakses lewat daftar maupun URL detail.
+- Berikutnya **PUB-01 agenda -> PUB-02 tim/kontak -> PUB-03 navigasi/Daftar final**. Gunakan informasi resmi, empty state, tampilan mobile dan akses keyboard. Koordinasikan perubahan view auth dengan A; jangan memperluas menjadi kalender interaktif, pendaftaran acara atau formulir kontak.
+- **B3-RELEASE (TODO)** dapat berjalan paralel pada pekerjaan independen: advisory Composer, inventarisasi kunci historis, CI remote dan staging/backup. Audit npm tetap dilewati. Jalur A memiliki **A3-VERIFY (TODO/P0)**; B tidak mengedit controller/request/gate verifikasi milik A. Integrasi/rilis wajib memverifikasi hasil A.
+- Awal sesi B: baca AGENTS/PRD/PLAN/TASK/AUDIT/SOP, cek branch/status, gunakan dev-B dari baseline develop gabungan yang sudah tersimpan; jangan membawa perubahan develop yang belum di-commit. Catat task IN_PROGRESS di file ini sebelum implementasi, verifikasi per batch, lalu REVIEW/DONE sesuai bukti. Jangan mengulang A0–A2 atau menimpa lockfile gabungan.
+- Status serah terima **NEXT-PLAN: DONE** untuk penyusunan arahan; AGENTS.md mengarahkan sesi B ke PUB-04. File: AGENTS.md, PLAN.md, TASK.md dan catatan ini. Konsistensi ID/urutan/tautan lokal serta git diff --check lulus. Perubahan hanya dokumentasi; test aplikasi/build tidak diulang. Belum dikirim ke remote atau dikonfirmasi dibaca rekan pengembang.
 
 - B0.2 masuk REVIEW; tunggu verifikasi CI remote saat perubahan diajukan.
 - B0.3 masuk REVIEW; runner lokal lulus, tracking environment rahasia dihentikan.

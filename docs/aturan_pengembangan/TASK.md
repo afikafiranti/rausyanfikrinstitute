@@ -11,6 +11,47 @@ Status yang digunakan:
 
 ## Ringkasan Status Saat Ini
 
+### DONE: NEXT-PLAN — Penetapan arah berikutnya dan serah terima Jalur B
+
+Tanggal mulai/selesai: 2026-10-17. Owner: penggabung dokumentasi pada develop, atas persetujuan pengguna.
+
+- Urutan disepakati: A3-VERIFY -> PUB-04 -> PUB-01 -> PUB-02 -> PUB-03 -> staging/rilis; persiapan B3-RELEASE dapat berjalan paralel secara independen.
+- Arahan pemilik Jalur B dicatat pada PLAN dan CATATAN_JALUR_B; status implementasi task berikut tetap TODO.
+- Verifikasi: konsistensi ID/urutan/tautan lokal dan git diff --check; hasil akhir dicatat pada CATATAN_JALUR_B.
+
+### TODO: A3-VERIFY — Batas Role Target Verifikasi
+
+Prioritas: P0 sebelum rilis. Owner: Jalur A.
+
+- [ ] Tegaskan matriks pemberi/target persetujuan akun pengelola; koorda tidak boleh mengaktifkan admin/super_admin, termasuk akun pending setelah perubahan profil.
+- [ ] Terapkan aturan pada endpoint approve/reject dan tampilan antrean/tindakan yang terkait sesuai kebijakan; pertahankan scope wilayah existing.
+- [ ] Tambahkan regression test target pengelola pada wilayah sama/berbeda, akun tanpa wilayah dan status tidak memenuhi syarat; pastikan verifikasi alumni yang sah tetap berjalan.
+- [ ] Catat kebijakan, hasil test domain A dan review independen sebelum integrasi.
+
+### TODO: B3-RELEASE — Penutupan Risiko dan Bukti Rilis
+
+Prioritas: P0 untuk risiko keamanan; verifikasi operasional wajib sebelum rilis. Owner: Jalur B; penggabung A+B untuk suite akhir.
+
+- [ ] Triase advisory Composer yang sudah tercatat dan perbaiki dependency terdampak secara terarah; ikuti lockfile dan verifikasi PHP 8.3. Audit npm dilewati sesuai keputusan pengguna.
+- [ ] Inventarisasi pemakaian kunci historis dan dampak dekripsi sebelum menetapkan tindakan server; jangan menganggap penghapusan dari tracking menyelesaikan paparan lama.
+- [ ] Jalankan CI remote setelah perubahan tersedia di remote; catat hasil, bukan hanya konfigurasi workflow.
+- [ ] Setelah target staging tersedia, uji alur per role, email nyata, impor Excel, upload, mobile/keyboard serta backup/restore sesuai runbook pada lingkungan terisolasi.
+- [ ] Gabungkan bukti A3-VERIFY, test gabungan, build dan review; pertahankan status REVIEW rilis sampai syarat terpenuhi.
+
+### DONE: DOC-SYNC — Sinkronisasi cakupan fitur dan rencana publik
+
+Prioritas: dokumentasi integrasi.
+Tanggal mulai: 2026-10-17.
+Tanggal selesai: 2026-10-17.
+Owner: penggabung dokumentasi A+B pada develop, atas instruksi pengguna.
+
+- README, PRD, PLAN, TASK, AUDIT dan SOP diselaraskan dengan implementasi hasil integrasi.
+- Matriks PRD membedakan fitur tersedia, sebagian, direncanakan dan ditunda; status ketersediaan bukan persetujuan rilis.
+- Pengguna mengonfirmasi fitur tampilan publik tetap akan dibuat: agenda, tim, kontak, artikel dan pelengkapan navigasi publik dicatat sebagai PUB-01–PUB-04.
+- Referensi instalasi/seeder diperbaiki, task materi lama ditutup oleh A2 dan workflow laporan diselaraskan ke REVIEW B2; riwayat audit tetap dipertahankan dengan konteks tanggal.
+- Verifikasi: 56 pemeriksaan konsistensi ID PUB-01–PUB-04, cakupan artikel, tautan lokal/anchor, referensi seeder dan status task lulus; git diff --check lulus. Dicocokkan dengan route/view/controller/seeder existing.
+- Perubahan hanya dokumentasi; test aplikasi/build tidak dijalankan ulang. CI remote, QA operasional dan staging tetap mengikuti tindak lanjut rilis.
+
 ### Integrasi lokal A+B — 2026-10-17
 
 - Penggabungan atas instruksi pengguna mempertahankan hasil A c411747 serta commit B a31cecf. Satu konflik metadata Composer diselesaikan tanpa memperbarui paket lama; route A/B tetap lengkap.
@@ -20,7 +61,7 @@ Status yang digunakan:
 
 ### Pembagian Aktif Dua Orang — 2026-10-16
 
-Rencana aktif dan batas file ada di PLAN.md pada bagian Rencana Aktif: Dua Orang Bekerja Paralel. Status berikut telah disinkronkan saat integrasi jalur A pada 2026-10-16; rincian bukti ada di CATATAN_JALUR_A.md.
+Rencana aktif dan batas file ada di PLAN.md pada bagian Rencana Aktif: Dua Orang Bekerja Paralel. Tabel ini telah disinkronkan dengan integrasi A+B pada 2026-10-17; rincian bukti ada di CATATAN_JALUR_A.md dan CATATAN_JALUR_B.md.
 
 | ID | Pemilik | Prioritas | Status | Pekerjaan |
 |---|---|---|---|---|
@@ -35,7 +76,7 @@ Rencana aktif dan batas file ada di PLAN.md pada bagian Rencana Aktif: Dua Orang
 ### Integrasi Jalur A ke develop — 2026-10-16
 
 - A0/A1/A2 selesai dan digabung ke develop atas instruksi pengguna tanpa menunggu B. Status DONE di atas berlaku pada implementasi dan automated test; QA browser impor Excel dan email nyata masih tertunda.
-- MERGE keseluruhan tetap TODO sampai jalur B selesai dan diuji bersama; status B belum diverifikasi melalui repo ini. Jangan mengulang pekerjaan A sebagai TODO.
+- Pada 2026-10-16, MERGE keseluruhan masih TODO sambil menunggu B. Status terkini sudah REVIEW sesuai integrasi A+B pada 2026-10-17; jangan mengulang pekerjaan A sebagai TODO.
 - Pemeriksaan integrasi: seluruh suite pada PHP 8.3.30 + ZIP dan database MySQL khusus, build frontend, validasi Composer/platform, route dan migration. Hasil final dicatat di CATATAN_JALUR_A.md.
 - Pengujian MySQL penuh menemukan tiga assertion audit yang bergantung urutan key JSON. Key diurutkan sebelum assertSame agar isi, struktur, dan tipe tetap diperiksa ketat pada MySQL maupun SQLite; tidak mengubah perilaku aplikasi.
 - Dev-B mengambil origin/develop lalu menyelesaikan konflik pada blok route dan Composer bila ada. Dependency Excel ditambahkan dengan persetujuan pengguna, tanpa memperbarui paket lama.
@@ -62,10 +103,11 @@ Tanggal: 2026-10-16.
 - Menyelaraskan SOP pencatatan per jalur agar dokumen pusat tidak diedit bersamaan.
 - File aturan dan rencana perlu di-commit serta dibagikan melalui baseline develop sebelum tersedia di checkout rekan.
 
-Project berada pada fase:
-- V1 Data Alumni: berjalan dan sebagian besar sudah aktif.
-- V2 Materi Kajian: awal dan perlu perapian schema.
-- V3 Laporan Kajian: awal dan perlu definisi workflow.
+Fase proyek setelah integrasi 2026-10-17:
+- V1 Data Alumni: fitur inti termasuk impor/ekspor CSV/Excel tersedia.
+- V2 Materi Kajian: pengelolaan dan akses materi tersedia; metadata otomatis/progres ditunda.
+- V3 Laporan Kajian: draf sampai rekap/CSV tersedia; B2 masih REVIEW untuk rilis.
+- Publik: homepage/refleksi/galeri tersedia; agenda, tim/kontak, navigasi final dan artikel dilanjutkan melalui PUB-01–PUB-04.
 
 ## Task Selesai
 
@@ -487,23 +529,64 @@ Verifikasi:
 - `php artisan test --filter=AlumniIndexFilterTest`: 5 passed, 27 assertions.
 - `php artisan test`: 54 passed, 2 skipped, 264 assertions.
 
-### TODO: Perbaiki Modul Materi
-Prioritas: tinggi setelah audit schema
+### DONE: Perbaiki Modul Materi (ditutup oleh A0/A2)
+Prioritas: tinggi setelah audit schema.
+Status disinkronkan: 2026-10-17; bukti implementasi/test pada CATATAN_JALUR_A.md dan integrasi A+B.
 
 Checklist:
-- Sesuaikan field controller dengan database.
-- Perbaiki variable typo pada `MateriController`.
-- Pastikan view menerima variable yang benar.
-- Pastikan akses berdasarkan level bekerja.
+- [x] Sesuaikan field controller dengan database dan perbaiki variabel view.
+- [x] Akses materi menurut status/level, pengelolaan playlist/video dan pencarian.
 
-### TODO: Definisikan Ulang Workflow Laporan Kajian
-Prioritas: sedang
+Metadata otomatis dan progres menonton tetap ditunda; bukan bagian task yang ditutup ini.
+
+### REVIEW: Workflow Laporan Kajian (implementasi B2 tersedia)
+Prioritas: sedang.
+Status disinkronkan: 2026-10-17; bukti implementasi/test pada CATATAN_JALUR_B.md.
 
 Checklist:
-- Finalisasi field laporan.
-- Finalisasi status laporan.
-- Finalisasi role yang boleh submit/review.
-- Finalisasi review approve/reject.
+- [x] Field/status/role laporan ditetapkan; draf, edit/kirim, review approve/reject, rekap dan CSV tersedia.
+- [ ] Selesaikan CI remote dan validasi staging/rilis bersama B0–B2.
+
+Laporan rejected tetap terkunci; alur revisi/kirim ulang belum tersedia.
+
+## Pekerjaan Publik Berikutnya
+
+Urutan pelaksanaan yang disetujui: **PUB-04 -> PUB-01 -> PUB-02 -> PUB-03**. Jalur B memulai artikel; ID task tidak diubah. Lihat A3-VERIFY dan B3-RELEASE untuk syarat integrasi/rilis. Agenda cukup informasi kajian; kalender interaktif, pendaftaran acara dan formulir kontak tidak termasuk batch ini.
+
+Cakupan dikonfirmasi pengguna pada 2026-10-17. Keempat task TODO berikut adalah pekerjaan yang akan dibuat; perubahan dokumentasi tidak menandai implementasinya selesai. Pemilik mengikuti PLAN dan kepemilikan file existing.
+
+### TODO: PUB-01 — Agenda Kajian Publik
+
+Prioritas: P2. Owner: Jalur B.
+
+- [ ] Tetapkan konten agenda resmi dan cara pengelolaannya sebelum coding.
+- [ ] Tampilkan informasi agenda pada halaman publik aktif; sediakan empty state bila belum ada agenda.
+- [ ] Verifikasi informasi, tautan, tampilan mobile dan keyboard; jangan menampilkan contoh sebagai agenda nyata.
+
+### TODO: PUB-02 — Profil Tim dan Kontak Resmi
+
+Prioritas: P2. Owner: Jalur B.
+
+- [ ] Gunakan nama/peran/foto tim dan kanal kontak resmi yang disetujui pengelola.
+- [ ] Pasang konten pada halaman publik aktif dan ganti template yang belum digunakan.
+- [ ] Verifikasi kanal/tautan kontak, aksesibilitas dan tampilan mobile.
+
+### TODO: PUB-03 — Navigasi, CTA Daftar dan Konten Publik Final
+
+Prioritas: P2. Owner: Jalur B; koordinasi A bila menyentuh view auth.
+
+- [ ] Hubungkan navigasi dengan konten publik yang sudah tersedia dan hasil PUB-01/PUB-02/PUB-04.
+- [ ] Tambahkan CTA Daftar menuju route register existing, dengan alur login yang tetap jelas.
+- [ ] Finalisasi konten resmi dan uji semua tautan, mobile serta keyboard.
+
+### TODO: PUB-04 — Artikel Publik
+
+Prioritas: P2. Owner: Jalur B.
+
+- [ ] Tetapkan pengelolaan/publikasi artikel oleh admin; evaluasi reuse model Post existing tanpa mengganggu refleksi.
+- [ ] Buat daftar dan detail artikel publik serta tautan navigasi.
+- [ ] Pastikan hanya artikel terbit yang dapat dibaca publik, dengan empty/not-found state dan test publikasi.
+- [ ] Verifikasi konten resmi, tampilan mobile dan keyboard; pertahankan URL/alur refleksi existing.
 
 ## Format Task Baru
 
