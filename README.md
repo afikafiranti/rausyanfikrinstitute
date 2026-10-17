@@ -52,16 +52,23 @@ Pengembangan dilakukan bertahap dalam versi (incremental release):
 git clone https://github.com/afikafiranti/rausyanfikrinstitute.git
 cd rausyan-fikr
 
-composer install
-npm install && npm run dev
-
 cp .env.example .env
+# Isi database lokal terpisah pada .env terlebih dahulu.
+composer install --prefer-dist --no-interaction
+npm ci
+# Hanya untuk instalasi lokal baru; jangan mengganti kunci environment existing.
 php artisan key:generate
 
-php artisan migrate --seed
+php artisan migrate
 
+# Jalankan Vite di terminal terpisah: npm run dev
 php artisan serve
 ```
+
+Jangan menjalankan seeder akun pada database existing sebelum perbaikan A0
+diverifikasi. Deployment staging, backup, dan pemulihan mengikuti
+[runbook Jalur B](docs/aturan_pengembangan/RUNBOOK_STAGING_JALUR_B.md);
+perintah instalasi lokal di atas bukan prosedur upgrade server.
 
 ---
 

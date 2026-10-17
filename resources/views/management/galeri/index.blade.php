@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('page-content')
+    @include('management.feedback')
     @php
         $totalRows = $galleries->count();
     @endphp
@@ -17,19 +18,19 @@
                     @csrf
                     <div>
                         <label class="block text-sm mb-1">Judul</label>
-                        <input type="text" name="title" required
+                        <input type="text" name="title" required value="{{ old('_editing_id') ? '' : old('title') }}"
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Judul berita...">
                     </div>
 
                     <div>
                         <label class="block text-sm mb-1">Caption</label>
                         <textarea name="caption" rows="3" class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                            placeholder="Isi Caption Foto..."></textarea>
+                            placeholder="Isi Caption Foto...">{{ old('_editing_id') ? '' : old('caption') }}</textarea>
                     </div>
 
                     <div>
-                        <label class="block text-sm mb-1">Gambar (opsional)</label>
-                        <input type="file" name="image" accept="image/*"
+                        <label class="block text-sm mb-1">Gambar JPG/PNG (maks. 2 MB)</label>
+                        <input type="file" name="image" accept="image/jpeg,image/png" required
                             class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     </div>
 
@@ -60,7 +61,8 @@
                             <div class="flex justify-between mt-3 p-4 ">
                                 <button data-id="{{ $gallery->id }}" data-title="{{ $gallery->title }}"
                                     data-caption="{{ $gallery->caption }}"
-                                    data-image="{{ asset('storage/' . $gallery->image_url) }}"
+                                    data-image="{{ $imgSrc }}"
+                                    data-update-url="{{ route('management.galeri.update', $gallery) }}"
                                     class="edit-btn text-blue-500 hover:underline">
                                     Edit
                                 </button>
@@ -77,29 +79,33 @@
                 <div class="mt-6">
                     {{ $galleries->links() }}
                 </div>
+            </section>
         </div>
-        </section>
 
         {{-- ================= Modal Edit ================= --}}
         <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
             <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
                 <h2 class="text-xl font-semibold mb-4">Edit Galeri</h2>
-                <form id="editForm" method="POST" enctype="multipart/form-data">
+                @if ($errors->any() && old('_editing_id'))
+                    @include('management.feedback')
+                @endif
+                <form id="editForm" action="{{ old('_editing_id') ? route('management.galeri.update', old('_editing_id')) : '#' }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
+                    <input type="hidden" name="_editing_id" id="editId" value="{{ old('_editing_id') }}">
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">Judul</label>
-                        <input type="text" name="title" id="editTitle" class="w-full border rounded px-3 py-2">
+                        <input type="text" name="title" id="editTitle" required value="{{ old('_editing_id') ? old('title') : '' }}" class="w-full border rounded px-3 py-2">
                     </div>
 
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">Caption</label>
-                        <textarea name="caption" id="editCaption" rows="3" class="w-full border rounded px-3 py-2"></textarea>
+                        <textarea name="caption" id="editCaption" rows="3" class="w-full border rounded px-3 py-2">{{ old('_editing_id') ? old('caption') : '' }}</textarea>
                     </div>
 
                     <div class="mb-3">
                         <label class="block text-sm font-medium text-gray-700">Ganti Gambar (opsional)</label>
-                        <input type="file" name="image" class="w-full border rounded px-3 py-2">
+                        <input type="file" name="image" accept="image/jpeg,image/png" class="w-full border rounded px-3 py-2">
                         <img id="previewImage" src="" alt="Preview" class="mt-2 w-full h-40 object-cover rounded">
                     </div>
 
@@ -126,11 +132,11 @@
 
                 editBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
-                        const id = btn.dataset.id;
+                        document.getElementById('editId').value = btn.dataset.id;
                         titleField.value = btn.dataset.title;
                         captionField.value = btn.dataset.caption;
                         previewImage.src = btn.dataset.image;
-                        editForm.action = `/management/galeri/${id}`;
+                        editForm.action = btn.dataset.updateUrl;
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
                     });
@@ -140,6 +146,11 @@
                     modal.classList.add('hidden');
                     modal.classList.remove('flex');
                 });
+                @if ($errors->any() && old('_editing_id'))
+                    modal.classList.remove('hidden');
+                    modal.classList.add('flex');
+                @endif
             });
         </script>
+    </div>
     @endsection

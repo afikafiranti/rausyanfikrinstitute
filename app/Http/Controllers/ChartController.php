@@ -13,7 +13,12 @@ class ChartController extends Controller
      */
     protected function alumniQuery()
     {
-        return User::query();
+        $viewer = request()->user();
+
+        return User::query()->when(
+            ! $viewer->hasAnyRole(['admin', 'super_admin']),
+            fn ($query) => $query->where('wilayah_id', $viewer->wilayah_id),
+        );
     }
 
     /** GET /charts/alumni/monthly?year=2025 */
@@ -67,7 +72,7 @@ class ChartController extends Controller
 
     public function alumniAb()
 {
-    $raw = \App\Models\User::selectRaw('ab, COUNT(*) as c')
+    $raw = $this->alumniQuery()->selectRaw('ab, COUNT(*) as c')
         ->groupBy('ab')
         ->pluck('c', 'ab'); // ['iya' => 10, 'tidak' => 5]
 

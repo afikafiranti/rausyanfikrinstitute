@@ -14,7 +14,7 @@ use App\Http\Controllers\VerificationController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
-Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function () {
+Route::middleware(['auth', 'can:view-alumni', \App\Http\Middleware\ScopeWilayah::class])->prefix('charts')->name('charts.')->group(function () {
     Route::get('/alumni/monthly', [ChartController::class, 'alumniMonthly'])->name('alumni.monthly');
     Route::get('/alumni/status',  [ChartController::class, 'alumniStatus'])->name('alumni.status');
 
@@ -24,12 +24,14 @@ Route::middleware(['auth'])->prefix('charts')->name('charts.')->group(function (
 });
 
 // LANDING PAGE
-// Route::get('/', [LandingController::class, 'index'])->name('landing');
-Route::view('/', '/landingpage/home')->name('landing_page');
+Route::get('/', [LandingController::class, 'index'])->name('landing_page');
+Route::get('/refleksi', [\App\Http\Controllers\LandingController::class, 'posts'])->name('public.posts.index');
+Route::get('/refleksi/{slug}', [\App\Http\Controllers\LandingController::class, 'show'])->name('public.posts.show');
+Route::get('/galeri', [\App\Http\Controllers\LandingController::class, 'gallery'])->name('public.gallery.index');
 
 //  DASHBOARD
 //Route::view('/dashboard', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
-Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 
 
 // NOTIFIKASI
@@ -55,7 +57,20 @@ Route::middleware(['auth'])
         Route::get('/', [MateriController::class, 'index'])->name('index');
         Route::get('/{id}', [MateriController::class, 'show'])->name('show');
     });
-Route::prefix('laporan')->name('laporan.')->group(fn() => Route::view('/', 'laporan/index')->name('index'));
+Route::middleware(['auth', \App\Http\Middleware\ScopeWilayah::class])->prefix('laporan')->name('laporan.')->group(function () {
+    Route::get('/', [\App\Http\Controllers\ReportController::class, 'listing'])->name('index');
+    Route::get('/buat', [\App\Http\Controllers\ReportController::class, 'create'])->name('create');
+    Route::get('/rekap', [\App\Http\Controllers\ReportSummaryController::class, 'index'])->middleware('can:review-report')->name('summary');
+    Route::get('/ekspor', [\App\Http\Controllers\ReportSummaryController::class, 'export'])->middleware('can:review-report')->name('export');
+    Route::post('/', [\App\Http\Controllers\ReportController::class, 'store'])->name('store');
+    Route::get('/{report}', [\App\Http\Controllers\ReportController::class, 'show'])->whereNumber('report')->name('show');
+    Route::get('/{report}/edit', [\App\Http\Controllers\ReportController::class, 'edit'])->whereNumber('report')->name('edit');
+    Route::put('/{report}', [\App\Http\Controllers\ReportController::class, 'update'])->whereNumber('report')->name('update');
+    Route::post('/{report}/submit', [\App\Http\Controllers\ReportController::class, 'submit'])->whereNumber('report')->name('submit');
+    Route::post('/{report}/approve', [\App\Http\Controllers\ReportController::class, 'approve'])->whereNumber('report')->middleware('can:review-report')->name('approve');
+    Route::post('/{report}/reject', [\App\Http\Controllers\ReportController::class, 'reject'])->whereNumber('report')->middleware('can:review-report')->name('reject');
+    Route::get('/{report}/foto', [\App\Http\Controllers\ReportController::class, 'photo'])->whereNumber('report')->name('photo');
+});
 
 // PROFIL
 Route::middleware(['auth'])->group(function () {
@@ -82,7 +97,7 @@ Route::middleware(['auth', 'can:view-alumni'])
 
 
 // SCOPE WILAYAH + REVIEW LAPORAN
-Route::middleware(['auth', 'scope.wilayah'])->group(function () {
+Route::middleware(['auth', \App\Http\Middleware\ScopeWilayah::class])->group(function () {
     Route::get('/debug/scope', function (Request $r) {
         return 'WILAYAH: ' . $r->get('wilayah_id');
     })->name('debug.scope');
@@ -100,10 +115,10 @@ Route::middleware(['auth', 'can:manage-content'])
     ->group(function () {
 
         // ========== POST MANAGEMENT ==========
-        Route::resource('post', PostController::class);
+        Route::resource('post', PostController::class)->only(['index', 'store', 'update', 'destroy']);
 
         // ========== GALLERY MANAGEMENT ==========
-        Route::resource('galeri', GalleryController::class);
+        Route::resource('galeri', GalleryController::class)->only(['index', 'store', 'update', 'destroy']);
     });
 
 require __DIR__ . '/auth.php';

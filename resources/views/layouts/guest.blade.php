@@ -5,6 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Rausyan Fikr — Auth' }}</title>
+    <link rel="icon" href="{{ asset('landingpage/images/logo/favicon.svg') }}" type="image/svg+xml">
     @if (!app()->environment('testing'))
         @vite(['resources/css/app.css', 'resources/js/app.js'])
     @endif

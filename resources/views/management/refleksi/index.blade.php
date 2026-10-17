@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('page-content')
+@include('management.feedback')
 @php
     $totalRows = $posts->count();
 @endphp
@@ -18,7 +19,7 @@
                 @csrf
                 <div>
                     <label class="block text-sm mb-1">Judul</label>
-                    <input type="text" name="title" required
+                    <input type="text" name="title" required value="{{ old('_editing_id') ? '' : old('title') }}"
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
                         placeholder="Judul refleksi ..">
                 </div>
@@ -27,19 +28,19 @@
                     <label class="block text-sm mb-1">Ringkasan</label>
                     <textarea name="excerpt" rows="3"
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                        placeholder="Isi singkat refleksi .."></textarea>
+                        placeholder="Isi singkat refleksi ..">{{ old('_editing_id') ? '' : old('excerpt') }}</textarea>
                 </div>
 
                 <div>
                     <label class="block text-sm mb-1">Isi Refleksi Lengkap</label>
                     <textarea name="content" rows="6"
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
-                        placeholder="Tulis isi refleksi lengkap di sini..."></textarea>
+                        placeholder="Tulis isi refleksi lengkap di sini...">{{ old('_editing_id') ? '' : old('content') }}</textarea>
                 </div>
 
                 <div>
-                    <label class="block text-sm mb-1">Gambar (opsional)</label>
-                    <input type="file" name="cover_url" accept="image/*"
+                    <label class="block text-sm mb-1">Gambar JPG/PNG (opsional, maks. 2 MB)</label>
+                    <input type="file" name="cover_url" accept="image/jpeg,image/png"
                         class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
                 </div>
 
@@ -83,8 +84,10 @@
                                 <td class="py-2">
                                     <div class="flex gap-3">
                                         <button
-                                            class="text-indigo-600 hover:underline"
-                                            onclick="openEditModal({{ $post->id }}, '{{ addslashes($post->title) }}', '{{ addslashes($post->excerpt ?? '') }}', `{{ addslashes($post->content ?? '') }}`)">
+                                            class="edit-post-btn text-indigo-600 hover:underline"
+                                            data-id="{{ $post->id }}" data-title="{{ $post->title }}"
+                                            data-excerpt="{{ $post->excerpt }}" data-content="{{ $post->content }}"
+                                            data-update-url="{{ route('management.post.update', $post) }}">
                                             Edit
                                         </button>
 
@@ -116,33 +119,36 @@
 <div id="editModal" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg">
         <h2 class="text-lg font-semibold mb-3">Edit Refleksi</h2>
-        <form id="editForm" method="POST" enctype="multipart/form-data" class="space-y-3">
+        @if ($errors->any() && old('_editing_id'))
+            @include('management.feedback')
+        @endif
+        <form id="editForm" action="{{ old('_editing_id') ? route('management.post.update', old('_editing_id')) : '#' }}" method="POST" enctype="multipart/form-data" class="space-y-3">
             @csrf
             @method('PUT')
 
-            <input type="hidden" id="editId">
+            <input type="hidden" id="editId" name="_editing_id" value="{{ old('_editing_id') }}">
 
             <div>
                 <label class="block text-sm mb-1">Judul</label>
-                <input type="text" name="title" id="editTitle"
+                <input type="text" name="title" id="editTitle" required value="{{ old('_editing_id') ? old('title') : '' }}"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
             </div>
 
             <div>
                 <label class="block text-sm mb-1">Ringkasan</label>
                 <textarea name="excerpt" id="editExcerpt" rows="3"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2"></textarea>
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2">{{ old('_editing_id') ? old('excerpt') : '' }}</textarea>
             </div>
 
             <div>
                 <label class="block text-sm mb-1">Isi Refleksi Lengkap</label>
                 <textarea name="content" id="editContent" rows="6"
-                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2"></textarea>
+                    class="w-full rounded-lg border border-blueGray-200 px-3 py-2">{{ old('_editing_id') ? old('content') : '' }}</textarea>
             </div>
 
             <div>
                 <label class="block text-sm mb-1">Gambar (opsional)</label>
-                <input type="file" name="cover_url" accept="image/*"
+                <input type="file" name="cover_url" accept="image/jpeg,image/png"
                     class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
             </div>
 
@@ -156,16 +162,16 @@
 
 {{-- ===================== SCRIPT ===================== --}}
 <script>
-    function openEditModal(id, title, excerpt, content) {
+    function openEditModal(button) {
         const modal = document.getElementById('editModal');
         const form = document.getElementById('editForm');
 
-        document.getElementById('editId').value = id;
-        document.getElementById('editTitle').value = title;
-        document.getElementById('editExcerpt').value = excerpt;
-        document.getElementById('editContent').value = content;
+        document.getElementById('editId').value = button.dataset.id;
+        document.getElementById('editTitle').value = button.dataset.title;
+        document.getElementById('editExcerpt').value = button.dataset.excerpt;
+        document.getElementById('editContent').value = button.dataset.content;
 
-        form.action = `/management/post/${id}`;
+        form.action = button.dataset.updateUrl;
         modal.classList.remove('hidden');
         modal.classList.add('flex');
     }
@@ -175,5 +181,13 @@
         modal.classList.remove('flex');
         modal.classList.add('hidden');
     }
+
+    document.querySelectorAll('.edit-post-btn').forEach(button => {
+        button.addEventListener('click', () => openEditModal(button));
+    });
+    @if ($errors->any() && old('_editing_id'))
+        document.getElementById('editModal').classList.remove('hidden');
+        document.getElementById('editModal').classList.add('flex');
+    @endif
 </script>
 @endsection

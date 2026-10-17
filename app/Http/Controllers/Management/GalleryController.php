@@ -5,78 +5,117 @@ namespace App\Http\Controllers\Management;
 use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use RuntimeException;
+use Throwable;
 
 class GalleryController extends Controller
 {
-    // 🔹 Tampilkan semua galeri
     public function index()
     {
         $galleries = Gallery::latest()->paginate(9);
+
         return view('management.galeri.index', compact('galleries'));
     }
 
-    // 🔹 Form tambah galeri
     public function create()
     {
-        return view('management.galeri.create');
+        return redirect()->route('management.galeri.index');
     }
 
-    // 🔹 Simpan galeri baru
     public function store(Request $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'caption' => 'nullable|string',
-            'image' => 'required|image|max:2048',
-        ]);
-
-        $path = $request->file('image')->store('galleries', 'public');
-
-        Gallery::create([
-            'title' => $request->title,
-            'caption' => $request->caption,
-            'image_url' => $path,
-        ]);
+        $request->merge(['_editing_id' => null]);
+        $data = $this->validatedData($request, true);
+        $path = null;
+        try {
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('galleries', 'public');
+                if ($path === false) {
+                    throw new RuntimeException('Gambar gagal disimpan.');
+                }
+            }
+            $data['image_url'] = $path;
+            DB::transaction(function () use ($data) {
+                if (! (new Gallery($data))->save()) {
+                    throw new RuntimeException('Galeri gagal disimpan.');
+                }
+            });
+        } catch (Throwable $exception) {
+            $this->deleteImage($path ?: null);
+            throw $exception;
+        }
 
         return redirect()->route('management.galeri.index')->with('success', 'Galeri berhasil ditambahkan.');
     }
 
-    // 🔹 Update data galeri
     public function update(Request $request, Gallery $galeri)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'caption' => 'nullable|string',
-            'image' => 'nullable|image|max:2048',
-        ]);
-
-        $data = $request->only('title', 'caption');
-
-        // kalau ada gambar baru, hapus lama dan upload baru
-        if ($request->hasFile('image')) {
-            if ($galeri->image_url && Storage::disk('public')->exists($galeri->image_url)) {
-                Storage::disk('public')->delete($galeri->image_url);
+        $request->merge(['_editing_id' => $galeri->id]);
+        $data = $this->validatedData($request);
+        $oldPath = $galeri->image_url;
+        $path = null;
+        try {
+            if ($request->hasFile('image')) {
+                $path = $request->file('image')->store('galleries', 'public');
+                if ($path === false) {
+                    throw new RuntimeException('Gambar gagal disimpan.');
+                }
+                $data['image_url'] = $path;
             }
-
-            $path = $request->file('image')->store('galleries', 'public');
-            $data['image_url'] = $path;
+            DB::transaction(function () use ($galeri, $data) {
+                if (! $galeri->fill($data)->save()) {
+                    throw new RuntimeException('Galeri gagal diperbarui.');
+                }
+            });
+        } catch (Throwable $exception) {
+            $this->deleteImage($path ?: null);
+            throw $exception;
         }
-
-        $galeri->update($data);
+        if ($path !== null) {
+            $this->deleteImage($oldPath);
+        }
 
         return redirect()->route('management.galeri.index')->with('success', 'Galeri berhasil diperbarui.');
     }
 
-    // 🔹 Hapus galeri
     public function destroy(Gallery $galeri)
     {
-        if ($galeri->image_url && Storage::disk('public')->exists($galeri->image_url)) {
-            Storage::disk('public')->delete($galeri->image_url);
-        }
-
-        $galeri->delete();
+        $path = $galeri->image_url;
+        DB::transaction(function () use ($galeri) {
+            if (! $galeri->delete()) {
+                throw new RuntimeException('Galeri gagal dihapus.');
+            }
+        });
+        $this->deleteImage($path);
 
         return redirect()->route('management.galeri.index')->with('success', 'Galeri berhasil dihapus.');
+    }
+
+    private function validatedData(Request $request, bool $creating = false): array
+    {
+        $data = $request->validate([
+            'title' => 'required|string|max:255',
+            'caption' => 'nullable|string',
+            'image' => ($creating ? 'required' : 'nullable').'|image|mimes:jpg,jpeg,png|max:2048',
+        ]);
+        unset($data['image']);
+
+        return $data;
+    }
+
+    private function deleteImage(?string $path): void
+    {
+        if (! $path || ! str_starts_with($path, 'galleries/')) {
+            return;
+        }
+        try {
+            if (! Storage::disk('public')->delete($path)) {
+                report(new RuntimeException('Gambar lama gagal dibersihkan.'));
+            }
+        } catch (Throwable $exception) {
+            report($exception);
+        }
     }
 }

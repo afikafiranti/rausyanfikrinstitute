@@ -13,6 +13,30 @@ concurrency:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      mariadb:
+        image: mariadb:11.4
+        env:
+          MARIADB_ROOT_PASSWORD: ci-root-only
+          MARIADB_DATABASE: rf_b_testing
+          MARIADB_USER: rf_test
+          MARIADB_PASSWORD: ci-test-only
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="healthcheck.sh --connect --innodb_initialized"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=10
+    env:
+      APP_ENV: testing
+      APP_DEBUG: 'false'
+      TEST_DB_CONNECTION: mysql
+      TEST_DB_HOST: 127.0.0.1
+      TEST_DB_PORT: 3306
+      TEST_DB_DATABASE: rf_b_testing
+      TEST_DB_USERNAME: rf_test
+      TEST_DB_PASSWORD: ci-test-only
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -21,9 +45,9 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          tools: composer:2.5.5
+          tools: composer:2
           coverage: none
-          extensions: mbstring, intl, sqlite3, pdo_sqlite, bcmath, openssl
+          extensions: mbstring, intl, pdo_mysql, bcmath, openssl
 
       - name: Cache Composer
         uses: actions/cache@v4
@@ -32,30 +56,14 @@ jobs:
           key: composer-${{ runner.os }}-${{ hashFiles('**/composer.lock') }}
           restore-keys: composer-${{ runner.os }}-
 
-      - name: Install PHP deps
-        run: composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
-
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '22.19.0'
           cache: 'npm'
 
-      - name: Install JS deps
-        run: |
-          if [ -f package-lock.json ]; then npm ci; else npm i --no-audit --no-fund; fi
+      - name: Test CI runner safeguards
+        run: bash tests/Tooling/run-ci-test.sh
 
-      - name: Prepare test env (SQLite)
-        shell: bash
-        run: |
-          cp .env.example .env
-          printf "APP_ENV=testing\nAPP_KEY=\nDB_CONNECTION=sqlite\nDB_DATABASE=${{ github.workspace }}/database/database.sqlite\nCACHE_DRIVER=array\nSESSION_DRIVER=array\nQUEUE_CONNECTION=sync\nMAIL_MAILER=array\n" > .env.testing
-          mkdir -p database
-          touch database/database.sqlite
-          php artisan key:generate --env=testing
-          php artisan migrate --env=testing --no-interaction --force -v
-
-      - name: Run tests
-        env:
-          APP_ENV: testing
-        run: php artisan test --env=testing
+      - name: Install, validate, build and test
+        run: bash run-ci.sh

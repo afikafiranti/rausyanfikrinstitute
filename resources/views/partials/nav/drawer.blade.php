@@ -4,15 +4,15 @@
         : 'flex items-center gap-3 px-4 py-3 text-blueGray-700 hover:text-blueGray-900';
 @endphp
 
-<div id="rf-mobile-drawer" class="fixed inset-0 z-[60] hidden">
+<div id="rf-mobile-drawer" role="dialog" aria-modal="true" aria-label="Navigasi" aria-hidden="true" class="fixed inset-0 z-[60] hidden">
     {{-- backdrop --}}
     <div class="absolute inset-0 bg-black/30" onclick="rfToggleDrawer('rf-mobile-drawer', false)"></div>
 
     {{-- panel --}}
-    <aside class="absolute left-0 top-0 h-full w-72 bg-white shadow-xl overflow-y-auto">
+    <aside class="absolute left-0 top-0 h-full w-72 max-w-full bg-white shadow-xl overflow-y-auto">
         <div class="flex items-center justify-between p-4 border-b">
             <span class="font-bold uppercase">Navigasi</span>
-            <button class="p-2" onclick="rfToggleDrawer('rf-mobile-drawer', false)"><i
+            <button type="button" aria-label="Tutup navigasi" class="p-3" onclick="rfToggleDrawer('rf-mobile-drawer', false)"><i
                     class="fas fa-times"></i></button>
         </div>
 

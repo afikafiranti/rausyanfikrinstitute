@@ -3,7 +3,7 @@
     <div class="w-full mx-auto items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
 
         {{-- Burger: mobile --}}
-        <button class="md:hidden p-2 -ml-2" onclick="rfToggleDrawer('rf-mobile-drawer', true)">
+        <button type="button" aria-label="Buka navigasi" aria-controls="rf-mobile-drawer" aria-expanded="false" class="md:hidden p-3 -ml-2" onclick="rfToggleDrawer('rf-mobile-drawer', true)">
             <i class="fas fa-bars text-white"></i>
         </button>
 
@@ -26,20 +26,6 @@
             {{ $pageTitle }}
         </span>
 
-        {{-- Search opsional --}}
-        <form class="md:flex hidden flex-row flex-wrap items-center lg:ml-auto mr-3">
-            <div class="relative flex w-full flex-wrap items-stretch">
-                <span
-                    class="z-10 h-full leading-snug font-normal absolute text-center text-blueGray-300 bg-transparent rounded text-base
-                     items-center justify-center w-8 pl-3 py-3">
-                    <i class="fas fa-search"></i>
-                </span>
-                <input type="text" placeholder="Search here..."
-                    class="border-0 px-3 py-3 placeholder-blueGray-300 text-blueGray-600 bg-white rounded text-sm shadow outline-none
-                      focus:outline-none focus:ring w-full pl-10" />
-            </div>
-        </form>
-
         {{-- Avatar + badge + dropdown --}}
         @auth
             @php
@@ -49,7 +35,7 @@
             @endphp
             <ul class="flex-col md:flex-row list-none items-center hidden md:flex">
                 <li class="inline-block relative">
-                    <a href="#" class="text-blueGray-500 block" onclick="openDropdown(event,'user-dropdown')"
+                    <button type="button" aria-label="Menu akun" aria-controls="user-dropdown" aria-expanded="false" class="text-blueGray-500 block" onclick="openDropdown(event,'user-dropdown')"
                         data-dropdown-trigger="user-dropdown">
                         <div class="items-center flex relative">
                             @if ($avatar)
@@ -57,7 +43,7 @@
                                     class="w-12 h-12 inline-flex items-center justify-center rounded-full ring-2 ring-white overflow-hidden">
                                     <img alt="avatar" class="w-full h-full object-cover align-middle border-none"
                                         src="{{ $avatar }}?v={{ optional($user->updated_at)->timestamp }}"
-                                        alt="avatar" loading="lazy">
+                                        loading="lazy">
                                 </span>
                             @else
                                 <span
@@ -73,7 +59,7 @@
                                 </span>
                             @endif
                         </div>
-                    </a>
+                    </button>
                     <div id="user-dropdown"
                         class="hidden absolute right-0 mt-2 bg-white text-base z-50 py-2 list-none text-left rounded shadow-lg min-w-48">
                         <a href="{{ route('notifications.index') }}"

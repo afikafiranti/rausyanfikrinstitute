@@ -59,17 +59,9 @@
                 </div>
             </div>
 
-            {{-- GRAFIK KAJIAN Data Masih Dummy  --}}
-            <div class="col-span-4 rounded-lg bg-slate-50  p-4 shadow">
-                <div class="flex items-center justify-between -mb-8">
-                    <h3 class="font-semibold mb-3">Jumlah Kajian per Bulan</h3>
-                </div>
-                <div class="p-4 flex-auto text-gray-500">
-                    <!-- Chart -->
-                    <div class="relative h-350-px">
-                        <div id="chartKajian" class="w-full h-64"></div>
-                    </div>
-                </div>
+            <div class="col-span-4 rounded-lg bg-slate-50 p-4 shadow">
+                <h3 class="font-semibold mb-3">Jumlah Kajian per Bulan</h3>
+                <p class="text-sm text-slate-600" role="status">Statistik kajian belum tersedia.</p>
             </div>
 
             {{-- ========================= 2 CHART DALAM 1 BARIS ========================= --}}
@@ -302,110 +294,7 @@
         })();
     </script>
 
-    <script>
-        // --- Dummy Data Kajian per Bulan ---
-        const kajianPerBulan = {
-            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'],
-            data2024: [4, 6, 5, 3, 7, 4, 6, 5, 7, 6, 8, 5],
-            data2025: [5, 7, 6, 4, 8, 5, 7, 6, 8, 10, 9, 7]
-        };
 
-        const optionsKajianBulan = {
-            chart: {
-                type: 'bar',
-                height: 300,
-                toolbar: {
-                    show: false
-                }
-            },
-            plotOptions: {
-                bar: {
-                    horizontal: false,
-                    columnWidth: '55%',
-                    endingShape: 'rounded'
-                }
-            },
-            dataLabels: {
-                enabled: false
-            },
-            stroke: {
-                show: true,
-                width: 2,
-                colors: ['transparent']
-            },
-            series: [{
-                    name: 'Tahun 2024',
-                    data: kajianPerBulan.data2024
-                },
-                {
-                    name: 'Tahun 2025',
-                    data: kajianPerBulan.data2025
-                }
-            ],
-            legend: {
-                show: true,
-                position: 'bottom',
-                horizontalAlign: 'center',
-                fontSize: '13px',
-                fontWeight: 500,
-                labels: {
-                    colors: '#1e293b'
-                },
-                markers: {
-                    width: 12,
-                    height: 12,
-                    radius: 12
-                },
-                itemMargin: {
-                    horizontal: 12,
-                    vertical: 4
-                }
-            },
-            grid: {
-                borderColor: '#E2E8F0',
-                strokeDashArray: 3
-            },
-            xaxis: {
-                categories: kajianPerBulan.labels,
-                axisBorder: {
-                    color: '#E2E8F0'
-                },
-                axisTicks: {
-                    color: '#E2E8F0'
-                },
-                labels: {
-                    style: {
-                        colors: '#475569'
-                    }
-                }
-            },
-            yaxis: {
-                title: {
-                    text: 'Jumlah Kajian',
-                    style: {
-                        color: '#475569'
-                    }
-                },
-                labels: {
-                    style: {
-                        colors: '#475569'
-                    }
-                }
-            },
-            fill: {
-                opacity: 1
-            },
-            colors: ['#6366f1', '#ec4899'],
-            tooltip: {
-                theme: 'light',
-                y: {
-                    formatter: val => val + " Kajian"
-                }
-            }
-        };
-
-        new ApexCharts(document.querySelector("#chartKajian"), optionsKajianBulan).render();
-    </script>
 
     {{-- ========================= PIE CHART STATUS PERNIKAHAN ========================= --}}
 

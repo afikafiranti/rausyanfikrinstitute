@@ -2,18 +2,41 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Models\Post;
-use Illuminate\Support\Str;
 use App\Models\Gallery;
 
 class LandingController extends Controller
 {
     public function index()
     {
-        $posts = Post::latest()->take(3)->get();
-        $galleries = Gallery::latest()->take(3)->get();
+        $posts = Post::published()->orderByDesc('published_at')->orderByDesc('id')
+            ->limit(3)->get(['id', 'title', 'slug', 'excerpt', 'cover_url', 'published_at']);
+        $galleries = Gallery::latest()->orderByDesc('id')->limit(6)->get(['id', 'title', 'caption', 'image_url']);
+        $publishedPostCount = Post::published()->count();
+        $galleryCount = Gallery::count();
 
-        return view('layouts/landing', compact('posts', 'galleries'));
+        return view('landingpage.home', compact('posts', 'galleries', 'publishedPostCount', 'galleryCount'));
+    }
+
+    public function posts()
+    {
+        $posts = Post::published()->orderByDesc('published_at')->orderByDesc('id')
+            ->paginate(12, ['id', 'title', 'slug', 'excerpt', 'cover_url', 'published_at']);
+
+        return view('landingpage.posts.index', compact('posts'));
+    }
+
+    public function show(string $slug)
+    {
+        $post = Post::published()->where('slug', $slug)->firstOrFail();
+
+        return view('landingpage.posts.show', compact('post'));
+    }
+
+    public function gallery()
+    {
+        $galleries = Gallery::latest()->orderByDesc('id')->paginate(12, ['id', 'title', 'caption', 'image_url']);
+
+        return view('landingpage.gallery', compact('galleries'));
     }
 }

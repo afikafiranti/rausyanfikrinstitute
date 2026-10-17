@@ -14,12 +14,23 @@ class Post extends Model
         'title','slug','excerpt','content','cover_url','published_at',
     ];
 
+    protected $casts = ['published_at' => 'datetime'];
+
+    public function getPublicCoverUrlAttribute(): ?string
+    {
+        return \App\Support\PublicImageUrl::resolve($this->cover_url, 'covers');
+    }
+
     protected static function booted()
     {
-        static::creating(function ($post) {
-            if (empty($post->slug)) {
-                $post->slug = Str::slug($post->title) . '-' . Str::random(5);
+        static::saving(function (Post $post) {
+            if (filled($post->slug) && (! $post->exists || ! $post->isDirty('title'))) {
+                return;
             }
+
+            // Independent allocation avoids a check-then-insert race for equal titles.
+            $base = Str::substr(Str::slug($post->title) ?: 'refleksi', 0, 228);
+            $post->slug = $base.'-'.Str::lower((string) Str::ulid());
         });
     }
 
