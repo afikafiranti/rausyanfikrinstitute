@@ -27,6 +27,11 @@ class VerificationController extends Controller
             $query->where('wilayah_id', $me->wilayah_id);
         }
 
+        if ($blockedRoles = $this->blockedRoles($me)) {
+            $query->whereDoesntHave('roles', fn ($roles) => $roles->whereIn('name', $blockedRoles));
+        }
+
+
         $pending = $query->orderBy('name')->paginate(12)->withQueryString();
         $levels  = Level::where('is_active', true)->orderBy('id')->get(['id','name']);
 
@@ -49,6 +54,11 @@ class VerificationController extends Controller
                 && (!$me->wilayah_id || (int) $user->wilayah_id !== (int) $me->wilayah_id)) {
                 abort(403);
             }
+
+            if ($blockedRoles = $this->blockedRoles($me)) {
+                abort_if($user->roles()->whereIn('name', $blockedRoles)->exists(), 403);
+            }
+
 
             if ($user->status !== User::STATUS_PENDING) {
                 return false;
@@ -114,6 +124,11 @@ class VerificationController extends Controller
                 abort(403);
             }
 
+            if ($blockedRoles = $this->blockedRoles($me)) {
+                abort_if($user->roles()->whereIn('name', $blockedRoles)->exists(), 403);
+            }
+
+
             if ($user->status !== User::STATUS_PENDING) {
                 return false;
             }
@@ -140,5 +155,14 @@ class VerificationController extends Controller
         }
 
         return back()->with('success', "Akun {$user->name} ditolak. Alasan tersimpan.");
+    }
+
+    private function blockedRoles(User $actor): array
+    {
+        if ($actor->hasAnyRole(['super_admin', 'admin'])) {
+            return [];
+        }
+
+        return ['super_admin', 'admin', 'koorda'];
     }
 }

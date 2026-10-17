@@ -7,8 +7,12 @@ use App\Models\User;
 use App\Models\Level;
 use App\Models\Playlist;
 use App\Models\Wilayah;
+use Illuminate\Auth\Notifications\VerifyEmail;
+use Illuminate\Contracts\Notifications\Dispatcher;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Notification;
+use Mockery;
+use Symfony\Component\Mailer\Exception\TransportException;
 use Tests\TestCase;
 
 class RegistrationTest extends TestCase
@@ -42,6 +46,51 @@ class RegistrationTest extends TestCase
         $this->assertNull($user->level_id);
         $this->assertTrue($user->hasRole('alumni'));
         $this->assertFalse($user->hasRole('super_admin'));
+        Notification::assertSentTo($user, VerifyEmail::class);
+    }
+
+    public function test_duplicate_invalid_email_and_password_mismatch_do_not_create_accounts(): void
+    {
+        Notification::fake();
+        User::factory()->create(['email' => 'existing@example.test']);
+
+        foreach ([
+            ['email' => 'existing@example.test', 'error' => 'email'],
+            ['email' => 'not-an-email', 'error' => 'email'],
+            ['email' => 'new@example.test', 'error' => 'password'],
+        ] as $case) {
+            $this->post('/register', [
+                'name' => 'Akun Baru',
+                'email' => $case['email'],
+                'password' => 'Password123',
+                'password_confirmation' => $case['error'] === 'password' ? 'Mismatch123' : 'Password123',
+                'roles' => ['super_admin'],
+                'status' => User::STATUS_ACTIVE,
+            ])->assertSessionHasErrors($case['error']);
+        }
+
+        $this->assertSame(1, User::count());
+        $this->assertGuest();
+        Notification::assertNothingSent();
+    }
+
+    public function test_registration_survives_verification_mail_transport_failure(): void
+    {
+        $dispatcher = Mockery::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('send')->once()->andThrow(new TransportException('SMTP unavailable'));
+        app()->instance(Dispatcher::class, $dispatcher);
+
+        $this->post('/register', [
+            'name' => 'Alumni Baru', 'email' => 'mail-failed@example.test',
+            'password' => 'Password123', 'password_confirmation' => 'Password123',
+        ])->assertRedirect(route('verification.notice'))
+            ->assertSessionHas('status', 'verification-link-failed');
+
+        $user = User::where('email', 'mail-failed@example.test')->sole();
+        $this->assertAuthenticatedAs($user);
+        $this->assertSame(User::STATUS_PENDING, $user->status);
+        $this->assertTrue($user->hasRole('alumni'));
+        $this->assertFalse($user->hasVerifiedEmail());
     }
 
     public function test_authenticated_admin_cannot_register_another_account_or_lose_their_session(): void

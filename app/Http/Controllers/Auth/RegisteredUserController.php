@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class RegisteredUserController extends Controller
 {
@@ -41,9 +42,19 @@ class RegisteredUserController extends Controller
             return $user;
         });
 
-        event(new Registered($user));
+        $mailFailed = false;
+        try {
+            event(new Registered($user));
+        } catch (TransportExceptionInterface $error) {
+            report($error);
+            $mailFailed = true;
+        }
 
         Auth::login($user);
+
+        if ($mailFailed) {
+            return redirect()->route('verification.notice')->with('status', 'verification-link-failed');
+        }
 
         return redirect()->route('profile.edit')->with('success', 'Akun dibuat. Lengkapi profil dan wilayah untuk verifikasi koorda.');
     }
