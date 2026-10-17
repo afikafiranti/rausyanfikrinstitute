@@ -2,6 +2,8 @@
 
 ## A35-INTEGRATE — DONE lokal (2026-10-17)
 
+- Pengiriman integrasi: merge ecee5b4 dan sinkronisasi dokumen 13da2b5 sudah tersedia pada origin/develop dan origin/dev-A. [CI develop 39041927907](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39041927907) pada snapshot 13da2b5 **completed/success**, memakai PHP 8.3 dan MariaDB 11.4 (server 11.4.13). Tahap pengaman runner, install/Composer/platform/build/route/test semuanya lulus. Bukti CI ini menutup pemeriksaan remote batch A3–A5, tanpa menutup advisory/kunci/staging atau menyetujui rilis.
+
 - Atas instruksi pengguna, dev-A sampai abd815b digabung ke develop pada ecee5b4 tanpa konflik; dev-A dipertahankan. Tree hasil merge identik dengan snapshot yang diuji. Penggabung menyinkronkan AGENTS, README, PRD, PLAN, TASK, AUDIT, SOP dan serah terima B sesuai pengecualian dokumentasi integrasi.
 - Review independen baseline 72ef75b sampai abd815b tidak menemukan regresi konkret pada akses verifikasi, transport email, auth atau form profil. A3-VERIFY/A4-AUTH/A5-FIX selesai; A5 operasional tetap REVIEW karena SMTP eksternal/staging belum tersedia menurut pengguna.
 - Suite penuh PHP 8.3.30/MySQL 8.4.3 lulus **260 test, 1921 assertion**, tanpa kegagalan. Database rf_merge_a35_20261017_833410_testing dibuat baru setelah dipastikan belum ada, memakai environment proses dan storage uji terisolasi; hash .env tetap sama. Database ini disisakan untuk audit, tidak dipakai browser. Bukti ignored di storage/framework/testing/integration-a35.

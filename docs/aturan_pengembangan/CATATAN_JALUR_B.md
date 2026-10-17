@@ -351,6 +351,8 @@
 
 ### Arahan Berikutnya untuk Pemilik Jalur B
 
+- Bukti remote sesudah pengiriman integrasi: [CI develop 39041927907](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39041927907), snapshot 13da2b5, completed/success pada PHP 8.3/MariaDB 11.4. Checklist CI remote batch ini tertutup; advisory/kunci historis/email eksternal/staging tetap belum tertutup. Label CI belum dilakukan pada catatan historis di bawah merekam kondisi saat batch tersebut ditulis.
+
 - Pembaruan integrasi A3–A5 oleh penggabung 2026-10-17: A3-VERIFY/A4-AUTH/A5-FIX sudah masuk develop pada ecee5b4; jangan menganggap label TODO A3 historis di bawah sebagai pekerjaan ulang. Suite PHP 8.3/MySQL terbaru 260 test/1921 assertion, build/Composer/platform/80 route dan QA browser lokal impor/batas wilayah lulus; rincian pada CATATAN_JALUR_A bagian A35-INTEGRATE. Prioritas B tetap PUB-04 -> PUB-01 -> PUB-02 -> PUB-03 dan B3-RELEASE. Staging/SMTP organisasi belum tersedia; B3, CI remote dan email eksternal tetap perlu bukti sebelum rilis.
 
 - Keputusan pengguna 2026-10-17: arah lanjutan disetujui dan perlu diketahui pemilik B. Acuan aktif: [PLAN](PLAN.md#tindak-lanjut-setelah-integrasi) dan [TASK](TASK.md#ringkasan-status-saat-ini). Arahan ini menggantikan urutan mulai B0 historis untuk pekerjaan setelah integrasi; B0–B2 tetap REVIEW sesuai bukti sebelumnya.

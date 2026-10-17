@@ -12,7 +12,7 @@ Pembaruan cakupan 2026-10-17: pengguna meminta sinkronisasi dokumentasi dan meng
 
 ### Tindak Lanjut Setelah Integrasi
 
-Pembaruan A3–A5 pada 2026-10-17: A3-VERIFY, A4-AUTH dan A5-FIX sudah digabung ke develop pada ecee5b4. Suite gabungan 260 test/1921 assertion serta build/Composer/platform/route lulus; review independen tanpa temuan konkret. QA lokal dilengkapi pada A35-INTEGRATE. Staging dan SMTP organisasi belum tersedia menurut pengguna; bukti lokal tidak menggantikan keduanya. Urutan B tetap PUB-04 -> PUB-01 -> PUB-02 -> PUB-03.
+Pembaruan A3–A5 pada 2026-10-17: A3-VERIFY, A4-AUTH dan A5-FIX sudah digabung ke develop pada ecee5b4. Suite gabungan 260 test/1921 assertion serta build/Composer/platform/route lulus; review independen tanpa temuan konkret. CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4; QA lokal dilengkapi pada A35-INTEGRATE. Staging dan SMTP organisasi belum tersedia menurut pengguna; bukti ini tidak menggantikan keduanya. Urutan B tetap PUB-04 -> PUB-01 -> PUB-02 -> PUB-03.
 
 Keputusan pengguna 2026-10-17: arah pengembangan berikut disetujui. Urutan pengerjaan adalah **pengamanan verifikasi akun pengelola -> PUB-04 artikel -> PUB-01 agenda -> PUB-02 tim/kontak -> PUB-03 navigasi final -> staging/rilis**. Nomor PUB tetap dipertahankan sebagai identitas task, bukan urutan eksekusi.
 

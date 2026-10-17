@@ -2,7 +2,7 @@
 
 ## 1. Ringkasan Produk
 
-Status implementasi 2026-10-17: A0–A5 dan B0/B1/B2 sudah digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite gabungan terbaru PHP 8.3/MySQL lulus 260 test/1921 assertion; bukti A3–A5 ada pada CATATAN_JALUR_A.md, integrasi sebelumnya pada CATATAN_JALUR_B.md. A0–A4 dan A5-FIX DONE secara lokal; A5-QA, B0–B2 dan rilis tetap REVIEW untuk tindak lanjut operasional. Staging dan SMTP organisasi belum tersedia; CI remote/advisory dependency tetap perlu bukti. Agenda, tim, kontak, artikel dan pelengkapan publik tetap akan dibuat oleh B.
+Status implementasi 2026-10-17: A0–A5 dan B0/B1/B2 sudah digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite gabungan terbaru PHP 8.3/MySQL lulus 260 test/1921 assertion; CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. Bukti A3–A5 ada pada CATATAN_JALUR_A.md, integrasi sebelumnya pada CATATAN_JALUR_B.md. A0–A4 dan A5-FIX DONE secara lokal; A5-QA, B0–B2 dan rilis tetap REVIEW untuk tindak lanjut operasional. Staging dan SMTP organisasi belum tersedia; advisory dependency/penilaian kunci tetap perlu ditutup. Agenda, tim, kontak, artikel dan pelengkapan publik tetap akan dibuat oleh B.
 
 Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
 

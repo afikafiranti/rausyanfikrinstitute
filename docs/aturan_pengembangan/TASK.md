@@ -19,6 +19,7 @@ Tanggal: 2026-10-17. Owner: penggabung Jalur A atas instruksi pengguna.
 - Suite gabungan PHP 8.3.30/MySQL 8.4.3 pada database baru terisolasi: 260 test, 1921 assertion lulus; build frontend, 80 route, Composer validate --strict dan check-platform-reqs lulus.
 - Review independen tidak menemukan regresi konkret. Dokumen pusat disinkronkan; QA browser unggah XLSX/duplikat/filter/ekspor serta batas wilayah/endpoint koorda lulus. Bukti rinci ada pada CATATAN_JALUR_A bagian A35-INTEGRATE.
 - Pengguna mengonfirmasi staging dan SMTP organisasi belum tersedia; selesaikan integrasi dan QA lokal, tanpa mengklaim pengiriman email eksternal atau persetujuan rilis.
+- Merge ecee5b4 dan dokumen 13da2b5 sudah dipush ke develop/dev-A. [CI remote develop](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39041927907) snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4, termasuk pengaman runner dan seluruh tahap install/build/test.
 
 ### DONE: NEXT-PLAN — Penetapan arah berikutnya dan serah terima Jalur B
 
@@ -49,7 +50,7 @@ Prioritas: P0 untuk risiko keamanan; verifikasi operasional wajib sebelum rilis.
 
 - [ ] Triase advisory Composer yang sudah tercatat dan perbaiki dependency terdampak secara terarah; ikuti lockfile dan verifikasi PHP 8.3. Audit npm dilewati sesuai keputusan pengguna.
 - [ ] Inventarisasi pemakaian kunci historis dan dampak dekripsi sebelum menetapkan tindakan server; jangan menganggap penghapusan dari tracking menyelesaikan paparan lama.
-- [ ] Jalankan CI remote setelah perubahan tersedia di remote; catat hasil, bukan hanya konfigurasi workflow.
+- [x] CI remote batch integrasi A3–A5 snapshot 13da2b5 lulus: run 39041927907 pada develop, PHP 8.3/MariaDB 11.4. Batch berikut tetap wajib memiliki bukti CI sendiri.
 - [ ] Setelah target staging tersedia, uji alur per role, email nyata, impor Excel, upload, mobile/keyboard serta backup/restore sesuai runbook pada lingkungan terisolasi.
 - [ ] Gabungkan bukti A3-VERIFY, test gabungan, build dan review; pertahankan status REVIEW rilis sampai syarat terpenuhi.
 

@@ -21,7 +21,8 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 - Suite PHP 8.3.30/MySQL 8.4.3 pada database baru rf_merge_a35_20261017_833410_testing lulus 260 test/1921 assertion. Build, Composer strict/platform dan 80 route lulus; database kerja, QA browser dan .env tidak digunakan untuk RefreshDatabase.
 - QA browser lokal mengunggah XLSX nyata: satu akun pending/alumni dibuat, baris duplikat ditolak, filter memuat satu hasil dan ekspor XLSX valid. Koorda hanya melihat wilayahnya; detail lintas wilayah 404 dan endpoint pengelolaan konten 403. Fixture sintetis tambahan hanya di database QA pilihan pengguna, tanpa reset data existing.
 - Dua temuan profil ditutup oleh A5-FIX: 32 kontrol berlabel/ID unik dan tidak ada overflow pada 320/390 px. SMTP lokal Mailpit serta tautan verifikasi/reset lulus. Bukti lokal ini belum membuktikan penerimaan Gmail atau kondisi staging.
-- Pengguna mengonfirmasi staging/SMTP organisasi belum tersedia. Advisory dependency, penilaian kunci historis, CI remote dan bukti staging/backup tetap mengikuti B3-RELEASE; tidak menyatakan siap produksi.
+- [CI remote develop run 39041927907](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39041927907) pada snapshot 13da2b5 completed/success, PHP 8.3/MariaDB 11.4; seluruh tahap termasuk pengaman runner lulus. Ini bukti remote batch A3–A5, bukan hanya konfigurasi workflow.
+- Pengguna mengonfirmasi staging/SMTP organisasi belum tersedia. Advisory dependency, penilaian kunci historis dan bukti staging/backup tetap mengikuti B3-RELEASE; tidak menyatakan siap produksi.
 
 ### Sinkronisasi Cakupan dan Rencana Publik — 2026-10-17
 
