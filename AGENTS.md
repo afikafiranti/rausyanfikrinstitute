@@ -1,5 +1,7 @@
 # Aturan Agen Pengembangan Rausyan Fikr
 
+Pembaruan aktif 2026-10-18: pengguna mengizinkan dev-B dipush dan digabung ke develop. PUB-04/PUB-03, UIUX-02, dashboard alumni dan Refleksi saya untuk semua role sudah masuk hasil gabungan. Laporan hanya untuk pengelola aktif sesuai wilayah; alumni tidak mengaksesnya. Lanjutkan instruksi pengguna berikutnya, jangan mengulang task selesai dari tabel historis. Staging dijadwalkan pada tahap akhir pengembangan dan tidak menghalangi integrasi saat ini; bukti produksi tetap terpisah. Status/hash/verifikasi aktual mengikuti CATATAN_JALUR_B.
+
 ## Mulai Sesi dan Kenali Jalur
 
 1. Jalankan `git branch --show-current` dan `git status --short` sebelum mengubah file. Pertahankan perubahan pengguna; jangan melakukan reset, clean, atau checkout paksa.
@@ -9,8 +11,8 @@
    | Konteks | Jalur | Urutan pekerjaan |
    |---|---|---|
    | Branch `dev-A` | A, milik pengguna yang memulai pembagian ini | A3/A4/A5-FIX selesai dan terintegrasi; lanjut QA operasional ketika staging/SMTP organisasi tersedia |
-   | Branch `dev-B` | B, milik rekan pengembang | PUB-04 -> PUB-01 -> PUB-02 -> PUB-03; B3-RELEASE paralel bila independen |
-   | Sesi baru tanpa penugasan, di luar `dev-A` | Default Jalur B | Baca arahan terbaru CATATAN_JALUR_B, pastikan branch kerja B, lalu mulai PUB-04 |
+   | Branch `dev-B` | B, diambil alih pengguna pada 2026-10-17 | PUB-04/PUB-03, UIUX-02, dashboard alumni dan Refleksi saya sudah digabung; lanjut instruksi terbaru pengguna, PUB-01/PUB-02 tetap di luar cakupan |
+   | Sesi baru tanpa penugasan, di luar `dev-A` | Default Jalur B | Baca status terbaru CATATAN_JALUR_B, sinkronkan branch kerja secara aman, jangan mengulang task yang sudah selesai |
 
 4. Sebutkan jalur dan task aktif pada update awal. Jika pengguna memberi penugasan eksplisit yang berbeda, ikuti penugasan tersebut dan selaraskan branch secara aman. Jangan menganggap teman harus melanjutkan Jalur A.
 5. Branch kerja B adalah `dev-B`. Buat dari commit baseline bersama di `develop` yang sudah berisi aturan dan rencana ini, bukan dari perubahan implementasi A. Jangan berpindah branch dengan membawa perubahan jalur lain yang belum di-commit; tetap lakukan analisis yang aman sambil menjelaskan kondisi branch.

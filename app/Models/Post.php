@@ -11,7 +11,7 @@ class Post extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title','slug','excerpt','content','cover_url','published_at',
+        'title','slug','excerpt','content','cover_url','published_at','type',
     ];
 
     protected $casts = ['published_at' => 'datetime'];

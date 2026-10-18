@@ -9,28 +9,41 @@ class LandingController extends Controller
 {
     public function index()
     {
-        $posts = Post::published()->orderByDesc('published_at')->orderByDesc('id')
-            ->limit(3)->get(['id', 'title', 'slug', 'excerpt', 'cover_url', 'published_at']);
-        $galleries = Gallery::latest()->orderByDesc('id')->limit(6)->get(['id', 'title', 'caption', 'image_url']);
-        $publishedPostCount = Post::published()->count();
-        $galleryCount = Gallery::count();
+        $posts = Post::published()->where('type', 'article')->orderByDesc('published_at')->orderByDesc('id')
+            ->limit(4)->get(['id', 'title', 'slug', 'excerpt', 'cover_url', 'published_at']);
+        $galleries = Gallery::latest()->orderByDesc('id')->limit(4)->get(['id', 'title', 'caption', 'image_url']);
 
-        return view('landingpage.home', compact('posts', 'galleries', 'publishedPostCount', 'galleryCount'));
+        return view('landingpage.home', ['posts' => $posts, 'galleries' => $galleries, 'isArticle' => true]);
     }
 
     public function posts()
     {
-        $posts = Post::published()->orderByDesc('published_at')->orderByDesc('id')
+        $posts = Post::published()->where('type', 'reflection')->orderByDesc('published_at')->orderByDesc('id')
             ->paginate(12, ['id', 'title', 'slug', 'excerpt', 'cover_url', 'published_at']);
 
-        return view('landingpage.posts.index', compact('posts'));
+        return view('landingpage.posts.index', ['posts' => $posts, 'isArticle' => false]);
     }
 
     public function show(string $slug)
     {
-        $post = Post::published()->where('slug', $slug)->firstOrFail();
+        $post = Post::published()->where('type', 'reflection')->where('slug', $slug)->firstOrFail();
 
-        return view('landingpage.posts.show', compact('post'));
+        return view('landingpage.posts.show', ['post' => $post, 'isArticle' => false]);
+    }
+
+    public function articles()
+    {
+        $posts = Post::published()->where('type', 'article')->orderByDesc('published_at')->orderByDesc('id')
+            ->paginate(12, ['id', 'title', 'slug', 'excerpt', 'cover_url', 'published_at']);
+
+        return view('landingpage.posts.index', ['posts' => $posts, 'isArticle' => true]);
+    }
+
+    public function article(string $slug)
+    {
+        $post = Post::published()->where('type', 'article')->where('slug', $slug)->firstOrFail();
+
+        return view('landingpage.posts.show', ['post' => $post, 'isArticle' => true]);
     }
 
     public function gallery()

@@ -1,8 +1,14 @@
 # PRD Website Alumni dan Kajian Rausyan Fikr
 
+## Pembaruan aktif 2026-10-18
+
+Pengguna mengizinkan push dan penggabungan Jalur B ke `develop`. PUB-04/PUB-03, modernisasi UIUX-02, dashboard pribadi alumni dan Refleksi saya bagi empat role sudah tersedia pada hasil gabungan. Commit implementasi `7408828` sudah dikirim ke dev-B; bukti verifikasi dan pengiriman hasil integrasi mengikuti CATATAN_JALUR_B. Staging dijadwalkan pada tahap akhir pengembangan sesuai arahan pengguna, bukan prasyarat merge saat ini. SMTP eksternal dan kesiapan produksi belum dinyatakan lulus. Pernyataan belum terintegrasi/belum diterapkan pada database kerja dalam snapshot lama di bawah dibaca sebagai riwayat.
+
+Refleksi saya berbeda dari Refleksi publik: semua role dapat menyimpan draf pribadi; hanya penulis dapat membaca/mengedit/menghapus draf. Pengiriman opsional memerlukan akun aktif dan wilayah; isi terkunci setelah dikirim. Koorda wilayah kiriman serta admin/super admin aktif dapat membaca dan menanggapi, tanpa menanggapi kiriman sendiri. Tidak ada penerbitan publik otomatis. Laporan kajian hanya untuk pengelola aktif sesuai role/wilayah; alumni biasa ditolak pada menu maupun endpoint.
+
 ## 1. Ringkasan Produk
 
-Status implementasi 2026-10-17: A0–A5 dan B0/B1/B2 sudah digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite gabungan terbaru PHP 8.3/MySQL lulus 260 test/1921 assertion; CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. Bukti A3–A5 ada pada CATATAN_JALUR_A.md, integrasi sebelumnya pada CATATAN_JALUR_B.md. A0–A4 dan A5-FIX DONE secara lokal; A5-QA, B0–B2 dan rilis tetap REVIEW untuk tindak lanjut operasional. Staging dan SMTP organisasi belum tersedia; advisory dependency/penilaian kunci tetap perlu ditutup. Agenda, tim, kontak, artikel dan pelengkapan publik tetap akan dibuat oleh B.
+Riwayat integrasi 2026-10-17: A0–A5 dan B0/B1/B2 digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite saat itu lulus 260 test/1921 assertion dan CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. Bukti A3–A5 ada pada CATATAN_JALUR_A.md dan catatan integrasi Jalur B. Tindak lanjut operasional/produksi tetap terpisah. Status terkini PUB-04/PUB-03, dashboard dan refleksi mengikuti pembaruan aktif 2026-10-18 di atas.
 
 Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
 
@@ -14,22 +20,26 @@ Produk ini harus mengutamakan:
 
 ### Cakupan dan Status Implementasi
 
+Perubahan cakupan pengguna 2026-10-17: halaman publik aktif disederhanakan menjadi Hero, maksimal empat cuplikan Artikel, maksimal empat foto Galeri dan footer; navbar menghubungkan halaman yang tersedia. Artikel memiliki daftar/detail publik dan draf/terbit melalui pengelolaan Post yang sama dengan Refleksi publik. Seluruh pengelolaan Post dan Galeri hanya untuk super admin aktif. URL Refleksi publik existing tetap tersedia dan berbeda dari Refleksi saya. Agenda, tim/kontak, tentang/statistik serta CTA terpisah tidak masuk homepage. Implementasi PUB-04/PUB-03 telah diuji, migration lokal diterapkan, dan kode masuk hasil penggabungan develop pada 2026-10-18. Persetujuan konten resmi dan rilis tetap terpisah dari integrasi.
+
 Matriks ini menjadi acuan cakupan fitur per 2026-10-17. Tersedia berarti implementasi ada, sebagian berarti baru memenuhi sebagian alur, direncanakan berarti akan dibuat, dan ditunda berarti pengembangan lanjut belum dijalankan. Status task DONE/REVIEW dan persetujuan rilis tetap mengikuti TASK.md serta bukti verifikasi, bukan hanya keberadaan fitur.
 
 | Fitur | Status | Bukti dan batas saat ini |
 |---|---|---|
 | Akun, profil, verifikasi, data alumni dan audit | Tersedia | A0/A1/A3/A4/A5-FIX; registrasi pending, scope wilayah/role verifikasi, transport email gagal tertangani dan label profil aksesibel. SMTP lokal lulus; pengiriman eksternal masih perlu QA |
 | Impor/ekspor alumni CSV dan Excel .xlsx | Tersedia | A2/A35; template/nama wilayah, laporan baris gagal, unggah XLSX nyata/duplikat/filter/ekspor lulus QA browser lokal. Staging belum diuji |
-| Dashboard dan grafik alumni | Tersedia | B1 REVIEW; data database dan scope wilayah. Hitungan saat ini mencakup seluruh akun dalam scope |
+| Dashboard dan grafik pengelola | Tersedia | Data database dan scope wilayah; hitungan mencakup seluruh akun dalam scope |
+| Dashboard pribadi alumni | Tersedia | Status akun, level/wilayah, profil dasar, akses materi sesuai kelayakan, Refleksi saya dan notifikasi sendiri |
+| Refleksi saya semua role | Tersedia | Draf privat; kiriman opsional dan tanggapan pengelola sesuai wilayah, terpisah dari konten publik |
 | Playlist/video, pencarian dan akses materi berdasarkan status/level | Tersedia | A2; pengelolaan admin dan tautan YouTube, metadata judul/durasi manual |
 | Pengambilan/cache metadata YouTube otomatis | Ditunda | Belum ada integrasi otomatis; PLAN A2 menundanya |
 | Progres menonton, opsional | Ditunda | Model/tabel video_progress tersedia; endpoint dan UI pengguna belum tersedia |
 | Draf/edit/kirim/review/rekap/ekspor laporan | Tersedia | B2 REVIEW; foto privat dan CSV; rejected terkunci tanpa revisi/kirim ulang |
-| Homepage, tentang, statistik publikasi, refleksi dan galeri | Tersedia | B1 REVIEW; post terbit dan galeri dari database |
-| Artikel publik | Direncanakan | Halaman daftar/detail artikel belum tersedia; PUB-04. Refleksi existing tetap tersedia |
-| Agenda kajian publik | Sebagian | Placeholder belum tersedia; akan dilengkapi melalui PUB-01 |
-| Profil tim dan informasi kontak resmi | Direncanakan | Template belum dipasang pada homepage aktif; PUB-02 |
-| Navigasi/CTA pendaftaran publik dan konten final | Sebagian | Route registrasi tersedia, tetapi tautan Daftar belum ada di homepage/login aktif; PUB-03 |
+| Homepage Hero/Artikel/Galeri/Footer | Tersedia pada hasil gabungan | Maksimal empat artikel terbit dan empat foto Galeri; konten resmi tetap menunggu pengelola |
+| Artikel publik | Tersedia pada hasil gabungan | Daftar/detail dan draf/terbit melalui Post; pengelolaan hanya super admin. Refleksi publik existing tetap tersedia |
+| Agenda kajian publik | Di luar cakupan aktif | PUB-01 tidak dilanjutkan dalam homepage ringkas atas keputusan pengguna |
+| Profil tim dan informasi kontak resmi | Di luar cakupan aktif | PUB-02 tidak dilanjutkan dalam homepage ringkas atas keputusan pengguna |
+| Navigasi publik | Tersedia pada dev-B | PUB-03 REVIEW; Artikel/Galeri, Hero membaca artikel dan Masuk/Area anggota. CTA Daftar tambahan di luar cakupan aktif; route register tetap tersedia |
 | CRUD web khusus master role/wilayah/level | Direncanakan | Tujuan pengelolaan super admin; rincian task/acceptance criteria belum ditetapkan. Penetapan level akun sudah tersedia |
 
 ## 2. Tujuan Produk
@@ -37,7 +47,7 @@ Matriks ini menjadi acuan cakupan fitur per 2026-10-17. Tersedia berarti impleme
 1. Menjadi pusat data alumni Rausyan Fikr yang dapat dicari, difilter, diverifikasi, dan dirawat.
 2. Menyediakan akses materi kajian sesuai level alumni.
 3. Menyediakan laporan kajian wilayah yang dapat direkap dan ditinjau.
-4. Menyediakan halaman publik untuk profil organisasi, berita/refleksi, artikel, agenda, tim, galeri, dan kontak.
+4. Menyediakan homepage ringkas, artikel dan galeri publik serta mempertahankan akses Refleksi existing.
 5. Memberikan dasar sistem yang siap dikembangkan secara konsisten oleh tim web profesional.
 
 ## 3. Pengguna dan Role
@@ -51,7 +61,7 @@ Cakupan pengelolaan master melalui CRUD web khusus masih direncanakan sesuai mat
 
 ### Admin
 - Mengelola data alumni lintas wilayah sesuai kebijakan.
-- Mengelola konten refleksi dan galeri.
+- Mengelola materi sesuai gate existing; pengelolaan Post/Artikel/Refleksi dan Galeri hanya untuk super admin.
 - Melakukan verifikasi akun.
 - Melihat dashboard dan laporan.
 
@@ -67,28 +77,27 @@ Cakupan pengelolaan master melalui CRUD web khusus masih direncanakan sesuai mat
 - Menerima notifikasi status akun.
 
 ### Pengunjung Publik
-- Mengakses landing page, informasi organisasi, berita/refleksi, artikel, agenda, tim, galeri, dan kontak.
+- Mengakses homepage Hero/Artikel/Galeri/Footer, daftar/detail artikel, Refleksi existing dan Galeri.
 
 ## 4. Modul Produk
 
 ### Modul Landing Page
-Status: sebagian tersedia; pelengkapan publik dikonfirmasi pengguna pada 2026-10-17 dan tercatat sebagai PUB-01–PUB-04.
+Status: PUB-04/PUB-03 tersedia pada hasil penggabungan develop 2026-10-18. Migration lokal Post sudah diterapkan; persetujuan konten resmi dan rilis tetap terpisah dari integrasi kode.
 
 Fitur tersedia:
-- Homepage, tentang, statistik jumlah refleksi terbit/foto galeri, daftar/detail refleksi, galeri, CTA masuk dan footer.
-- Post yang terbit dan galeri diambil dari database.
+- Hero, Galeri, footer serta daftar/detail Refleksi existing menjadi dasar yang dipakai ulang.
+- Artikel dan Galeri diambil dari database; homepage menampilkan maksimal empat item masing-masing, bukan data contoh.
 
-Fitur yang akan dibuat:
-- PUB-01: agenda kajian dengan informasi nyata dan empty state saat belum ada agenda.
-- PUB-02: profil tim dan informasi kontak resmi yang diverifikasi pengelola, menggantikan template yang belum aktif.
-- PUB-03: pelengkapan navigasi, CTA Daftar menuju registrasi existing dan konten publik final.
-- PUB-04: daftar dan detail artikel publik, berikut tautan navigasi. Artikel dicatat sebagai kebutuhan tersendiri dari refleksi existing; penggunaan model Post bersama ditetapkan saat implementasi.
+Fitur batch PUB-04/PUB-03:
+- PUB-04: jenis Artikel pada Post, draf/terbit, daftar/detail publik serta empat cuplikan di homepage; seluruh pengelolaan Post dan Galeri dibatasi pada super admin aktif.
+- PUB-03 terkait: navigasi Artikel/Galeri, tautan membaca artikel dari Hero, serta tautan Masuk/Area anggota existing menuju halaman yang tersedia.
+- PUB-01/PUB-02 agenda dan tim/kontak berada di luar cakupan aktif saat ini, bukan bagian batch homepage.
 
-Batas saat ini: agenda masih placeholder; tim/kontak tidak di-include oleh homepage aktif; tautan Daftar belum ada di homepage/login. Jenis pengelolaan konten agenda/tim/kontak dan target rilis ditetapkan saat implementasi; tidak mengasumsikan kalender, pendaftaran acara atau formulir kontak baru.
+Batas cakupan: homepage hanya Hero/Artikel/Galeri/Footer. Tidak menambahkan kalender, agenda, tim/kontak, statistik/tentang atau CTA terpisah. Registrasi existing tetap tersedia tanpa perubahan kebijakan auth pada batch B ini.
 
 Kriteria UX:
 - Informasi utama langsung jelas.
-- CTA pendaftaran/login mudah ditemukan.
+- Tautan Artikel/Galeri dan Masuk/Area anggota mudah ditemukan.
 - Layout responsif dan tidak terlalu padat di mobile.
 
 ### Modul Autentikasi
@@ -160,6 +169,8 @@ Kriteria:
 ### Modul Dashboard
 Status: tersedia pada hasil integrasi; B1 REVIEW untuk tindak lanjut rilis.
 
+Dashboard statistik di bawah khusus admin/super admin/koorda aktif. Alumni mendapat dashboard pribadi: sapaan, status akun, level/wilayah, data profil dasar, akses materi sesuai status/level existing, Refleksi saya dan notifikasi miliknya sendiri. Akun tanpa role tetap diarahkan ke profil.
+
 Fitur:
 - Total alumni.
 - Alumni aktif.
@@ -177,11 +188,11 @@ Kriteria:
 Definisi hitungan saat ini adalah seluruh akun dalam scope, termasuk pengelola; perubahan definisi menjadi role alumni saja memerlukan keputusan produk dan pembaruan test.
 
 ### Modul Manajemen Konten
-Status: tersedia pada hasil integrasi; B1 REVIEW untuk tindak lanjut rilis.
+Status: CRUD, pembeda jenis, draf/terbit dan pembatasan pengelola super admin tersedia melalui PUB-04.
 
 Fitur:
-- CRUD refleksi/post.
-- CRUD galeri.
+- CRUD Artikel/Refleksi pada Post dan Galeri oleh super admin aktif saja.
+- Pilihan draf/terbit memakai published_at; admin biasa, koorda dan alumni tidak dapat mengakses endpoint pengelolaan Post/Galeri.
 - Upload gambar.
 
 Kriteria:
@@ -189,7 +200,7 @@ Kriteria:
 - Validasi gambar aman.
 - Pesan sukses dan error tampil jelas.
 
-Batas saat ini: post baru langsung terbit dan galeri tidak memiliki status publikasi terpisah. Alur editorial draf/penjadwalan belum ditetapkan sebagai fitur tambahan.
+Batas: Galeri tidak memiliki status publikasi terpisah; item yang disimpan pengelola ditampilkan publik. Form Post mendukung draf/terbit, tanpa fitur penjadwalan baru. Request legacy tanpa jenis/status tetap kompatibel; konten lama berjenis Refleksi.
 
 ### Modul Materi Kajian
 Status: fitur inti tersedia; A2 DONE. Pengambilan metadata otomatis dan progres menonton ditunda.
@@ -207,6 +218,8 @@ Inkonsistensi schema/controller pada baseline awal sudah ditangani dalam A0–A2
 
 ### Modul Laporan Kajian
 Status: implementasi lokal tersedia; B2 REVIEW untuk tindak lanjut rilis.
+
+Akses hanya untuk admin, super admin dan koorda aktif dengan scope wilayah existing. Alumni biasa menggunakan Refleksi saya dan tidak dapat mengakses endpoint Laporan; laporan historis tetap tersimpan.
 
 Fitur tersedia:
 - Draf, edit dan kirim laporan kajian.

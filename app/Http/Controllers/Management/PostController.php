@@ -32,10 +32,12 @@ class PostController extends Controller
                 }
             }
             $data['cover_url'] = $path;
-            $data['published_at'] = now();
+            $data['type'] ??= 'reflection';
+            $data['published_at'] = ($data['publication_status'] ?? 'published') === 'published' ? now() : null;
+            unset($data['publication_status']);
             DB::transaction(function () use ($data) {
                 if (! (new Post($data))->save()) {
-                    throw new RuntimeException('Refleksi gagal disimpan.');
+                    throw new RuntimeException('Tulisan gagal disimpan.');
                 }
             });
         } catch (Throwable $exception) {
@@ -43,13 +45,19 @@ class PostController extends Controller
             throw $exception;
         }
 
-        return redirect()->route('management.post.index')->with('success', 'Refleksi berhasil ditambahkan.');
+        return redirect()->route('management.post.index')->with('success', 'Tulisan berhasil ditambahkan.');
     }
 
     public function update(Request $request, Post $post)
     {
         $request->merge(['_editing_id' => $post->id]);
         $data = $this->validatedData($request);
+        if (isset($data['publication_status'])) {
+            $data['published_at'] = $data['publication_status'] === 'draft'
+                ? null
+                : ($post->published_at && ! $post->published_at->isFuture() ? $post->published_at : now());
+        }
+        unset($data['publication_status']);
         $oldPath = $post->cover_url;
         $path = null;
         try {
@@ -62,7 +70,7 @@ class PostController extends Controller
             }
             DB::transaction(function () use ($post, $data) {
                 if (! $post->fill($data)->save()) {
-                    throw new RuntimeException('Refleksi gagal diperbarui.');
+                    throw new RuntimeException('Tulisan gagal diperbarui.');
                 }
             });
         } catch (Throwable $exception) {
@@ -73,7 +81,7 @@ class PostController extends Controller
             $this->deleteImage($oldPath);
         }
 
-        return redirect()->route('management.post.index')->with('success', 'Refleksi berhasil diperbarui.');
+        return redirect()->route('management.post.index')->with('success', 'Tulisan berhasil diperbarui.');
     }
 
     public function destroy(Post $post)
@@ -81,12 +89,12 @@ class PostController extends Controller
         $path = $post->cover_url;
         DB::transaction(function () use ($post) {
             if (! $post->delete()) {
-                throw new RuntimeException('Refleksi gagal dihapus.');
+                throw new RuntimeException('Tulisan gagal dihapus.');
             }
         });
         $this->deleteImage($path);
 
-        return redirect()->route('management.post.index')->with('success', 'Refleksi berhasil dihapus.');
+        return redirect()->route('management.post.index')->with('success', 'Tulisan berhasil dihapus.');
     }
 
     private function validatedData(Request $request): array
@@ -96,6 +104,8 @@ class PostController extends Controller
             'excerpt' => 'nullable|string|max:500',
             'content' => 'nullable|string',
             'cover_url' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'type' => 'sometimes|required|in:reflection,article',
+            'publication_status' => 'sometimes|nullable|in:draft,published',
         ]);
         unset($data['cover_url']);
 

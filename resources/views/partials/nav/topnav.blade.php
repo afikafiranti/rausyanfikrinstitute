@@ -1,10 +1,10 @@
 <nav
-    class="absolute top-0 left-0 w-full z-10 bg-transparent md:flex-row md:flex-nowrap md:justify-start flex items-center p-4">
-    <div class="w-full mx-auto items-center flex justify-between md:flex-nowrap flex-wrap md:px-10 px-4">
+    class="relative z-10 w-full border-b border-slate-200 bg-white px-4 py-4 md:px-8">
+    <div class="mx-auto flex w-full max-w-[1536px] items-center justify-between gap-3">
 
         {{-- Burger: mobile --}}
         <button type="button" aria-label="Buka navigasi" aria-controls="rf-mobile-drawer" aria-expanded="false" class="md:hidden p-3 -ml-2" onclick="rfToggleDrawer('rf-mobile-drawer', true)">
-            <i class="fas fa-bars text-white"></i>
+            <i class="fas fa-bars text-ink"></i>
         </button>
 
         {{-- Judul halaman dinamis --}}
@@ -12,6 +12,8 @@
             $r = Route::currentRouteName();
             $pageTitle = match (true) {
                 $r === 'dashboard' => 'Dashboard',
+                str_starts_with($r, 'reflections.review.') => 'Tinjau refleksi',
+                str_starts_with($r, 'reflections.') => 'Refleksi saya',
                 str_starts_with($r, 'materi.') => 'Materi',
                 $r === 'laporan.review' => 'Review Laporan',
                 str_starts_with($r, 'laporan.') => 'Laporan',
@@ -19,10 +21,12 @@
                 str_starts_with($r, 'alumni.') => 'Alumni',
                 str_starts_with($r, 'notifications.') => 'Notifikasi',
                 $r === 'profile.edit' => 'Profil',
+                str_starts_with($r, 'management.post.') => 'Artikel & Refleksi',
+                str_starts_with($r, 'management.galeri.') => 'Galeri',
                 default => \Illuminate\Support\Str::headline(request()->segment(1)) ?: 'Dashboard',
             };
         @endphp
-        <span class="text-white text-lg uppercase hidden lg:inline-block font-semibold">
+        <span class="min-w-0 flex-1 text-lg font-bold text-ink sm:text-xl">
             {{ $pageTitle }}
         </span>
 
@@ -40,14 +44,14 @@
                         <div class="items-center flex relative">
                             @if ($avatar)
                                 <span
-                                    class="w-12 h-12 inline-flex items-center justify-center rounded-full ring-2 ring-white overflow-hidden">
+                                    class="w-12 h-12 inline-flex items-center justify-center rounded-full ring-2 ring-slate-200 overflow-hidden">
                                     <img alt="avatar" class="w-full h-full object-cover align-middle border-none"
                                         src="{{ $avatar }}?v={{ optional($user->updated_at)->timestamp }}"
                                         loading="lazy">
                                 </span>
                             @else
                                 <span
-                                    class="w-12 h-12 inline-flex items-center justify-center rounded-full ring-2 ring-white bg-blueGray-200 text-blueGray-500">
+                                    class="w-12 h-12 inline-flex items-center justify-center rounded-full ring-2 ring-slate-200 bg-brand/10 text-brand">
                                     <i class="fas fa-user-circle text-2xl"></i>
                                 </span>
                             @endif
@@ -71,12 +75,12 @@
                             @endif
                         </a>
                         <a href="{{ route('profile.edit') }}" class="text-sm py-2 px-4 block w-full text-blueGray-700">
-                            <i class="fas fa-user mr-2"></i> Profile
+                            <i class="fas fa-user mr-2"></i> Profil
                         </a>
                         <div class="h-0 my-2 border border-solid border-blueGray-100"></div>
                         <form method="POST" action="{{ route('logout') }}">@csrf
                             <button type="submit" class="w-full text-left text-sm py-2 px-4 text-blueGray-700">
-                                <i class="fas fa-right-from-bracket mr-2"></i> Logout
+                                <i class="fas fa-right-from-bracket mr-2"></i> Keluar
                             </button>
                         </form>
                     </div>

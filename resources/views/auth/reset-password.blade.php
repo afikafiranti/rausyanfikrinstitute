@@ -9,7 +9,7 @@
         @foreach (array_merge($errors->get('email'), $errors->get('token')) as $message)
           <p>{{ $message }}</p>
         @endforeach
-        <a href="{{ route('password.request') }}" class="text-indigo-600 underline">Minta tautan reset baru</a>
+        <a href="{{ route('password.request') }}" class="text-brand underline">Minta tautan reset baru</a>
       </div>
     @endif
 

@@ -36,7 +36,7 @@
                 </div>
             @endforeach
             <div class="flex flex-wrap items-center gap-4 sm:col-span-2 lg:col-span-4">
-                <button type="submit" class="rounded-lg bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-700">Terapkan filter</button>
+                <button type="submit" class="rounded-lg bg-brand px-5 py-3 font-medium text-white hover:bg-brand-dark">Terapkan filter</button>
                 <a href="{{ route('laporan.summary') }}" class="text-indigo-700 hover:underline">Reset filter</a>
                 <a href="{{ route('laporan.export', $filters) }}" class="rounded-lg border border-indigo-600 px-5 py-3 font-medium text-indigo-700 hover:bg-indigo-50">Unduh CSV sesuai filter</a>
             </div>

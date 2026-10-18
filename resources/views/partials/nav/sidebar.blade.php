@@ -1,12 +1,12 @@
 @php
     $link = fn($active) => $active
-        ? 'text-xs uppercase py-3 font-bold block text-red-600 hover:text-red-600'
-        : 'text-xs uppercase py-3 font-bold block text-blueGray-700 hover:text-blueGray-500';
+        ? 'rf-nav-link rf-nav-active'
+        : 'rf-nav-link rf-nav-idle';
 @endphp
 
 <nav
     class="hidden md:block md:left-0 md:fixed md:top-0 md:bottom-0 md:overflow-y-auto md:flex-row md:flex-nowrap md:overflow-hidden
-            shadow-xl bg-white relative md:w-64 z-10 py-4 px-6">
+            border-r border-slate-200 bg-white relative md:w-64 z-10 py-6 px-4">
     <div
         class="md:flex-col md:items-stretch md:min-h-full md:flex-nowrap px-0 flex flex-wrap items-center justify-between w-full mx-auto">
 
@@ -19,8 +19,9 @@
 
         {{-- Brand --}}
         <a href="{{ route('dashboard') }}"
-            class="md:block text-left md:pb-2 text-blueGray-600 mr-0 inline-block whitespace-nowrap text-sm uppercase font-bold p-4 px-0">
-            Rausyan Fikr
+            class="flex items-center gap-3 px-2 text-left text-ink">
+            <img src="{{ asset('landingpage/images/logo/logo_rf.jpeg') }}" alt="" width="40" height="40" class="h-10 w-10 rounded object-contain">
+            <span class="text-base font-bold leading-tight">Rausyan Fikr <span class="block text-xs font-medium text-muted">Institute</span></span>
         </a>
 
         {{-- Collapsible --}}
@@ -47,12 +48,29 @@
                     </a>
                 </li>
 
+                @if (auth()->user()->hasAnyRole(['alumni', 'koorda', 'admin', 'super_admin']))
+                    <li class="items-center">
+                        <a href="{{ route('reflections.index') }}" class="{{ $link(request()->routeIs('reflections.*') && ! request()->routeIs('reflections.review.*')) }}">
+                            <i class="fas fa-pen mr-2 text-sm opacity-75" aria-hidden="true"></i> Refleksi saya
+                        </a>
+                    </li>
+                @endif
+                @can('review-report')
+                    <li class="items-center">
+                        <a href="{{ route('reflections.review.index') }}" class="{{ $link(request()->routeIs('reflections.review.*')) }}">
+                            <i class="fas fa-comment mr-2 text-sm opacity-75" aria-hidden="true"></i> Tinjau refleksi
+                        </a>
+                    </li>
+                @endcan
+
                 {{-- Laporan --}}
+                @can('review-report')
                 <li class="items-center">
                     <a href="{{ route('laporan.index') }}" class="{{ $link(request()->routeIs('laporan.index')) }}">
                         <i class="fas fa-file-lines mr-2 text-sm text-blueGray-300"></i> Laporan
                     </a>
                 </li>
+                @endcan
 
                 {{-- Review Laporan --}}
                 @can('review-report')
@@ -86,13 +104,14 @@
                 @auth
                     <li class="items-center">
                         <a href="{{ route('profile.edit') }}" class="{{ $link(request()->routeIs('profile.edit')) }}">
-                            <i class="fas fa-user-circle mr-2 text-sm text-blueGray-300"></i> Profile
+                            <i class="fas fa-user-circle mr-2 text-sm text-blueGray-500"></i> Profil
                         </a>
                     </li>
                 @endauth
 
                 {{-- ================== Manajemen Web ================== --}}
                 @can('manage-content')
+                @if (auth()->user()->hasRole('super_admin'))
                     <hr class="my-4 md:min-w-full" />
                     <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4">Manajemen Web
                     </h6>
@@ -100,7 +119,7 @@
                     <li class="items-center">
                         <a href="{{ route('management.post.index') }}"
                             class="{{ $link(request()->routeIs('management.post.*')) }}">
-                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Refleksi 
+                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Artikel &amp; Refleksi
                         </a>
                     </li>
 
@@ -110,6 +129,7 @@
                             <i class="fas fa-images mr-2 text-sm text-blueGray-300"></i> Galeri
                         </a>
                     </li>
+                @endif
                 @endcan
 
 

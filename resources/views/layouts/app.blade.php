@@ -11,26 +11,20 @@
     @endif
 </head>
 
-<body class="antialiased text-blueGray-700">
+<body class="rf-app">
     <a href="#konten-utama" class="sr-only focus:not-sr-only focus:fixed focus:top-0 focus:left-0 focus:z-[70] focus:bg-white focus:p-4">Langsung ke konten</a>
 
     {{-- SIDEBAR FIXED (struktur Notus) --}}
     @include('partials.nav.sidebar')
 
     {{-- WRAPPER KONTEN --}}
-    <div class="relative md:ml-64 bg-blueGray-50 min-h-screen">
+    <div class="relative min-h-screen min-w-0 md:ml-64">
         {{-- TOP NAV TRANSPARENT --}}
         @include('partials.nav.topnav')
 
-        {{-- HEADER GRADIENT --}}
-        <div class="relative z-0 bg-red-700 md:pt-32 pb-32 pt-8 ">
-            <div class="px-4 md:px-10 mx-auto w-full">
-                @yield('page-header')
-            </div>
-        </div>
-
         {{-- KONTEN HALAMAN --}}
-        <main id="konten-utama" tabindex="-1" class="relative z-0 px-4 md:px-10 mx-auto w-full -mt-16 md:-mt-36">
+        <main id="konten-utama" tabindex="-1" class="relative z-0 mx-auto w-full max-w-[1600px] px-4 py-6 md:px-8 md:py-8">
+            @yield('page-header')
             @yield('page-content')
         </main>
 

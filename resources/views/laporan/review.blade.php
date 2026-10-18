@@ -21,6 +21,6 @@
         </ul>
         <div class="mt-5">{{ $reports->links() }}</div>
         <a href="{{ route('laporan.summary') }}" class="mt-5 inline-block text-indigo-700 hover:underline">Rekap dan ekspor</a>
-        <a href="{{ route('laporan.index') }}" class="mt-6 inline-block rounded-lg bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-700">Kembali ke laporan</a>
+        <a href="{{ route('laporan.index') }}" class="mt-6 inline-block rounded-lg bg-brand px-5 py-3 font-medium text-white hover:bg-brand-dark">Kembali ke laporan</a>
     </section>
 @endsection

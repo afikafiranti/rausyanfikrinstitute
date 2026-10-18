@@ -15,22 +15,23 @@ class PublicContentTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_homepage_only_shows_the_latest_published_posts_and_real_gallery(): void
+    public function test_homepage_only_shows_the_latest_published_articles_and_real_gallery(): void
     {
         $this->travelTo(now()->setDate(2026, 10, 16)->setTime(12, 0));
-        for ($i = 1; $i <= 4; $i++) {
-            Post::create(['title' => 'Refleksi Terbit '.$i, 'excerpt' => 'Ringkasan '.$i, 'published_at' => now()->subDays($i)]);
+        for ($i = 1; $i <= 5; $i++) {
+            Post::create(['title' => 'Artikel Terbit '.$i, 'type' => 'article', 'excerpt' => 'Ringkasan '.$i, 'published_at' => now()->subDays($i)]);
         }
-        Post::create(['title' => 'Rahasia Draft', 'published_at' => null]);
-        Post::create(['title' => 'Rahasia Terjadwal', 'published_at' => now()->addSecond()]);
+        Post::create(['title' => 'Refleksi Terbit', 'published_at' => now()]);
+        Post::create(['title' => 'Rahasia Draft', 'type' => 'article', 'published_at' => null]);
+        Post::create(['title' => 'Rahasia Terjadwal', 'type' => 'article', 'published_at' => now()->addSecond()]);
         Gallery::create(['title' => 'Dokumentasi Kajian', 'caption' => 'Kegiatan bersama', 'image_url' => 'galleries/kajian.jpg']);
 
         $this->get(route('landing_page'))->assertOk()->assertViewIs('landingpage.home')
-            ->assertSeeInOrder(['Refleksi Terbit 1', 'Refleksi Terbit 2', 'Refleksi Terbit 3'])
-            ->assertDontSee('Refleksi Terbit 4')->assertDontSee('Rahasia Draft')->assertDontSee('Rahasia Terjadwal')
+            ->assertSeeInOrder(['Artikel Terbit 1', 'Artikel Terbit 2', 'Artikel Terbit 3', 'Artikel Terbit 4'])
+            ->assertDontSee('Artikel Terbit 5')->assertDontSee('Refleksi Terbit')
+            ->assertDontSee('Rahasia Draft')->assertDontSee('Rahasia Terjadwal')
             ->assertSee('Dokumentasi Kajian')->assertSee('Kegiatan bersama')
-            ->assertSee('/storage/galleries/kajian.jpg', false)
-            ->assertViewHas('publishedPostCount', 4)->assertViewHas('galleryCount', 1);
+            ->assertSee('/storage/galleries/kajian.jpg', false);
     }
 
     public function test_public_detail_rejects_draft_future_and_missing_slugs_and_accepts_publication_boundary(): void
@@ -48,7 +49,7 @@ class PublicContentTest extends TestCase
 
     public function test_empty_homepage_and_public_lists_have_honest_empty_states_and_no_demo_links(): void
     {
-        $response = $this->get('/')->assertOk()->assertSee('Belum ada refleksi yang diterbitkan.')->assertSee('Belum ada foto galeri.');
+        $response = $this->get('/')->assertOk()->assertSee('Belum ada artikel yang diterbitkan.')->assertSee('Belum ada foto galeri.');
         foreach (['Lorem Ipsum', 'Our Blogs', 'Testimonials', 'blog-details.html', 'javascript:void(0)', 'info@yourdomain.com'] as $demo) {
             $response->assertDontSee($demo, false);
         }
@@ -82,39 +83,39 @@ class PublicContentTest extends TestCase
     public function test_public_content_is_escaped_and_unsafe_image_urls_are_not_rendered(): void
     {
         $payload = '<script>window.injected=true</script>';
-        $post = Post::create(['title' => 'Judul '.$payload, 'excerpt' => $payload, 'content' => $payload."\nBaris kedua", 'cover_url' => 'javascript:alert(1)', 'published_at' => now()]);
+        $post = Post::create(['title' => 'Judul '.$payload, 'type' => 'article', 'excerpt' => $payload, 'content' => $payload."\nBaris kedua", 'cover_url' => 'javascript:alert(1)', 'published_at' => now()]);
         Gallery::create(['title' => 'Galeri '.$payload, 'caption' => $payload, 'image_url' => 'data:image/svg+xml,bad']);
-        foreach (['/', '/refleksi', '/refleksi/'.$post->slug, '/galeri'] as $url) {
+        foreach (['/', '/artikel', '/artikel/'.$post->slug, '/galeri'] as $url) {
             $this->get($url)->assertOk()->assertDontSee($payload, false)->assertDontSee('javascript:alert(1)', false)->assertDontSee('data:image/svg+xml', false);
         }
-        $this->get('/refleksi/'.$post->slug)->assertSee($payload)->assertSee('Baris kedua');
+        $this->get('/artikel/'.$post->slug)->assertSee($payload)->assertSee('Baris kedua');
     }
 
-    public function test_content_saved_by_admin_is_available_to_guests_with_its_uploaded_images(): void
+    public function test_content_saved_by_super_admin_is_available_to_guests_with_its_uploaded_images(): void
     {
         Storage::fake('public');
         $admin = User::factory()->create(['status' => 'active']);
-        $admin->roles()->attach(Role::firstOrCreate(['name' => 'admin']));
-        $this->actingAs($admin)->post('/management/post', ['title' => 'Refleksi Dari Pengelola', 'content' => 'Isi baru.', 'cover_url' => UploadedFile::fake()->image('cover.jpg')])->assertRedirect();
+        $admin->roles()->attach(Role::firstOrCreate(['name' => 'super_admin']));
+        $this->actingAs($admin)->post('/management/post', ['title' => 'Artikel Dari Pengelola', 'type' => 'article', 'content' => 'Isi baru.', 'cover_url' => UploadedFile::fake()->image('cover.jpg')])->assertRedirect();
         $this->post('/management/galeri', ['title' => 'Galeri Dari Pengelola', 'image' => UploadedFile::fake()->image('foto.png')])->assertRedirect();
         $this->app['auth']->forgetGuards();
         $this->assertGuest();
         $post = Post::firstOrFail();
         $gallery = Gallery::firstOrFail();
 
-        $this->get('/')->assertOk()->assertSee('Refleksi Dari Pengelola')->assertSee('Galeri Dari Pengelola')
+        $this->get('/')->assertOk()->assertSee('Artikel Dari Pengelola')->assertSee('Galeri Dari Pengelola')
             ->assertSee(Storage::disk('public')->url($post->cover_url), false)->assertSee(Storage::disk('public')->url($gallery->image_url), false);
-        $this->get('/refleksi/'.$post->slug)->assertOk()->assertSee('Isi baru.');
+        $this->get('/artikel/'.$post->slug)->assertOk()->assertSee('Isi baru.');
     }
 
     public function test_existing_https_images_are_preserved_and_publication_can_be_withdrawn(): void
     {
-        $post = Post::create(['title' => 'Terbit Sementara', 'cover_url' => 'https://images.example.test/cover.jpg', 'published_at' => now()]);
+        $post = Post::create(['title' => 'Terbit Sementara', 'type' => 'article', 'cover_url' => 'https://images.example.test/cover.jpg', 'published_at' => now()]);
         Gallery::create(['title' => 'Foto HTTPS', 'image_url' => 'https://images.example.test/foto.jpg']);
         $this->get('/')->assertOk()->assertSee('https://images.example.test/cover.jpg', false)->assertSee('https://images.example.test/foto.jpg', false);
-        $this->get('/refleksi/'.$post->slug)->assertOk();
+        $this->get('/artikel/'.$post->slug)->assertOk();
         $post->update(['published_at' => null]);
-        $this->get('/refleksi/'.$post->slug)->assertNotFound();
+        $this->get('/artikel/'.$post->slug)->assertNotFound();
         $this->get('/')->assertDontSee('Terbit Sementara');
     }
 }

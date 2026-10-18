@@ -49,7 +49,7 @@ class KajianReportReviewTest extends TestCase
 
     public function test_rejection_requires_reason_and_displays_escaped_reason_to_owner(): void
     {
-        $author = $this->member('alumni');
+        $author = $this->member('koorda');
         $report = $this->report($author, 'Perlu Perbaikan');
         $this->actingAs($this->member('koorda', $author->wilayah_id));
         foreach (['', '   ', str_repeat('字', 16384), ['invalid']] as $reason) {

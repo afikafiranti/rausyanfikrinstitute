@@ -4,6 +4,12 @@ Dokumen ini menetapkan prioritas, pembagian kerja paralel, dan urutan pengembang
 
 ## Rencana Aktif: Dua Orang Bekerja Paralel
 
+### Arahan terbaru 2026-10-18
+
+Pengguna meminta push dev-B lalu gabung/push develop. PUB-04/PUB-03, UIUX-02, B1-ALUMNI-DASH dan B1-MEMBER-REFLECTION sudah diimplementasikan dan digabung tanpa konflik. Dashboard alumni bersifat pribadi; Refleksi saya tersedia untuk empat role, dengan draf privat dan kiriman opsional untuk tanggapan. Laporan hanya untuk pengelola aktif sesuai wilayah. Jangan mengulang implementasi task selesai pada daftar historis di bawah. Penggabung menyelaraskan dokumen pusat dan memverifikasi hasil gabungan; bukti/hash aktual mengikuti CATATAN_JALUR_B dan Git.
+
+Staging dijadwalkan pada tahap akhir pengembangan sesuai keputusan pengguna dan tidak menghalangi integrasi ini. SMTP eksternal, konten resmi, risiko B3 dan persetujuan produksi tetap tindak lanjut terpisah. Tidak memulai agenda/tim-kontak atau progres menonton tanpa arahan baru.
+
 Tanggal penetapan: 2026-10-16.
 
 Rencana ini menggantikan urutan dan prioritas tahap lama di bagian referensi modul. Pembaruan integrasi 2026-10-17: A0/A1/A2 sudah berada di origin/develop; B0/B1/B2.1–B2.6 lokal digabung sesuai instruksi pengguna. Implementasi dan bukti masing-masing tercatat pada CATATAN_JALUR_A.md dan CATATAN_JALUR_B.md. Pengujian hasil gabungan dicatat pada bagian integrasi Jalur B; staging, CI remote, advisory dependency dan persetujuan rilis tetap terpisah dari merge lokal.
@@ -12,26 +18,30 @@ Pembaruan cakupan 2026-10-17: pengguna meminta sinkronisasi dokumentasi dan meng
 
 ### Tindak Lanjut Setelah Integrasi
 
-Pembaruan A3–A5 pada 2026-10-17: A3-VERIFY, A4-AUTH dan A5-FIX sudah digabung ke develop pada ecee5b4. Suite gabungan 260 test/1921 assertion serta build/Composer/platform/route lulus; review independen tanpa temuan konkret. CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4; QA lokal dilengkapi pada A35-INTEGRATE. Staging dan SMTP organisasi belum tersedia menurut pengguna; bukti ini tidak menggantikan keduanya. Urutan B tetap PUB-04 -> PUB-01 -> PUB-02 -> PUB-03.
+Keputusan terbaru pengguna 2026-10-17 setelah pengambilalihan Jalur B: cakupan publik aktif kini **Hero -> maksimal 4 cuplikan Artikel -> maksimal 4 foto Galeri -> Footer**, dengan daftar/detail artikel dan daftar galeri terhubung dari homepage. Post/Artikel/Refleksi dan Galeri dikelola hanya oleh super admin aktif. PUB-04 dikerjakan terlebih dahulu bersama penyederhanaan homepage dan navigasi PUB-03 yang terkait; PUB-01 agenda dan PUB-02 tim/kontak berada di luar cakupan aktif saat ini. Urutan empat task pada catatan sebelumnya adalah riwayat sebelum penyederhanaan ini, bukan perintah menambah section lagi.
 
-Keputusan pengguna 2026-10-17: arah pengembangan berikut disetujui. Urutan pengerjaan adalah **pengamanan verifikasi akun pengelola -> PUB-04 artikel -> PUB-01 agenda -> PUB-02 tim/kontak -> PUB-03 navigasi final -> staging/rilis**. Nomor PUB tetap dipertahankan sebagai identitas task, bukan urutan eksekusi.
+Status PUB-04/PUB-03 2026-10-18: implementasi, review dan QA lokal selesai serta masuk hasil penggabungan develop bersama UIUX-02/dashboard alumni/Refleksi saya. Draf/terbit, batas super admin, jadwal saat edit, mobile dan keyboard telah diuji. Migration lokal Post dan tabel refleksi sudah diterapkan; commit implementasi `7408828` sudah dipush. Bukti suite terbaru, hasil merge/push dan CI remote mengikuti CATATAN_JALUR_B. Konten resmi dan rilis tetap tindak lanjut; staging dijadwalkan pada tahap akhir pengembangan.
+
+Pembaruan A3–A5 pada 2026-10-17: A3-VERIFY, A4-AUTH dan A5-FIX sudah digabung ke develop pada ecee5b4. Suite gabungan saat integrasi 260 test/1921 assertion serta build/Composer/platform/route lulus; review independen tanpa temuan konkret. CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4; QA lokal dilengkapi pada A35-INTEGRATE. Staging dan SMTP organisasi belum tersedia menurut pengguna; bukti ini tidak menggantikan keduanya.
+
+Riwayat keputusan sebelum penyederhanaan 2026-10-17: urutan awal pengamanan verifikasi -> PUB-04 -> PUB-01 -> PUB-02 -> PUB-03 digantikan oleh cakupan aktif di atas. Nomor PUB tetap dipertahankan sebagai identitas task.
 
 - **Jalur A:** A3-VERIFY, A4-AUTH dan A5-FIX selesai pada hasil integrasi; jangan ulangi implementasi. Lanjutkan penutupan QA operasional saat staging/SMTP organisasi tersedia, mengikuti bukti lokal pada CATATAN_JALUR_A.
-- **Jalur B:** mulai PUB-04 sebagai batch fitur berikutnya; gunakan pola pengelolaan Post existing bila sesuai, tentukan pembeda artikel/refleksi dan aturan publikasinya sebelum mengubah schema. Pertahankan URL/refleksi dan hindari dua sistem konten yang menduplikasi alur yang sama. Setelah itu lanjut PUB-01, PUB-02 dan PUB-03.
+- **Jalur B (diambil alih pengguna):** implementasi PUB-04/PUB-03, UIUX-02, dashboard alumni dan Refleksi saya sudah masuk hasil penggabungan develop. Lanjutkan permintaan pengguna dan persetujuan konten resmi, tanpa mengulang task selesai. Super admin mengelola konten publik; Refleksi saya bersifat pribadi untuk empat role; Laporan khusus pengelola. PUB-01/PUB-02 tetap di luar cakupan.
 - **Jalur B, persiapan rilis:** tangani B3-RELEASE secara paralel bila independen: triase advisory Composer, penilaian pemakaian kunci historis, CI remote dan persiapan staging. Audit npm tetap dilewati sesuai keputusan pengguna; jangan rotasi kunci server tanpa inventarisasi dampak.
 - **Penggabung A+B:** A3-VERIFY sudah tertutup; verifikasi integrasi per batch dan selesaikan B3-RELEASE, email eksternal serta QA staging sebelum rilis. Pekerjaan fitur B pada lingkungan terisolasi tidak perlu menunggu seluruh pekerjaan rilis selesai.
 
 Arahan serah terima Jalur B tersedia di [CATATAN_JALUR_B.md](CATATAN_JALUR_B.md#arahan-berikutnya-untuk-pemilik-jalur-b). Periksa branch/status sebelum mulai; jangan memindahkan perubahan dokumentasi develop yang belum di-commit ke dev-B. Ambil baseline gabungan setelah tersimpan pada branch bersama, lalu catat task IN_PROGRESS pada catatan jalur sendiri.
 
 1. Tindak lanjuti advisory dependency, penilaian kunci historis, CI remote, email eksternal dan staging/backup nyata sebelum menetapkan kesiapan rilis. Batas verifikasi akun pengelola sudah ditangani A3; hasil QA lokal terbaru mengikuti catatan integrasi A35.
-2. Lengkapi tampilan publik melalui PUB-01–PUB-04. Cakupannya dikonfirmasi pengguna; statusnya TODO, belum diimplementasikan dan belum memiliki tanggal rilis. Pekerjaan dapat disiapkan tanpa menunggu staging; penggunaan data nyata tetap mengikuti syarat rilis.
+2. Siapkan persetujuan konten resmi serta penerapan/integrasi PUB-04/PUB-03 pada lingkungan target. QA lokal cakupan ringkas sudah lulus. PUB-01/PUB-02 tidak dilanjutkan tanpa arahan baru; hasil lokal belum menjadi persetujuan rilis.
 
 | ID | Pemilik | Prioritas | Hasil yang akan dibuat |
 |---|---|---|---|
-| PUB-01 | Jalur B | P2 | Agenda publik berisi informasi kajian nyata dan empty state bila belum ada agenda |
-| PUB-02 | Jalur B | P2 | Profil tim dan informasi kontak resmi yang disetujui pengelola, ditampilkan pada halaman publik aktif |
-| PUB-03 | Jalur B, koordinasi A untuk view auth | P2 | Navigasi, CTA Daftar menuju register existing, dan konten publik final; semua tautan menuju halaman/section yang tersedia |
-| PUB-04 | Jalur B | P2 | Daftar/detail artikel publik dan tautan navigasi, dengan pengelolaan konten oleh admin; pertahankan refleksi existing |
+| PUB-01 | Jalur B | Di luar cakupan aktif | Agenda; menunggu arahan baru setelah penyederhanaan homepage |
+| PUB-02 | Jalur B | Di luar cakupan aktif | Tim/kontak; menunggu arahan baru setelah penyederhanaan homepage |
+| PUB-03 | Jalur B | P2 | Navigasi Artikel/Galeri dan utilitas login existing; homepage tanpa tautan section yang dikeluarkan |
+| PUB-04 | Jalur B | P2 | Homepage ringkas, daftar/detail Artikel, reuse Post dengan draf/terbit dan pengelolaan Post/Galeri oleh super admin; pertahankan Refleksi existing |
 
 Kriteria selesai publik: konten resmi disetujui, tidak ada data/template fiktif yang tampil, tersedia empty/error state sesuai alur, tampilan mobile dan keyboard diuji, serta konten yang belum terbit tidak terbuka. Reuse alur post/galeri existing jika memenuhi kebutuhan; cara pengelolaan agenda/tim/kontak serta penyimpanan artikel ditetapkan sebelum coding. Rencana ini tidak otomatis menambah kalender, pendaftaran acara atau pengiriman formulir kontak.
 
@@ -40,7 +50,7 @@ Metadata YouTube otomatis dan progres menonton tetap ditunda; revisi laporan rej
 | Jalur | Penanggung jawab | Hasil utama | Branch |
 |---|---|---|---|
 | A | Pengembang A (pengguna) | Akses akun dan wilayah aman; data alumni, profil, verifikasi, dan materi konsisten | dev-A |
-| B | Pengembang B (rekan pengguna) | Pengujian tim konsisten; dashboard, konten publik, dan laporan dapat dipakai | dev-B |
+| B | Diambil alih pengguna | Pengujian tim konsisten; dashboard, konten publik, dan laporan dapat dipakai | dev-B |
 
 Penugasan Jalur A dikonfirmasi pengguna pada 2026-10-16. Branch dev-A dibuat dari develop; implementasi A0-A2 telah selesai. Baseline pembagian kerja dan hasil A kini tersedia di develop agar pengembang B dapat mengambilnya.
 

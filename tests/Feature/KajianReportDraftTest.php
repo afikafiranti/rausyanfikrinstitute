@@ -23,11 +23,31 @@ class KajianReportDraftTest extends TestCase
         Storage::fake('public');
     }
 
+    public function test_alumni_cannot_access_any_report_endpoint(): void
+    {
+        $region = Wilayah::create(['name' => 'Wilayah Alumni']);
+        $alumni = $this->member('alumni', $region->id);
+        $report = $this->report($alumni, $region->id, 'Laporan Lama', 'submitted');
+
+        $this->actingAs($alumni);
+        foreach (['/laporan', '/laporan/buat', '/laporan/review', '/laporan/rekap', '/laporan/ekspor',
+            '/laporan/'.$report->id, '/laporan/'.$report->id.'/edit', '/laporan/'.$report->id.'/foto'] as $url) {
+            $this->get($url)->assertForbidden();
+        }
+        $this->post('/laporan', $this->data())->assertForbidden();
+        $this->put('/laporan/'.$report->id, $this->data())->assertForbidden();
+        foreach (['submit', 'approve', 'reject'] as $action) {
+            $this->post('/laporan/'.$report->id.'/'.$action, ['reject_reason' => 'Alasan'])->assertForbidden();
+        }
+        $this->assertDatabaseCount('kajian_reports', 1);
+        $this->assertSame('submitted', $report->fresh()->status);
+    }
+
     public function test_member_saves_a_draft_with_server_owned_identity_region_totals_and_status(): void
     {
         $local = Wilayah::create(['name' => 'Wilayah Lokal']);
         $other = Wilayah::create(['name' => 'Wilayah Lain']);
-        $viewer = $this->member('alumni', $local->id);
+        $viewer = $this->member('koorda', $local->id);
         $this->actingAs($viewer)->post('/laporan?wilayah_id='.$other->id, $this->data() + [
             'wilayah_id' => $other->id, 'user_id' => 999, 'total_peserta' => 999,
             'status' => 'approved', 'reviewed_by' => $viewer->id, 'reviewed_at' => '2026-01-01',
@@ -59,11 +79,11 @@ class KajianReportDraftTest extends TestCase
         $this->assertDatabaseCount('kajian_reports', 2);
     }
 
-    public function test_alumni_cannot_read_another_members_report_or_own_old_region_report(): void
+    public function test_koorda_cannot_read_another_members_draft_or_own_old_region_report(): void
     {
         $local = Wilayah::create(['name' => 'Wilayah Lokal']);
         $other = Wilayah::create(['name' => 'Wilayah Lain']);
-        $viewer = $this->member('alumni', $local->id);
+        $viewer = $this->member('koorda', $local->id);
         $own = $this->report($viewer, $local->id, 'Laporan Sendiri');
         $foreign = $this->report($this->member('alumni', $local->id), $local->id, 'Draf Orang Lain');
         $old = $this->report($viewer, $other->id, 'Wilayah Akun Lama');
@@ -122,7 +142,7 @@ class KajianReportDraftTest extends TestCase
     public function test_validation_preserves_input_and_rejects_invalid_schema_values_and_images(): void
     {
         $region = Wilayah::create(['name' => 'Wilayah']);
-        $this->actingAs($this->member('alumni', $region->id));
+        $this->actingAs($this->member('koorda', $region->id));
         $this->from('/laporan/buat')->post('/laporan', array_replace($this->data(), [
             'tanggal' => '2026-02-30', 'judul' => str_repeat('a', 181), 'peserta_l' => -1, 'peserta_p' => 2147483648,
             'durasi_menit' => 'invalid', 'pemateri' => str_repeat('p', 151), 'tempat' => str_repeat('t', 151), 'catatan' => str_repeat('字', 16384),
@@ -137,7 +157,7 @@ class KajianReportDraftTest extends TestCase
     public function test_photo_is_private_and_only_readable_by_viewers_of_the_report(): void
     {
         $region = Wilayah::create(['name' => 'Wilayah']);
-        $viewer = $this->member('alumni', $region->id);
+        $viewer = $this->member('koorda', $region->id);
         $photo = UploadedFile::fake()->image('foto.jpg');
         $bytes = file_get_contents($photo->getPathname());
         $this->actingAs($viewer)->post('/laporan', $this->data() + ['foto' => $photo])->assertRedirect();
@@ -147,7 +167,7 @@ class KajianReportDraftTest extends TestCase
         $response = $this->get('/laporan/'.$report->id.'/foto')->assertOk()->assertStreamedContent($bytes);
         $this->assertStringContainsString('private', $response->headers->get('Cache-Control'));
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
-        $this->actingAs($this->member('alumni', $region->id))->get('/laporan/'.$report->id.'/foto')->assertNotFound();
+        $this->actingAs($this->member('alumni', $region->id))->get('/laporan/'.$report->id.'/foto')->assertForbidden();
         $this->actingAs($this->member('koorda', $region->id))->get('/laporan/'.$report->id.'/foto')->assertNotFound();
         $this->actingAs($this->member('admin'))->get('/laporan/'.$report->id.'/foto')->assertOk();
     }
@@ -156,7 +176,7 @@ class KajianReportDraftTest extends TestCase
     {
         $region = Wilayah::create(['name' => 'Wilayah']);
         KajianReport::created(fn () => throw new RuntimeException('Simulated report post-insert failure'));
-        $this->actingAs($this->member('alumni', $region->id))->post('/laporan', $this->data() + ['foto' => UploadedFile::fake()->image('foto.jpg')])->assertServerError();
+        $this->actingAs($this->member('koorda', $region->id))->post('/laporan', $this->data() + ['foto' => UploadedFile::fake()->image('foto.jpg')])->assertServerError();
         $this->assertDatabaseCount('kajian_reports', 0);
         $this->assertSame([], Storage::disk('local')->allFiles('report-photos'));
     }
@@ -165,7 +185,7 @@ class KajianReportDraftTest extends TestCase
     {
         $region = Wilayah::create(['name' => 'Wilayah']);
         KajianReport::saving(fn () => false);
-        $this->actingAs($this->member('alumni', $region->id))
+        $this->actingAs($this->member('koorda', $region->id))
             ->post('/laporan', $this->data() + ['foto' => UploadedFile::fake()->image('foto.png')])
             ->assertServerError()->assertSessionMissing('success');
         $this->assertDatabaseCount('kajian_reports', 0);
@@ -175,7 +195,7 @@ class KajianReportDraftTest extends TestCase
     public function test_photo_endpoint_rejects_unsafe_legacy_paths_and_revoked_account_access(): void
     {
         $region = Wilayah::create(['name' => 'Wilayah']);
-        $viewer = $this->member('alumni', $region->id);
+        $viewer = $this->member('koorda', $region->id);
         $report = $this->report($viewer, $region->id, 'Laporan Privat');
         Storage::disk('local')->put('unrelated.png', 'private bytes');
         $this->actingAs($viewer);

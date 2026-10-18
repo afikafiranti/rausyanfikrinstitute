@@ -57,7 +57,7 @@
                 @if ($canEditProfile)
                     <div class="mt-4">
                         <a href="{{ route('alumni.edit', $alumni) }}"
-                            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+                            class="inline-flex items-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark">
                             <i class="fas fa-pen"></i> Edit Data
                         </a>
                     </div>
@@ -113,7 +113,7 @@
                             </div>
 
                             <button type="submit"
-                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-indigo-600 px-4 py-2 text-sm font-medium text-white hover:bg-indigo-700">
+                                class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2 text-sm font-medium text-white hover:bg-brand-dark">
                                 <i class="fas fa-save"></i> Simpan
                             </button>
                         </form>
@@ -148,7 +148,7 @@
         {{-- Tombol kembali --}}
         <div class="p-6 border-t text-center bg-slate-50">
             <a href="{{ route('alumni.index') }}"
-                class="inline-block bg-indigo-600 hover:bg-indigo-700 text-white font-medium px-5 py-2 rounded-lg shadow-sm border border-slate-200 transition">
+                class="inline-block bg-brand hover:bg-brand-dark text-white font-medium px-5 py-2 rounded-lg shadow-sm border border-slate-200 transition">
                 ← Kembali ke Daftar Alumni
             </a>
         </div>

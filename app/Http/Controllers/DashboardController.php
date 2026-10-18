@@ -12,6 +12,22 @@ class DashboardController extends Controller
     public function index(Request $request)
     {
         $viewer = $request->user();
+        if ($viewer->hasRole('alumni') && ! $viewer->hasAnyRole(['admin', 'super_admin', 'koorda'])) {
+            $viewer->loadMissing(['level', 'wilayah']);
+            $missingProfile = [];
+            foreach (['phone' => 'nomor telepon', 'angkatan' => 'angkatan', 'wilayah_id' => 'wilayah'] as $field => $label) {
+                if (blank($viewer->{$field})) {
+                    $missingProfile[] = $label;
+                }
+            }
+
+            return view('dashboard.alumni', [
+                'alumni' => $viewer,
+                'canOpenMateri' => $viewer->status === User::STATUS_ACTIVE && (bool) $viewer->level_id,
+                'missingProfile' => $missingProfile,
+                'unreadCount' => $viewer->unreadNotifications()->count(),
+            ]);
+        }
         if (! $viewer->hasAnyRole(['admin', 'super_admin', 'koorda'])) {
             return redirect()->route('profile.edit');
         }

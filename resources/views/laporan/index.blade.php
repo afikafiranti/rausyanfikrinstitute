@@ -8,7 +8,7 @@
             <a href="{{ route('laporan.review') }}" class="mt-4 inline-block font-medium text-indigo-700 hover:underline">Buka antrean review</a>
             <a href="{{ route('laporan.summary') }}" class="mt-4 ml-4 inline-block font-medium text-indigo-700 hover:underline">Rekap dan ekspor</a>
         @endcan
-        <a href="{{ route('laporan.create') }}" class="mt-5 inline-block rounded-lg bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-700">Buat draf laporan</a>
+        <a href="{{ route('laporan.create') }}" class="mt-5 inline-block rounded-lg bg-brand px-5 py-3 font-medium text-white hover:bg-brand-dark">Buat draf laporan</a>
         @include('laporan.feedback')
         <ul class="mt-6 divide-y divide-slate-200">
             @forelse ($reports as $report)

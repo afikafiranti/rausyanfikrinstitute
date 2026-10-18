@@ -65,12 +65,15 @@ class DashboardStatisticsTest extends TestCase
         }
     }
 
-    public function test_alumni_are_directed_to_their_profile_and_cannot_read_statistics(): void
+    public function test_alumni_see_their_personal_dashboard_and_cannot_read_statistics(): void
     {
         $region = Wilayah::create(['name' => 'Wilayah Alumni']);
         foreach ([null, $region->id] as $wilayahId) {
             $viewer = $this->member('alumni', $wilayahId);
-            $this->actingAs($viewer)->get('/dashboard')->assertRedirect(route('profile.edit'));
+            $this->actingAs($viewer)->get('/dashboard')->assertOk()
+                ->assertViewIs('dashboard.alumni')
+                ->assertDontSee('Total Alumni')
+                ->assertDontSee('Sebaran Alumni');
             foreach (array_slice($this->statisticUrls(), 1) as $url) {
                 $this->get($url)->assertForbidden();
             }

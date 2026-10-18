@@ -6,7 +6,7 @@ Tujuan utama proyek ini adalah:
 1. Mengelola data alumni.
 2. Memberikan akses materi kajian (YouTube) berdasarkan level.
 3. Menyediakan sistem laporan kajian wilayah.
-4. Menyediakan informasi organisasi, refleksi, artikel, agenda, tim, galeri dan kontak untuk pengunjung publik.
+4. Menyediakan homepage ringkas, artikel dan galeri untuk pengunjung publik, serta mempertahankan URL Refleksi existing.
 
 Pengembangan dilakukan bertahap dalam versi (incremental release):
 - **V1** — Data Alumni (MVP)
@@ -36,16 +36,25 @@ Matriks cakupan dan batas fitur ada di [PRD](docs/aturan_pengembangan/PRD.md#cak
 - Progres menonton bersifat opsional dan masih ditunda; tabel/model yang ada belum menjadi fitur pengguna.
 
 ### Versi 3 (V3) — Laporan Kajian
+- Akses laporan hanya untuk admin, super admin, dan koorda aktif sesuai wilayah; alumni biasa tidak dapat mengakses endpoint laporan.
 - Draf, edit dan kirim laporan kajian dengan peserta laki-laki/perempuan, catatan serta foto privat.
 - Review koorda/admin sesuai wilayah, approve/reject dengan alasan penolakan.
 - Rekap dengan filter wilayah/status/tanggal dan ekspor CSV.
 - Laporan rejected belum mendukung revisi atau pengiriman ulang.
 
+### Beranda Anggota dan Refleksi Pribadi (hasil penggabungan develop, 2026-10-18)
+
+- Alumni mendapat dashboard pribadi berisi status akun, level/wilayah, data profil dasar, akses materi sesuai kelayakan, dan notifikasi sendiri. Dashboard statistik pengelola tetap terpisah.
+- **Refleksi saya** tersedia bagi alumni, koorda, admin, dan super admin: catat pengalaman setelah materi, kajian, atau kegiatan lain; simpan/edit/hapus sebagai draf pribadi.
+- Pengiriman opsional memerlukan akun aktif dan wilayah. Setelah dikirim, isi dikunci; koorda wilayah kiriman serta admin/super admin dapat membaca dan memberi tanggapan. Draf tidak dapat dibaca pengelola lain; pemilik tidak dapat menanggapi kirimannya sendiri.
+- Refleksi pribadi memakai `/refleksi-saya`, antrean pengelola `/tinjau-refleksi`. Ini terpisah dari Refleksi publik di `/refleksi`; tidak otomatis diterbitkan.
+- Migration `2026_10_18_010000_create_member_reflections_table.php` hanya menambah tabel. Saat mengambil kode baru, jalankan migration pada database lokal yang sudah dikonfigurasi sebelum membuka fitur ini. Bukti dan status integrasi ada di catatan Jalur B.
+
 ### Tampilan Publik
 
-- Tersedia: homepage, informasi tentang, statistik publikasi, daftar/detail refleksi, galeri, CTA masuk dan footer. Post terbit serta galeri ditampilkan dari database.
-- Direncanakan dan dikonfirmasi pengguna pada 2026-10-17: agenda kajian, profil tim, informasi kontak resmi, artikel publik dan pelengkapan navigasi/CTA pendaftaran. Agenda saat ini masih berupa placeholder; template tim/kontak belum dipasang pada homepage aktif. Halaman artikel belum tersedia; halaman refleksi existing tetap tersedia.
-- Task berikutnya: `PUB-01` (agenda), `PUB-02` (tim/kontak), `PUB-03` (navigasi, CTA Daftar dan konten publik final) dan `PUB-04` (daftar/detail artikel). Fitur tersebut tetap bagian cakupan produk.
+- Cakupan terbaru pengguna 2026-10-17: **Hero → maksimal empat cuplikan Artikel → maksimal empat foto Galeri → Footer**, dengan tautan daftar/detail Artikel dan daftar Galeri. Konten berasal dari database; saat kosong halaman menampilkan empty state.
+- Artikel dan Refleksi memakai Post dengan pembeda jenis serta draf/terbit. URL Refleksi existing tetap tersedia. Pengelolaan Post dan Galeri hanya untuk super admin aktif; admin biasa tetap dapat mengelola materi sesuai izin existing.
+- PUB-04 dan navigasi PUB-03 tersedia pada hasil penggabungan develop, bersama UIUX-02, dashboard alumni dan Refleksi saya semua role. Commit implementasi `7408828` sudah dipush ke dev-B; bukti test/review/merge ada pada CATATAN_JALUR_B. Migration lokal Post dan tabel refleksi sudah diterapkan tanpa reset/seeder. Persetujuan konten resmi dan rilis tetap terpisah; staging dijadwalkan pada tahap akhir pengembangan sesuai pengguna. Agenda (PUB-01), tim/kontak (PUB-02), section tentang/statistik dan CTA terpisah tetap di luar cakupan homepage.
 
 Pengelolaan master role/wilayah/level melalui CRUD web khusus belum tersedia; rincian implementasinya perlu ditetapkan sebelum dikerjakan. Penetapan level akun melalui verifikasi/pengelolaan alumni sudah tersedia.
 
