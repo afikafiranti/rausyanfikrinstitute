@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? 'Rausyan Fikr Institute' }}</title>
-    <meta name="description" content="Refleksi, dokumentasi kegiatan, dan ruang alumni Rausyan Fikr Institute.">
+    <meta name="description" content="Artikel, galeri kegiatan, dan ruang alumni Rausyan Fikr Institute.">
     <link rel="icon" href="{{ asset('landingpage/images/logo/favicon.svg') }}" type="image/svg+xml">
     @if (! app()->environment('testing'))
         @vite(['resources/css/app.css'])

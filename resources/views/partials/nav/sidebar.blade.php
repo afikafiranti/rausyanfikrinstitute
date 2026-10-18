@@ -93,6 +93,7 @@
 
                 {{-- ================== Manajemen Web ================== --}}
                 @can('manage-content')
+                @if (auth()->user()->hasRole('super_admin'))
                     <hr class="my-4 md:min-w-full" />
                     <h6 class="md:min-w-full text-blueGray-500 text-xs uppercase font-bold block pt-1 pb-4">Manajemen Web
                     </h6>
@@ -100,7 +101,7 @@
                     <li class="items-center">
                         <a href="{{ route('management.post.index') }}"
                             class="{{ $link(request()->routeIs('management.post.*')) }}">
-                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Refleksi 
+                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Artikel &amp; Refleksi
                         </a>
                     </li>
 
@@ -110,6 +111,7 @@
                             <i class="fas fa-images mr-2 text-sm text-blueGray-300"></i> Galeri
                         </a>
                     </li>
+                @endif
                 @endcan
 
 

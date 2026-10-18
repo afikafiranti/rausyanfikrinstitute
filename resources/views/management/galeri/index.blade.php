@@ -5,9 +5,9 @@
     @php
         $totalRows = $galleries->count();
     @endphp
-    <div class="hidden md:block">
-        <div class="grid grid-cols-12 gap-4">
-            <section class="col-span-4 rounded-xl bg-white p-4 shadow">
+    <div>
+        <div class="grid gap-4 lg:grid-cols-12">
+            <section class="min-w-0 rounded-xl bg-white p-4 shadow lg:col-span-4">
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-semibold">Input Galeri</h3>
                     <span class="text-sm text-gray-400">Tambah</span>
@@ -17,21 +17,21 @@
                     class="space-y-3">
                     @csrf
                     <div>
-                        <label class="block text-sm mb-1">Judul</label>
-                        <input type="text" name="title" required value="{{ old('_editing_id') ? '' : old('title') }}"
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Judul berita...">
+                        <label for="createGalleryTitle" class="block text-sm mb-1">Judul</label>
+                        <input type="text" name="title" id="createGalleryTitle" required value="{{ old('_editing_id') ? '' : old('title') }}"
+                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2" placeholder="Judul foto galeri">
                     </div>
 
                     <div>
-                        <label class="block text-sm mb-1">Caption</label>
-                        <textarea name="caption" rows="3" class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
+                        <label for="createGalleryCaption" class="block text-sm mb-1">Caption</label>
+                        <textarea name="caption" id="createGalleryCaption" rows="3" class="w-full rounded-lg border border-blueGray-200 px-3 py-2"
                             placeholder="Isi Caption Foto...">{{ old('_editing_id') ? '' : old('caption') }}</textarea>
                     </div>
 
                     <div>
-                        <label class="block text-sm mb-1">Gambar JPG/PNG (maks. 2 MB)</label>
-                        <input type="file" name="image" accept="image/jpeg,image/png" required
-                            class="w-full rounded-lg border border-blueGray-200 px-3 py-2">
+                        <label for="createGalleryImage" class="block text-sm mb-1">Gambar JPG/PNG (maks. 2 MB)</label>
+                        <input type="file" name="image" id="createGalleryImage" accept="image/jpeg,image/png" required
+                            class="min-w-0 w-full rounded-lg border border-blueGray-200 px-3 py-2">
                     </div>
 
                     <button type="submit"
@@ -40,7 +40,7 @@
                     </button>
                 </form>
             </section>
-            <section class="col-span-8 rounded-xl bg-white p-4 shadow">
+            <section class="min-w-0 rounded-xl bg-white p-4 shadow lg:col-span-8">
                 {{-- Grid Galeri --}}
                 <div class="flex items-center justify-between mb-3">
                     <h3 class="font-semibold">Galeri</h3>
@@ -48,7 +48,7 @@
                 </div>
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                     @foreach ($galleries as $gallery)
-                        <div class="bg-white rounded-lg shadow ">
+                        <div class="min-w-0 bg-white rounded-lg shadow ">
                             @php
                                         $imgSrc = Str::startsWith($gallery->image_url, ['http', 'https'])
                                             ? $gallery->image_url
@@ -56,8 +56,8 @@
                                     @endphp
                                     <img src="{{ $imgSrc }}" alt="{{ $gallery->title }}"  class="w-full h-48 object-cover rounded">
                                
-                            <h3 class="mt-2 text-lg font-semibold px-4">{{ $gallery->title }}</h3>
-                            <p class="text-sm text-gray-600 px-4">{{ Str::limit($gallery->caption, 80) }}</p>
+                            <h3 class="mt-2 break-words text-lg font-semibold px-4">{{ $gallery->title }}</h3>
+                            <p class="break-words text-sm text-gray-600 px-4">{{ Str::limit($gallery->caption, 80) }}</p>
                             <div class="flex justify-between mt-3 p-4 ">
                                 <button data-id="{{ $gallery->id }}" data-title="{{ $gallery->title }}"
                                     data-caption="{{ $gallery->caption }}"
@@ -83,9 +83,9 @@
         </div>
 
         {{-- ================= Modal Edit ================= --}}
-        <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50">
-            <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6 relative">
-                <h2 class="text-xl font-semibold mb-4">Edit Galeri</h2>
+        <div id="editModal" role="dialog" aria-modal="true" aria-labelledby="editGalleryHeading" aria-hidden="true" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-50 p-4">
+            <div class="bg-white rounded-lg shadow-lg w-full max-w-md max-h-full overflow-y-auto p-6 relative">
+                <h2 id="editGalleryHeading" class="text-xl font-semibold mb-4">Edit Galeri</h2>
                 @if ($errors->any() && old('_editing_id'))
                     @include('management.feedback')
                 @endif
@@ -94,18 +94,18 @@
                     @method('PUT')
                     <input type="hidden" name="_editing_id" id="editId" value="{{ old('_editing_id') }}">
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700">Judul</label>
+                        <label for="editTitle" class="block text-sm font-medium text-gray-700">Judul</label>
                         <input type="text" name="title" id="editTitle" required value="{{ old('_editing_id') ? old('title') : '' }}" class="w-full border rounded px-3 py-2">
                     </div>
 
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700">Caption</label>
+                        <label for="editCaption" class="block text-sm font-medium text-gray-700">Caption</label>
                         <textarea name="caption" id="editCaption" rows="3" class="w-full border rounded px-3 py-2">{{ old('_editing_id') ? old('caption') : '' }}</textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700">Ganti Gambar (opsional)</label>
-                        <input type="file" name="image" accept="image/jpeg,image/png" class="w-full border rounded px-3 py-2">
+                        <label for="editGalleryImage" class="block text-sm font-medium text-gray-700">Ganti Gambar (opsional)</label>
+                        <input type="file" name="image" id="editGalleryImage" accept="image/jpeg,image/png" class="min-w-0 w-full border rounded px-3 py-2">
                         <img id="previewImage" src="" alt="Preview" class="mt-2 w-full h-40 object-cover rounded">
                     </div>
 
@@ -129,6 +129,14 @@
                 const titleField = document.getElementById('editTitle');
                 const captionField = document.getElementById('editCaption');
                 const previewImage = document.getElementById('previewImage');
+                let editTrigger;
+
+                function closeEditModal() {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('flex');
+                    modal.setAttribute('aria-hidden', 'true');
+                    editTrigger?.focus();
+                }
 
                 editBtns.forEach(btn => {
                     btn.addEventListener('click', () => {
@@ -139,16 +147,30 @@
                         editForm.action = btn.dataset.updateUrl;
                         modal.classList.remove('hidden');
                         modal.classList.add('flex');
+                        modal.setAttribute('aria-hidden', 'false');
+                        editTrigger = btn;
+                        titleField.focus();
                     });
                 });
 
-                closeModal.addEventListener('click', () => {
-                    modal.classList.add('hidden');
-                    modal.classList.remove('flex');
+                closeModal.addEventListener('click', closeEditModal);
+                modal.addEventListener('keydown', event => {
+                    if (event.key === 'Escape') closeEditModal();
+                    if (event.key !== 'Tab') return;
+                    const focusable = [...modal.querySelectorAll('input:not([type="hidden"]), textarea, button')];
+                    if (event.shiftKey && document.activeElement === focusable[0]) {
+                        event.preventDefault();
+                        focusable.at(-1).focus();
+                    } else if (!event.shiftKey && document.activeElement === focusable.at(-1)) {
+                        event.preventDefault();
+                        focusable[0].focus();
+                    }
                 });
                 @if ($errors->any() && old('_editing_id'))
                     modal.classList.remove('hidden');
                     modal.classList.add('flex');
+                    modal.setAttribute('aria-hidden', 'false');
+                    titleField.focus();
                 @endif
             });
         </script>

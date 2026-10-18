@@ -22,7 +22,7 @@ class ContentManagementTest extends TestCase
         parent::setUp();
         Storage::fake('public');
         $admin = User::factory()->create(['status' => 'active']);
-        $admin->roles()->attach(Role::firstOrCreate(['name' => 'admin']));
+        $admin->roles()->attach(Role::firstOrCreate(['name' => 'super_admin']));
         $this->actingAs($admin);
     }
 

@@ -14,6 +14,14 @@ Dokumen ini menjaga pengembangan tetap pada jalur produk, teknis, UX, dan priori
 
 ## Audit Status Saat Ini
 
+### PUB-04 — Perubahan cakupan dan akses konten publik (2026-10-17)
+
+- Pengguna meminta homepage ringkas Hero/empat artikel/empat Galeri/footer serta pengelolaan oleh super admin. Pembatasan ini khusus Post/Galeri; hak admin mengelola materi tidak diperketat oleh batch ini.
+- Penambahan pembeda jenis Post memakai migration baru dengan default Refleksi, tanpa menulis ulang migration lama atau mengubah URL Refleksi. Published_at tetap menentukan keterbukaan publik; tipe dan status publikasi divalidasi dari form pengelola. Draf, tanggal terbit masa depan dan jenis lain harus ditolak pada URL detail artikel/refleksi.
+- Pengelolaan Post/Galeri dibatasi server dan navigasi. Test positif memakai super admin, test negatif mencakup admin biasa, koorda, alumni serta status pending/suspended. Alur transaksi/pembersihan file existing harus tetap utuh.
+- Tidak menerapkan migration pada database kerja. Test menggunakan database baru terisolasi berakhiran _testing; konten resmi tidak dibuat fiktif, sehingga homepage kosong menampilkan empty state bila belum ada artikel/foto terbit.
+- Hasil 2026-10-18: suite PHP 8.3/MySQL 266 test/1996 assertion, build 162 modul dan review independen lulus. Review menutup regresi publikasi: pilihan Terbit eksplisit menerbitkan konten masa depan, sedangkan edit default/kosong mempertahankan tanggal/status. Regresi nilai kosong sempat gagal validasi lalu diperbaiki dan diuji ulang. QA browser publik/pengelolaan lulus, termasuk draf/terbit, admin ditolak, jadwal tetap, mobile 320/390 px dan keyboard/modal. Bukti pada CATATAN_JALUR_B; migration belum dijalankan pada database kerja, belum commit/push/CI remote batch ini. REVIEW tersisa untuk persetujuan konten resmi serta penerapan/integrasi lingkungan target.
+
 ### Integrasi A3–A5 dan QA lokal — 2026-10-17
 
 - A3-VERIFY, A4-AUTH dan A5-FIX digabung ke develop pada ecee5b4 tanpa konflik; tree identik dengan abd815b yang diuji. Review independen tidak menemukan regresi konkret.

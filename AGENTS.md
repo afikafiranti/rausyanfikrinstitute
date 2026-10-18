@@ -9,8 +9,8 @@
    | Konteks | Jalur | Urutan pekerjaan |
    |---|---|---|
    | Branch `dev-A` | A, milik pengguna yang memulai pembagian ini | A3/A4/A5-FIX selesai dan terintegrasi; lanjut QA operasional ketika staging/SMTP organisasi tersedia |
-   | Branch `dev-B` | B, milik rekan pengembang | PUB-04 -> PUB-01 -> PUB-02 -> PUB-03; B3-RELEASE paralel bila independen |
-   | Sesi baru tanpa penugasan, di luar `dev-A` | Default Jalur B | Baca arahan terbaru CATATAN_JALUR_B, pastikan branch kerja B, lalu mulai PUB-04 |
+   | Branch `dev-B` | B, diambil alih pengguna pada 2026-10-17 | PUB-04 dan navigasi PUB-03: homepage Hero/4 Artikel/4 Galeri/Footer; pengelolaan hanya super admin; PUB-01/PUB-02 di luar cakupan aktif |
+   | Sesi baru tanpa penugasan, di luar `dev-A` | Default Jalur B | Baca arahan terbaru CATATAN_JALUR_B, pastikan branch kerja B, lanjut PUB-04 sesuai status terbaru |
 
 4. Sebutkan jalur dan task aktif pada update awal. Jika pengguna memberi penugasan eksplisit yang berbeda, ikuti penugasan tersebut dan selaraskan branch secara aman. Jangan menganggap teman harus melanjutkan Jalur A.
 5. Branch kerja B adalah `dev-B`. Buat dari commit baseline bersama di `develop` yang sudah berisi aturan dan rencana ini, bukan dari perubahan implementasi A. Jangan berpindah branch dengan membawa perubahan jalur lain yang belum di-commit; tetap lakukan analisis yang aman sambil menjelaskan kondisi branch.

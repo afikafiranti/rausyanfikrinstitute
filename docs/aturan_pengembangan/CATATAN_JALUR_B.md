@@ -1,5 +1,33 @@
 # Catatan Jalur B
 
+## Pengiriman PUB-04/PUB-03 — 2026-10-18
+
+- Pengguna meminta commit dan push hasil yang sudah diverifikasi ke branch `dev-B`, kemudian audit khusus tampilan UI/UX untuk arah modern. Audit berikutnya tidak otomatis menerapkan redesign atau mengubah backend.
+- Pernyataan “belum commit/push” pada snapshot verifikasi di bawah merekam kondisi sebelum permintaan pengiriman ini; status pengiriman aktual mengikuti commit dan remote Git. Integrasi ke develop tetap terpisah.
+
+## PUB-04 / PUB-03 — REVIEW: homepage ringkas dan artikel (2026-10-18)
+
+- Pengguna menyerahkan pekerjaan Jalur B kepada agen sesi ini setelah A3–A5 selesai. Branch dev-B dibuat dari develop 355c791 dengan working tree bersih; dev-A tetap dipertahankan.
+- Scope awal: artikel publik dengan daftar/detail/navigasi dan pengelolaan admin, memakai alur Post existing; URL/alur refleksi, gate manage-content, serta keamanan upload tetap dipertahankan.
+- Rancangan disepakati dengan koreksi pengguna: pembeda Refleksi/Artikel pada Post, konten lama tetap Refleksi, draf/terbit melalui published_at existing, publik hanya melihat artikel terbit. Daftar/detail artikel tetap tersedia dari cuplikan; URL refleksi dipertahankan. Pengelolaan Post dan Galeri hanya oleh super admin aktif, bukan admin biasa. Gate materi existing tidak berubah.
+- Cakupan publik dipersempit pengguna: Hero, maksimal empat cuplikan artikel, maksimal empat foto Galeri, dan footer. Navbar tetap sebagai navigasi utilitas. Section statistik/tentang/agenda/CTA terpisah serta tim/kontak tidak masuk homepage; PUB-01/PUB-02 dikeluarkan dari cakupan aktif sekarang. Tidak membuat konten resmi fiktif.
+- Persiapan read-only mencakup model/controller Post, LandingController, view pengelolaan/refleksi, routes publik, factory/seeder dan test konten. Migration baru terpisah diperlukan bila pembeda jenis disetujui; migration existing tidak diubah. Test wajib memakai database baru berakhiran _testing, terpisah dari database kerja dan QA browser.
+
+### Implementasi dan verifikasi lokal
+
+- Post memiliki jenis `reflection`/`article`; migration `2026_10_17_210000_add_type_to_posts_table.php` memberi default Refleksi untuk data lama. Daftar/detail `/artikel` terpisah dari `/refleksi`; draf dan tanggal terbit masa depan tidak terbuka untuk publik.
+- Homepage hanya Hero, empat artikel terbit terbaru, empat foto Galeri dan footer. Navigasi Artikel/Galeri serta Masuk/Area anggota memakai route yang tersedia; empty state tetap ditampilkan bila konten kosong.
+- Middleware `EnsureSuperAdmin` membatasi seluruh endpoint pengelolaan Post/Galeri ke super admin aktif; menu mengikuti batas yang sama. Hak pengelolaan materi existing tetap berlaku. Form Post/Galeri tersedia di mobile, berlabel, dan modal mendukung fokus/Tab/Escape.
+- Form Post mendukung Draf/Terbit. Edit memakai pilihan awal “Pertahankan status saat ini”; nilai kosong tidak mengubah `published_at`. Memilih Terbit secara eksplisit menerbitkan draf/konten bertanggal masa depan; tanggal terbit lama yang sudah lewat dipertahankan.
+- TDD: test awal fitur dan regresi publikasi dijalankan RED sebelum perbaikan. Regresi terakhir mereproduksi nilai status kosong ditolak, kemudian GREEN setelah validasi nullable dan pembuangan field virtual sebelum fill.
+- PHP 8.3.30 + ZIP / MySQL, database khusus `rf_pub04_20261017_968b80_testing`: seluruh suite **266 test / 1996 assertion lulus**; suite domain konten **35 test / 363 assertion lulus**. Runner berada di direktori testing yang diabaikan Git dan memverifikasi nama/koneksi database sebelum RefreshDatabase.
+- `npm.cmd run build` lulus (162 modul); lint controller/middleware/migration PHP 8.3, `route:list --except-vendor` (80 route) dan `git diff --check` lulus. Route management memuat auth, manage-content dan EnsureSuperAdmin. Lockfile/dependency tidak diubah; peringatan metadata browser lama tetap ada.
+- Review independen menemukan dua masalah pada status publikasi terjadwal; keduanya diperbaiki dan diperiksa ulang. Review akhir tidak menemukan blocker konkret.
+- QA publik pada database sintetis terpisah `rf_pub04qa_20261017_30d6e15a_testing` lulus: empat artikel/empat foto, daftar/detail, draf/masa depan 404, Refleksi existing 200 serta gambar 200. QA browser final memakai Chrome headless terisolasi: homepage 320/390 px dan daftar/detail artikel 320 px tanpa overflow; Menu dapat dibuka dengan Enter lalu Tab mencapai Artikel. Super admin membuat Artikel/Draf lewat UI, membuka modal dengan fokus Judul, Tab ke Jenis, Escape menutup/mengembalikan fokus, lalu menerbitkan dan membaca artikel publik. Modal muat pada 320/390 px. Edit judul dengan status kosong mempertahankan Terjadwal dan detail publik 404; uji HTTP sesi/CSRF juga memastikan timestamp persis tidak berubah. Login admin tidak menampilkan menu management dan kedua endpoint mengembalikan 403.
+- Screenshot desktop/mobile publik dan pengelolaan tersimpan di `storage/framework/testing/pub04qa/` (`home-*-headless.png`, `management-*.png`, `article-*.png`), bersama harness/evidence lokal yang diabaikan Git. Proses Chrome uji dan server 8766 milik QA ditutup setelah verifikasi; server pengguna port 8000 tidak disentuh.
+- Status REVIEW kini untuk persetujuan konten resmi dan penerapan/integrasi lingkungan target; implementasi, review independen, suite dan QA lokal batch ini selesai.
+- Batas: migration hanya diterapkan pada database test/QA, **belum pada database kerja untuk Live Preview port 8000**. Tidak mengubah `.env`, menambah konten resmi fiktif, atau menyentuh server pengguna. Batch ini belum di-commit/push; CI remote batch PUB-04, staging dan SMTP eksternal belum dijalankan. Konten resmi tetap diisi/disetujui super admin; B3-RELEASE tetap terpisah.
+
 ## B0.1 / P0 — Proteksi dashboard
 
 - Status: REVIEW (2026-10-16); perbaikan dan test akses tamu selesai, B0 keseluruhan belum selesai.

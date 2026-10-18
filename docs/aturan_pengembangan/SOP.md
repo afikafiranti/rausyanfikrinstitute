@@ -4,6 +4,8 @@ Dokumen ini wajib diikuti sebelum, selama, dan setelah pengembangan fitur.
 
 ## 1. Dokumen Wajib
 
+Pengambilalihan Jalur B 2026-10-17: pengguna mempersempit homepage menjadi Hero/empat Artikel/empat Galeri/Footer dan menetapkan super admin sebagai satu-satunya pengelola Post/Galeri. PUB-04 dan navigasi terkait PUB-03 mengikuti cakupan ini; agenda/tim/kontak di luar cakupan aktif. Penggabung boleh menyelaraskan dokumen pusat atas perubahan cakupan eksplisit ini. Pengujian/migration tetap pada database baru terisolasi; jangan menjalankan migration atau menambahkan konten sintetis pada database kerja agar preview tampak terisi.
+
 Pembaruan A3–A5 2026-10-17: pengguna mengizinkan penggabung mengintegrasikan hasil dev-A ke develop dan menyinkronkan dokumen pusat. Merge ecee5b4 mempertahankan seluruh hasil A+B; suite terbaru 260 test/1921 assertion serta build/Composer/platform/route lulus pada PHP 8.3/MySQL dengan database baru terisolasi. QA browser memakai database sintetis terpisah tanpa migrate:fresh. SMTP lokal Mailpit bukan pengiriman eksternal. Staging/SMTP organisasi belum tersedia menurut pengguna; pertahankan REVIEW rilis dan tindak lanjut B3.
 
 Pembaruan integrasi 2026-10-17: penggabung menyinkronkan hasil A+B atas instruksi pengguna. Target bersama PHP 8.3/MySQL atau MariaDB; test gabungan memakai database terisolasi dengan akhiran _testing melalui guard B. Instal dependency mengikuti lockfile gabungan (termasuk Excel A), jangan mengganti dengan lockfile salah satu jalur. Bukti merge lokal tidak menggantikan CI remote, QA staging dan persetujuan rilis.
@@ -19,7 +21,7 @@ Semua pengembangan harus mengacu pada:
 
 README menjadi ringkasan fitur/setup dan menautkan matriks cakupan PRD. Setiap pembaruan fitur menyelaraskan status pada README/PRD, urutan PLAN dan ID/status TASK; catatan historis diberi konteks tanggal. Tersedia/sebagian/direncanakan/ditunda menggambarkan cakupan implementasi, sedangkan DONE/REVIEW menggambarkan penyelesaian task berdasarkan bukti. Keduanya tidak menggantikan verifikasi rilis.
 
-Keputusan cakupan publik 2026-10-17: agenda, tim/kontak, navigasi/CTA Daftar dan artikel akan dibuat melalui PUB-01–PUB-04. Gunakan konten resmi; penentuan cara pengelolaan/reuse model dilakukan sebelum coding sesuai PRD/PLAN. Sinkronisasi dokumentasi diperbolehkan atas instruksi pengguna sesuai pengecualian bagian 2A.
+Riwayat cakupan publik sebelum penyederhanaan 2026-10-17 mencakup agenda, tim/kontak dan CTA Daftar melalui PUB-01–PUB-04. Cakupan aktif kini mengikuti keputusan ringkas di awal dokumen; bagian lama bukan perintah memulai PUB-01/PUB-02. Gunakan konten resmi dan sinkronkan dokumentasi atas instruksi pengguna sesuai pengecualian bagian 2A.
 
 ## 2. Aturan Sinkronisasi
 

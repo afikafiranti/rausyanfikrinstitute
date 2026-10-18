@@ -6,7 +6,7 @@ Tujuan utama proyek ini adalah:
 1. Mengelola data alumni.
 2. Memberikan akses materi kajian (YouTube) berdasarkan level.
 3. Menyediakan sistem laporan kajian wilayah.
-4. Menyediakan informasi organisasi, refleksi, artikel, agenda, tim, galeri dan kontak untuk pengunjung publik.
+4. Menyediakan homepage ringkas, artikel dan galeri untuk pengunjung publik, serta mempertahankan URL Refleksi existing.
 
 Pengembangan dilakukan bertahap dalam versi (incremental release):
 - **V1** — Data Alumni (MVP)
@@ -43,9 +43,9 @@ Matriks cakupan dan batas fitur ada di [PRD](docs/aturan_pengembangan/PRD.md#cak
 
 ### Tampilan Publik
 
-- Tersedia: homepage, informasi tentang, statistik publikasi, daftar/detail refleksi, galeri, CTA masuk dan footer. Post terbit serta galeri ditampilkan dari database.
-- Direncanakan dan dikonfirmasi pengguna pada 2026-10-17: agenda kajian, profil tim, informasi kontak resmi, artikel publik dan pelengkapan navigasi/CTA pendaftaran. Agenda saat ini masih berupa placeholder; template tim/kontak belum dipasang pada homepage aktif. Halaman artikel belum tersedia; halaman refleksi existing tetap tersedia.
-- Task berikutnya: `PUB-01` (agenda), `PUB-02` (tim/kontak), `PUB-03` (navigasi, CTA Daftar dan konten publik final) dan `PUB-04` (daftar/detail artikel). Fitur tersebut tetap bagian cakupan produk.
+- Cakupan terbaru pengguna 2026-10-17: **Hero → maksimal empat cuplikan Artikel → maksimal empat foto Galeri → Footer**, dengan tautan daftar/detail Artikel dan daftar Galeri. Konten berasal dari database; saat kosong halaman menampilkan empty state.
+- Artikel dan Refleksi memakai Post dengan pembeda jenis serta draf/terbit. URL Refleksi existing tetap tersedia. Pengelolaan Post dan Galeri hanya untuk super admin aktif; admin biasa tetap dapat mengelola materi sesuai izin existing.
+- PUB-04 dan navigasi PUB-03 tersedia pada dev-B: suite PHP 8.3/MySQL 266 test/1996 assertion, build, review independen dan QA browser lokal lulus, termasuk mobile 320/390 px dan keyboard. Status REVIEW per 2026-10-18 tersisa untuk persetujuan konten resmi serta penerapan/integrasi lingkungan target. Migration baru belum diterapkan pada database kerja, batch belum commit/push atau digabung ke develop. Agenda (PUB-01), tim/kontak (PUB-02), section tentang/statistik dan CTA terpisah berada di luar cakupan aktif homepage ini.
 
 Pengelolaan master role/wilayah/level melalui CRUD web khusus belum tersedia; rincian implementasinya perlu ditetapkan sebelum dikerjakan. Penetapan level akun melalui verifikasi/pengelolaan alumni sudah tersedia.
 

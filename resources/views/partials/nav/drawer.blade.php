@@ -41,6 +41,16 @@
                     <i class="fas fa-user-graduate w-5 text-center"></i><span>Alumni</span>
                 </a>
             @endcan
+            @can('manage-content')
+                @if (auth()->user()->hasRole('super_admin'))
+                    <a href="{{ route('management.post.index') }}" class="{{ $link(request()->routeIs('management.post.*')) }}">
+                        <i class="fas fa-newspaper w-5 text-center"></i><span>Artikel &amp; Refleksi</span>
+                    </a>
+                    <a href="{{ route('management.galeri.index') }}" class="{{ $link(request()->routeIs('management.galeri.*')) }}">
+                        <i class="fas fa-images w-5 text-center"></i><span>Galeri</span>
+                    </a>
+                @endif
+            @endcan
             @auth
                 <a href="{{ route('profile.edit') }}" class="{{ $link(request()->routeIs('profile.edit')) }}">
                     <i class="fas fa-user-circle w-5 text-center"></i><span>Profile</span>

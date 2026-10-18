@@ -11,6 +11,12 @@ Status yang digunakan:
 
 ## Ringkasan Status Saat Ini
 
+### REVIEW: PUB-04 / PUB-03 — Homepage ringkas dan artikel publik
+
+Keputusan terbaru pengguna 2026-10-17: homepage hanya Hero, maksimal empat artikel terbit, maksimal empat foto Galeri dan footer. Cuplikan menuju daftar/detail publik; super admin aktif menjadi satu-satunya pengelola Post dan Galeri. PUB-01 agenda/PUB-02 tim-kontak tidak termasuk cakupan aktif; PUB-03 dibatasi navigasi bagian/halaman yang tersedia. Rincian implementasi, risiko dan verifikasi mengikuti CATATAN_JALUR_B. Daftar kebutuhan lama di bawah dibaca sebagai riwayat bila bertentangan dengan keputusan ini.
+
+Implementasi, review independen dan QA browser lokal selesai 2026-10-18 pada dev-B; suite PHP 8.3/MySQL 266 test/1996 assertion serta build lulus. QA mencakup draf/terbit, admin ditolak, jadwal terbit dipertahankan, mobile 320/390 px dan keyboard/modal. REVIEW tersisa untuk persetujuan konten resmi serta penerapan/integrasi lingkungan target. Migration belum dijalankan pada database kerja; belum commit/push atau CI remote batch baru.
+
 ### DONE: A35-INTEGRATE — Integrasi A3–A5 dan QA lokal
 
 Tanggal: 2026-10-17. Owner: penggabung Jalur A atas instruksi pengguna.
@@ -567,11 +573,13 @@ Laporan rejected tetap terkunci; alur revisi/kirim ulang belum tersedia.
 
 ## Pekerjaan Publik Berikutnya
 
-Urutan pelaksanaan yang disetujui: **PUB-04 -> PUB-01 -> PUB-02 -> PUB-03**. Jalur B memulai artikel; ID task tidak diubah. Lihat A3-VERIFY dan B3-RELEASE untuk syarat integrasi/rilis. Agenda cukup informasi kajian; kalender interaktif, pendaftaran acara dan formulir kontak tidak termasuk batch ini.
+Urutan aktif setelah penyederhanaan pengguna: **PUB-04 bersama navigasi PUB-03**. PUB-01/PUB-02 berada di luar cakupan aktif. Lihat A3-VERIFY dan B3-RELEASE untuk riwayat integrasi/syarat rilis.
 
-Cakupan dikonfirmasi pengguna pada 2026-10-17. Keempat task TODO berikut adalah pekerjaan yang akan dibuat; perubahan dokumentasi tidak menandai implementasinya selesai. Pemilik mengikuti PLAN dan kepemilikan file existing.
+Cakupan disederhanakan pengguna pada 2026-10-17; status berikut mengikuti bukti pada CATATAN_JALUR_B. Pemilik mengikuti PLAN dan kepemilikan file existing.
 
 ### TODO: PUB-01 — Agenda Kajian Publik
+
+Di luar cakupan aktif sesuai penyederhanaan homepage oleh pengguna pada 2026-10-17. Jangan implementasikan sebelum ada arahan baru; checklist berikut disimpan sebagai kebutuhan historis.
 
 Prioritas: P2. Owner: Jalur B.
 
@@ -581,28 +589,34 @@ Prioritas: P2. Owner: Jalur B.
 
 ### TODO: PUB-02 — Profil Tim dan Kontak Resmi
 
+Di luar cakupan aktif sesuai penyederhanaan homepage oleh pengguna pada 2026-10-17. Jangan implementasikan sebelum ada arahan baru; checklist berikut disimpan sebagai kebutuhan historis.
+
 Prioritas: P2. Owner: Jalur B.
 
 - [ ] Gunakan nama/peran/foto tim dan kanal kontak resmi yang disetujui pengelola.
 - [ ] Pasang konten pada halaman publik aktif dan ganti template yang belum digunakan.
 - [ ] Verifikasi kanal/tautan kontak, aksesibilitas dan tampilan mobile.
 
-### TODO: PUB-03 — Navigasi, CTA Daftar dan Konten Publik Final
+### REVIEW: PUB-03 — Navigasi Homepage Ringkas
+
+Cakupan sekarang hanya navigasi Artikel/Galeri, tautan Hero membaca artikel, dan utilitas Masuk/Area anggota existing; dikerjakan bersama PUB-04. Kebutuhan CTA Daftar/section lainnya pada checklist lama ditunda sesuai penyederhanaan pengguna.
 
 Prioritas: P2. Owner: Jalur B; koordinasi A bila menyentuh view auth.
 
-- [ ] Hubungkan navigasi dengan konten publik yang sudah tersedia dan hasil PUB-01/PUB-02/PUB-04.
-- [ ] Tambahkan CTA Daftar menuju route register existing, dengan alur login yang tetap jelas.
-- [ ] Finalisasi konten resmi dan uji semua tautan, mobile serta keyboard.
+- [x] Hubungkan navigasi Artikel/Galeri, Hero membaca artikel serta Masuk/Area anggota ke route tersedia.
+- [x] Hapus tautan homepage ke section di luar cakupan; CTA Daftar tambahan ditunda sesuai keputusan pengguna.
+- [x] Uji navigasi mobile/keyboard dan tautan publik yang tersedia; bukti ada pada catatan jalur.
+- [ ] Persetujuan konten resmi oleh pengelola pada lingkungan target.
 
-### TODO: PUB-04 — Artikel Publik
+### REVIEW: PUB-04 — Artikel Publik
 
 Prioritas: P2. Owner: Jalur B.
 
-- [ ] Tetapkan pengelolaan/publikasi artikel oleh admin; evaluasi reuse model Post existing tanpa mengganggu refleksi.
-- [ ] Buat daftar dan detail artikel publik serta tautan navigasi.
-- [ ] Pastikan hanya artikel terbit yang dapat dibaca publik, dengan empty/not-found state dan test publikasi.
-- [ ] Verifikasi konten resmi, tampilan mobile dan keyboard; pertahankan URL/alur refleksi existing.
+- [x] Reuse Post dengan jenis Refleksi/Artikel dan published_at untuk draf/terbit; pengelolaan Post/Galeri hanya super admin aktif, sesuai keputusan pengguna. Konten lama tetap Refleksi.
+- [x] Buat daftar dan detail artikel publik serta tautan navigasi.
+- [x] Pastikan hanya artikel terbit yang dapat dibaca publik, dengan empty/not-found state dan test publikasi; edit biasa tidak mengubah jadwal terbit.
+- [x] Verifikasi tampilan mobile dan keyboard; pertahankan URL/alur refleksi existing.
+- [ ] Persetujuan konten resmi dan penerapan migration/integrasi lingkungan target; data QA sintetis hanya pada database terisolasi.
 
 ## Format Task Baru
 

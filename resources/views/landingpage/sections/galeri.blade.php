@@ -1,10 +1,10 @@
 <section id="galeri" class="px-4 py-16 sm:px-6">
     <div class="mx-auto max-w-6xl">
         <div class="mb-8 flex flex-wrap items-end justify-between gap-4">
-            <div><h2 class="text-3xl font-bold">Galeri kegiatan</h2><p class="mt-3 text-slate-600">Dokumentasi yang dibagikan oleh pengelola Rausyan Fikr.</p></div>
+            <div><h2 class="text-3xl font-bold">Galeri kajian</h2><p class="mt-3 text-slate-600">Dokumentasi yang dibagikan oleh pengelola Rausyan Fikr.</p></div>
             <a href="{{ route('public.gallery.index') }}" class="font-semibold text-blue-800 underline underline-offset-4">Semua galeri</a>
         </div>
-        <div class="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+        <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
             @forelse ($galleries as $gallery)
                 <figure class="overflow-hidden rounded-xl border border-slate-200 bg-white">
                     @if ($gallery->public_image_url)
@@ -20,7 +20,7 @@
                     </figcaption>
                 </figure>
             @empty
-                <p class="rounded-lg bg-white p-6 text-slate-600 md:col-span-2 lg:col-span-3" role="status">Belum ada foto galeri.</p>
+                <p class="rounded-lg bg-white p-6 text-slate-600 sm:col-span-2 lg:col-span-4" role="status">Belum ada foto galeri.</p>
             @endforelse
         </div>
     </div>

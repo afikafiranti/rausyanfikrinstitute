@@ -27,6 +27,8 @@ Route::middleware(['auth', 'can:view-alumni', \App\Http\Middleware\ScopeWilayah:
 Route::get('/', [LandingController::class, 'index'])->name('landing_page');
 Route::get('/refleksi', [\App\Http\Controllers\LandingController::class, 'posts'])->name('public.posts.index');
 Route::get('/refleksi/{slug}', [\App\Http\Controllers\LandingController::class, 'show'])->name('public.posts.show');
+Route::get('/artikel', [\App\Http\Controllers\LandingController::class, 'articles'])->name('public.articles.index');
+Route::get('/artikel/{slug}', [\App\Http\Controllers\LandingController::class, 'article'])->name('public.articles.show');
 Route::get('/galeri', [\App\Http\Controllers\LandingController::class, 'gallery'])->name('public.gallery.index');
 
 //  DASHBOARD
@@ -124,7 +126,7 @@ Route::middleware(['auth', \App\Http\Middleware\ScopeWilayah::class])->group(fun
 
 // ADMIN: POST & GALLERY 
 
-Route::middleware(['auth', 'can:manage-content'])
+Route::middleware(['auth', 'can:manage-content', \App\Http\Middleware\EnsureSuperAdmin::class])
     ->prefix('management')
     ->name('management.')
     ->group(function () {
