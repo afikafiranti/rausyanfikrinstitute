@@ -16,7 +16,7 @@
       <button class="rf-btn w-full">Kirim Ulang Email Verifikasi</button>
     </form>
 
-    <p class="mt-3 text-sm"><a href="{{ route('profile.edit') }}" class="text-indigo-600 underline">Lanjutkan melengkapi profil</a></p>
+    <p class="mt-3 text-sm"><a href="{{ route('profile.edit') }}" class="text-brand underline">Lanjutkan melengkapi profil</a></p>
 
     <form method="POST" action="{{ route('logout') }}" class="mt-3">
       @csrf

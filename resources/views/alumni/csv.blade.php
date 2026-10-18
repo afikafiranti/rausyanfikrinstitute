@@ -38,7 +38,7 @@
             <input id="alumni_csv_file" name="file" type="file" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,.csv,text/csv" required aria-describedby="alumni-file-help" class="block w-full rounded border border-slate-300 p-2 text-sm focus:border-indigo-600 focus:ring-indigo-600">
             <p id="alumni-file-help" class="text-sm text-slate-600">Gunakan template .xlsx. CSV UTF-8 juga tetap diterima; format Excel lama .xls tidak didukung. Header rusak membatalkan berkas, dan formula tidak dihitung. Pada CSV, nomor baris mengikuti urutan record termasuk header.</p>
             @error('file')<p role="alert" class="text-sm text-red-700">{{ $message }}</p>@enderror
-            <button type="submit" class="rf-btn bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">Impor alumni</button>
+            <button type="submit" class="rf-btn bg-brand px-4 py-2 text-white hover:bg-brand-dark">Impor alumni</button>
         </form>
     </section>
 
@@ -61,7 +61,7 @@
         <h2 class="text-lg font-semibold">Ekspor Excel</h2>
         <p class="mt-2 text-sm text-slate-700">Unduh semua hasil sesuai wilayah dan filter dari daftar alumni, tanpa batas halaman. Kolom wilayah berisi nama wilayah. Telepon dan nilai lainnya disimpan sebagai teks.</p>
         <div class="mt-4 flex flex-wrap items-center gap-4">
-            <a href="{{ route('alumni.excel.export', request()->query()) }}" class="rf-btn inline-block bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700">Unduh Excel (.xlsx)</a>
+            <a href="{{ route('alumni.excel.export', request()->query()) }}" class="rf-btn inline-block bg-brand px-4 py-2 text-white hover:bg-brand-dark">Unduh Excel (.xlsx)</a>
             <a href="{{ route('alumni.csv.export', request()->query()) }}" class="text-sm text-indigo-700 underline">Unduh CSV</a>
         </div>
     </section>

@@ -9,7 +9,7 @@
     @if ($q !== '')
         <p class="mb-4 text-sm">
             Hasil pencarian: {{ $q }}.
-            <a href="{{ route('materi.index') }}" class="text-indigo-600 underline">Reset pencarian</a>
+            <a href="{{ route('materi.index') }}" class="text-brand underline">Reset pencarian</a>
         </p>
     @endif
     {{-- ===================== DESKTOP (≥ md) ===================== --}}
@@ -68,7 +68,7 @@
                                     <td class="py-2">
                                         <div class="flex gap-3">
                                             <a href="{{ route('materi.show', $row->id) }}"
-                                                class="text-indigo-600 hover:underline">Lihat</a>
+                                                class="text-brand hover:underline">Lihat</a>
                                         </div>
                                     </td>
                                 </tr>
@@ -119,7 +119,7 @@
                         <x-badge :color="$color">{{ $status }}</x-badge>
                     </div>
                     <div class="mt-3 flex gap-3 text-sm">
-                        <a href="{{ route('materi.show', $m->id) }}" class="text-indigo-600">Buka</a>
+                        <a href="{{ route('materi.show', $m->id) }}" class="text-brand">Buka</a>
                     </div>
                 </div>
             @empty

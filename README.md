@@ -36,10 +36,19 @@ Matriks cakupan dan batas fitur ada di [PRD](docs/aturan_pengembangan/PRD.md#cak
 - Progres menonton bersifat opsional dan masih ditunda; tabel/model yang ada belum menjadi fitur pengguna.
 
 ### Versi 3 (V3) — Laporan Kajian
+- Akses laporan hanya untuk admin, super admin, dan koorda aktif sesuai wilayah; alumni biasa tidak dapat mengakses endpoint laporan.
 - Draf, edit dan kirim laporan kajian dengan peserta laki-laki/perempuan, catatan serta foto privat.
 - Review koorda/admin sesuai wilayah, approve/reject dengan alasan penolakan.
 - Rekap dengan filter wilayah/status/tanggal dan ekspor CSV.
 - Laporan rejected belum mendukung revisi atau pengiriman ulang.
+
+### Beranda Anggota dan Refleksi Pribadi (dev-B, 2026-10-18)
+
+- Alumni mendapat dashboard pribadi berisi status akun, level/wilayah, data profil dasar, akses materi sesuai kelayakan, dan notifikasi sendiri. Dashboard statistik pengelola tetap terpisah.
+- **Refleksi saya** tersedia bagi alumni, koorda, admin, dan super admin: catat pengalaman setelah materi, kajian, atau kegiatan lain; simpan/edit/hapus sebagai draf pribadi.
+- Pengiriman opsional memerlukan akun aktif dan wilayah. Setelah dikirim, isi dikunci; koorda wilayah kiriman serta admin/super admin dapat membaca dan memberi tanggapan. Draf tidak dapat dibaca pengelola lain; pemilik tidak dapat menanggapi kirimannya sendiri.
+- Refleksi pribadi memakai `/refleksi-saya`, antrean pengelola `/tinjau-refleksi`. Ini terpisah dari Refleksi publik di `/refleksi`; tidak otomatis diterbitkan.
+- Migration `2026_10_18_010000_create_member_reflections_table.php` hanya menambah tabel. Saat mengambil kode baru, jalankan migration pada database lokal yang sudah dikonfigurasi sebelum membuka fitur ini. Bukti dan status integrasi ada di catatan Jalur B.
 
 ### Tampilan Publik
 

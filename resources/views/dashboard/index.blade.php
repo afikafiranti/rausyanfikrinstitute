@@ -4,39 +4,38 @@
 @endsection
 
 @section('page-content')
-    {{-- DESKTOP --}}
-    <div class="hidden md:block">
-        <div class="grid grid-cols-12 gap-4 pb-4">
+    <div>
+        <div class="grid grid-cols-1 gap-4 pb-4 sm:grid-cols-2 lg:grid-cols-12">
             {{-- STATISTIK UTAMA --}}
-            <div class="col-span-3 rounded-lg bg-white p-4 shadow">
+            <div class="rf-card lg:col-span-3">
                 <div class="text-xs text-slate-500">Total Alumni</div>
                 <div class="mt-1 text-2xl font-semibold">{{ number_format($totalAlumni) }}</div>
             </div>
 
-            <div class="col-span-3 rounded-lg bg-white p-4 shadow">
+            <div class="rf-card lg:col-span-3">
                 <div class="text-xs text-slate-500">Alumni Baru Bulan Ini</div>
                 <div class="mt-1 text-2xl font-semibold">{{ number_format($alumniBaru) }}</div>
             </div>
 
-            <div class="col-span-3 rounded-lg bg-white p-4 shadow">
+            <div class="rf-card lg:col-span-3">
                 <div class="text-xs text-slate-500">Alumni Aktif</div>
                 <div class="mt-1 text-2xl font-semibold">{{ number_format($alumniAktif) }}</div>
             </div>
 
-            <div class="col-span-3 rounded-lg bg-white p-4 shadow">
+            <div class="rf-card lg:col-span-3">
                 <div class="text-xs text-slate-500">Persentase Verifikasi</div>
                 <div class="mt-1 text-2xl font-semibold">{{ round($persenVerifikasi, 1) }}%</div>
             </div>
 
             {{-- NOTIFIKASI VERIFIKASI --}}
             @can('review-user')
-                <div class="col-span-12 rounded-lg bg-slate-50 p-4 shadow">
-                    <div class="flex items-center justify-between">
+                <div class="rf-card sm:col-span-2 lg:col-span-12">
+                    <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                         <div>
-                            <div class="text-black font-semibold">Verifikasi Pending</div>
-                            <div class="text-sm text-slate-800">Akun menunggu persetujuan Koordonator Daerah</div>
+                            <div class="font-semibold text-[#14213D]">Verifikasi pending</div>
+                            <div class="text-sm text-[#536173]">Akun menunggu persetujuan Koordinator Daerah</div>
                         </div>
-                        <div class="flex items-center gap-3">
+                        <div class="flex flex-wrap items-center gap-3">
                             <div class="rf-badge bg-yellow-100 text-yellow-800">{{ $pendingCount }} akun</div>
                             <a href="{{ route('verification.index') }}" class="rf-btn">
                                 <i class="fas fa-user-check"></i> Buka
@@ -47,35 +46,35 @@
             @endcan
 
             {{-- GRAFIK TREN (ApexCharts) --}}
-            <div class="col-span-8 rounded-lg bg-slate-900 p-4 shadow">
-                <div class="flex items-center justify-between -mb-8">
-                    <h3 class="text-white px-4 font-semibold ">Pertumbuhan Anggota per Bulan ({{ $year }})</h3>
+            <div class="min-w-0 rounded-xl bg-[#14213D] p-4 shadow sm:col-span-2 lg:col-span-8">
+                <div class="flex items-center justify-between">
+                    <h3 class="font-semibold text-white">Pertumbuhan Anggota per Bulan ({{ $year }})</h3>
                 </div>
-                <div class="p-4 flex-auto">
+                <div class="min-w-0 flex-auto pt-4">
                     <!-- Chart -->
-                    <div class="relative h-350-px text-gray-500">
-                        <div id="chart-alumni" class="w-full text-white h-80"></div>
+                    <div class="relative min-w-0 text-slate-300">
+                        <div id="chart-alumni" class="h-80 w-full min-w-0 text-white"></div>
                     </div>
                 </div>
             </div>
 
-            <div class="col-span-4 rounded-lg bg-slate-50 p-4 shadow">
+            <div class="rf-card sm:col-span-2 lg:col-span-4">
                 <h3 class="font-semibold mb-3">Jumlah Kajian per Bulan</h3>
                 <p class="text-sm text-slate-600" role="status">Statistik kajian belum tersedia.</p>
             </div>
 
             {{-- ========================= 2 CHART DALAM 1 BARIS ========================= --}}
-            <div class="col-span-6 rounded-lg bg-white p-4 shadow">
+            <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-6">
                 <h3 class="font-semibold mb-3">Status Pernikahan Alumni</h3>
-                <div class="relative h-350-px">
-                    <div id="chartStatusPernikahan" class="w-full h-96"></div>
+                <div class="relative min-w-0">
+                    <div id="chartStatusPernikahan" class="h-80 w-full min-w-0"></div>
                 </div>
             </div>
 
-            <div class="col-span-6 rounded-lg bg-white p-4 shadow">
+            <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-6">
                 <h3 class="font-semibold mb-3">Status AB Alumni</h3>
-                <div class="relative h-350-px">
-                    <div id="chartAb" class="w-full h-72"></div>
+                <div class="relative min-w-0">
+                    <div id="chartAb" class="h-72 w-full min-w-0"></div>
                 </div>
             </div>
 
@@ -84,15 +83,15 @@
 
             {{-- BLOK TABEL BAWAH  --}}
 
-            <div class="col-span-8 rounded-lg bg-slate-50 shadow">
+            <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-8">
                 {{-- TABEL SEBARAN ANGKATAN --}}
-                <div class="flex items-center justify-between p-4">
+                <div class="flex flex-wrap items-center justify-between gap-2 pb-4">
                     <h3 class="font-semibold text-base text-blueGray-700">Sebaran Alumni per Angkatan
                     </h3>
-                    <div class="p-4 flex-auto text-right">
+                    <div>
                         <a href="{{ route('alumni.index') }}"
-                            class="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
-                            See all
+                            class="rf-btn">
+                            Lihat semua
                         </a>
                     </div>
 
@@ -152,17 +151,11 @@
             </div>
 
             {{-- TABEL SEBARAN WILAYAH --}}
-            <div class="col-span-4 rounded-lg bg-slate-50 shadow">
-                <div class="flex items-center justify-between p-4">
+            <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-4">
+                <div class="flex items-center justify-between pb-4">
                     <h3 class="font-semibold text-base text-blueGray-700">Sebaran Alumni per Wilayah
                     </h3>
 
-                    <div class="p-4 flex-auto text-right">
-                        <a href="#"
-                            class="bg-indigo-500 text-white active:bg-indigo-600 text-xs font-bold uppercase px-3 py-1 rounded outline-none focus:outline-none ease-linear transition-all duration-150">
-                            See all
-                        </a>
-                    </div>
                 </div>
                 <div class="block w-full overflow-x-auto">
                     <table class="items-center w-full bg-transparent border-collapse">

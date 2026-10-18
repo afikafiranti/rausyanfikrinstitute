@@ -4,7 +4,7 @@
     <div class="mx-auto max-w-5xl rounded-xl bg-white p-6 shadow">
         <div class="mb-6 flex flex-wrap items-start justify-between gap-3">
             <div>
-                <a href="{{ route('materi.index') }}" class="text-sm text-indigo-600 hover:underline">
+                <a href="{{ route('materi.index') }}" class="text-sm text-brand hover:underline">
                     &larr; Kembali ke Materi
                 </a>
                 <h2 class="mt-2 text-2xl font-semibold text-slate-900">{{ $playlist->title }}</h2>
@@ -23,7 +23,7 @@
         @endif
 
         <a href="https://www.youtube.com/playlist?list={{ rawurlencode($playlist->youtube_playlist_id) }}"
-            class="mb-6 inline-block text-indigo-600 underline" target="_blank" rel="noopener noreferrer">
+            class="mb-6 inline-block text-brand underline" target="_blank" rel="noopener noreferrer">
             Buka playlist di YouTube (tab baru)
         </a>
 
@@ -44,7 +44,7 @@
                             <td class="py-2 pr-4 font-medium text-slate-800">{{ $video->title }}</td>
                             <td class="py-2 pr-4">
                                 <a href="https://www.youtube.com/watch?v={{ rawurlencode($video->youtube_video_id) }}"
-                                    class="text-indigo-600 underline" target="_blank" rel="noopener noreferrer"
+                                    class="text-brand underline" target="_blank" rel="noopener noreferrer"
                                     aria-label="Tonton {{ $video->title }} di YouTube (tab baru)">Tonton di YouTube (tab baru)</a>
                             </td>
                             <td class="py-2">{{ $video->duration_sec ? gmdate('H:i:s', $video->duration_sec) : '-' }}</td>

@@ -12,15 +12,15 @@
 
 </head>
 
-<body class="min-h-screen bg-gray-50 text-slate-800">
-    <header class="py-4">
-        <div class="max-w-md mx-auto px-4 flex items-center gap-2">
-            <span class="inline-flex h-8 w-8 rounded-xl bg-brand shadow-card"></span>
-            <span class="font-semibold">Rausyan Fikr</span>
-        </div>
+<body class="rf-auth min-h-screen border-t-4 border-accent">
+    <header class="py-6 sm:py-8">
+        <a href="{{ route('landing_page') }}" class="mx-auto flex max-w-md items-center gap-3 px-4 text-ink">
+            <img src="{{ asset('landingpage/images/logo/logo_rf.jpeg') }}" alt="" width="44" height="44" class="h-11 w-11 rounded object-contain">
+            <span class="text-lg font-bold leading-tight">Rausyan Fikr <span class="block text-sm font-medium text-muted">Institute</span></span>
+        </a>
     </header>
 
-    <main class="max-w-md mx-auto p-4">
+    <main class="mx-auto max-w-md px-4 pb-12">
         @yield('content')
     </main>
 </body>

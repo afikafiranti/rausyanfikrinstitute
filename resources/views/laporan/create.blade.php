@@ -63,7 +63,7 @@
                 @endif
                 <input id="foto" name="foto" type="file" accept="image/jpeg,image/png" aria-describedby="foto-help" class="mt-2 block w-full text-sm">
             </div>
-            <button type="submit" class="rounded-lg bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-700">Simpan draf</button>
+            <button type="submit" class="rounded-lg bg-brand px-5 py-3 font-medium text-white hover:bg-brand-dark">Simpan draf</button>
         </form>
     </section>
 @endsection

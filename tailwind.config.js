@@ -53,10 +53,18 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        brand: { DEFAULT: '#4f46e5' },
-        latar: '#f9fafb',
-        gelap: '#111827',
-        primary: '#10B981', // tambahan untuk keseragaman di Notus + Flowbite
+        brand: { DEFAULT: '#284BDA', dark: '#1E3BAA' },
+        ink: '#14213D',
+        accent: '#C5282F',
+        canvas: '#F8F6F1',
+        muted: '#536173',
+        blueGray: require('tailwindcss/colors').slate,
+        latar: '#F8F6F1',
+        gelap: '#14213D',
+        primary: '#284BDA',
+      },
+      fontFamily: {
+        sans: ['Segoe UI', 'system-ui', 'sans-serif'],
       },
       borderRadius: {
         '2xl': '1rem',

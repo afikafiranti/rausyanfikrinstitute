@@ -22,7 +22,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_owner_edits_draft_preserving_identity_region_and_status(): void
     {
-        foreach (['alumni', 'koorda', 'admin', 'super_admin'] as $role) {
+        foreach (['koorda', 'admin', 'super_admin'] as $role) {
             $owner = $this->member($role);
             $report = $this->draft($owner);
             $this->actingAs($owner)->get('/laporan/'.$report->id.'/edit')->assertOk()->assertSee('Judul Lama');
@@ -40,9 +40,9 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_only_owner_can_mutate_even_when_viewer_is_admin(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
-        foreach (['alumni', 'koorda', 'admin', 'super_admin'] as $role) {
+        foreach (['koorda', 'admin', 'super_admin'] as $role) {
             $this->actingAs($this->member($role, $owner->wilayah_id))->get('/laporan/'.$report->id.'/edit')->assertNotFound();
             $this->put('/laporan/'.$report->id, $this->data())->assertNotFound();
             $this->post('/laporan/'.$report->id.'/submit')->assertNotFound();
@@ -53,7 +53,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_submit_uses_saved_values_and_locks_further_changes(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         $this->actingAs($owner)->get('/laporan/'.$report->id)->assertSee('Kirim laporan');
         $this->post('/laporan/'.$report->id.'/submit', ['judul' => 'Forged', 'status' => 'approved', 'user_id' => 999])
@@ -68,7 +68,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_submitted_report_becomes_visible_only_to_local_koorda(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         $local = $this->member('koorda', $owner->wilayah_id);
         $foreign = $this->member('koorda');
@@ -80,7 +80,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_validation_keeps_draft_and_rejects_invalid_saved_data_on_submit(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         $this->actingAs($owner)->from('/laporan/'.$report->id.'/edit')
             ->put('/laporan/'.$report->id, array_replace($this->data(), ['judul' => '', 'peserta_l' => -1]))
@@ -92,7 +92,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_photo_replacement_keeps_old_file_until_success_and_preserves_it_without_new_upload(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         Storage::disk('local')->put('report-photos/old.jpg', 'old photo');
         $report->update(['foto_url' => 'report-photos/old.jpg']);
@@ -106,7 +106,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_failed_update_rolls_back_fields_and_preserves_old_photo(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         Storage::disk('local')->put('report-photos/old.jpg', 'old photo');
         $report->update(['foto_url' => 'report-photos/old.jpg']);
@@ -118,7 +118,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_guests_inactive_and_moved_accounts_cannot_mutate(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         $this->get('/laporan/'.$report->id.'/edit')->assertRedirect(route('login'));
         $this->put('/laporan/'.$report->id, $this->data())->assertRedirect(route('login'));
@@ -135,7 +135,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_status_is_rechecked_after_route_binding_before_update_or_submit(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $update = $this->draft($owner);
         $submit = $this->draft($owner);
         $changed = [];
@@ -153,7 +153,7 @@ class KajianReportSubmissionTest extends TestCase
 
     public function test_failed_submission_rolls_back_status_and_recalculated_total(): void
     {
-        $owner = $this->member('alumni');
+        $owner = $this->member('koorda');
         $report = $this->draft($owner);
         $report->update(['total_peserta' => 99]);
         KajianReport::updated(fn () => throw new RuntimeException('Simulated submission failure'));

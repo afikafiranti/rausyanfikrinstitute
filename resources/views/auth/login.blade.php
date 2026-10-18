@@ -45,13 +45,16 @@
         <label for="remember" class="inline-flex items-center gap-2">
           <input id="remember" type="checkbox" name="remember" class="rounded"> Ingat saya
         </label>
-        <a href="{{ route('password.request') }}" class="text-indigo-600">Lupa password?</a>
+        <a href="{{ route('password.request') }}" class="text-brand">Lupa password?</a>
       </div>
 
       {{-- <button class="rf-btn w-full">Masuk</button> --}}
       <button type="submit" class="rf-btn w-full flex items-center justify-center text-center">Masuk</button>
 
     </form>
+    <p class="mt-6 border-t border-slate-200 pt-5 text-sm text-muted">
+      Belum punya akun? <a href="{{ route('register') }}" class="rf-text-action">Buat akun</a>
+    </p>
   </div>
 
   <script>

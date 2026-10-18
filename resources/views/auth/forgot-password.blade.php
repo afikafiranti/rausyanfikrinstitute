@@ -20,7 +20,7 @@
     </form>
 
     <p class="text-sm text-slate-600 mt-4">
-      Kembali ke <a href="{{ route('login') }}" class="text-indigo-600">Masuk</a>
+      Kembali ke <a href="{{ route('login') }}" class="text-brand">Masuk</a>
     </p>
   </div>
 @endsection

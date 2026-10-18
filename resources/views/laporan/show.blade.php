@@ -23,7 +23,7 @@
                 @csrf
                 <p class="text-slate-700">Setelah dikirim, isian laporan terkunci. Pastikan data dan foto sudah benar.</p>
                 <label class="mt-3 flex items-start gap-2"><input type="checkbox" name="confirmation" value="1" required class="mt-1 rounded border-slate-300"><span>Saya sudah memeriksa laporan ini.</span></label>
-                <button type="submit" class="mt-4 rounded-lg bg-indigo-600 px-5 py-3 font-medium text-white hover:bg-indigo-700">Kirim laporan</button>
+                <button type="submit" class="mt-4 rounded-lg bg-brand px-5 py-3 font-medium text-white hover:bg-brand-dark">Kirim laporan</button>
             </form>
         @elseif ($report->status !== 'draft')
             <p class="mt-6 text-slate-700">Laporan sudah dikirim. Isian laporan terkunci.</p>

@@ -10,7 +10,7 @@
 
         <div class="mb-4 flex flex-wrap gap-2">
             <button onclick="document.getElementById('modal-register-alumni').classList.remove('hidden')"
-                class="rf-btn bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg inline-flex items-center gap-2">
+                class="rf-btn">
                 <i class="fas fa-plus"></i> Tambah Alumni
             </button>
             <a href="{{ route('alumni.csv.index', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Impor Excel</a>
@@ -82,7 +82,7 @@
                 </select>
             </div>
 
-            <button class="rf-btn bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg">
+            <button class="rf-btn bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-lg">
                 <i class="fas fa-search mr-1"></i> Filter
             </button>
 
@@ -203,14 +203,14 @@
                             <td class="px-4 py-2 text-center">
                                 <div class="flex flex-wrap justify-center gap-2">
                                     <a href="{{ route('alumni.show', $item->id) }}"
-                                        class="rf-btn inline-flex h-8 w-8 items-center justify-center bg-indigo-600 p-0 text-sm text-white hover:bg-indigo-700 rounded-lg"
+                                        class="rf-btn inline-flex h-8 w-8 items-center justify-center bg-brand p-0 text-sm text-white hover:bg-brand-dark rounded-lg"
                                         title="Detail {{ $item->name }}" aria-label="Detail {{ $item->name }}">
                                         <i class="fas fa-eye"></i>
                                     </a>
 
                                     @if ($canDeleteAlumniAccounts && $item->hasAnyRole(['alumni', 'koorda']) && !$item->hasAnyRole(['super_admin', 'admin']))
                                         <a href="{{ route('alumni.edit', $item) }}"
-                                            class="rf-btn inline-flex h-8 w-8 items-center justify-center bg-amber-500 p-0 text-sm text-white hover:bg-amber-600 rounded-lg"
+                                            class="rf-btn-secondary p-2"
                                             title="Edit {{ $item->name }}" aria-label="Edit {{ $item->name }}">
                                             <i class="fas fa-pen"></i>
                                         </a>
@@ -222,7 +222,7 @@
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
-                                                class="rf-btn inline-flex h-8 w-8 items-center justify-center bg-red-600 p-0 text-sm text-white hover:bg-red-700 rounded-lg"
+                                                class="rf-btn-danger p-2"
                                                 title="Hapus {{ $item->name }}" aria-label="Hapus {{ $item->name }}">
                                                 <i class="fas fa-trash"></i>
                                             </button>
@@ -318,7 +318,7 @@
                         </div>
                     </div>
 
-                    <button class="rf-btn w-full bg-indigo-600 hover:bg-indigo-700 text-white py-2 rounded-lg">
+                    <button class="rf-btn w-full bg-brand hover:bg-brand-dark text-white py-2 rounded-lg">
                         Buat Akun
                     </button>
                 </form>

@@ -19,7 +19,7 @@
         @error('email') <p class="text-sm text-red-600 mt-1">{{ $message }}</p> @enderror
       </div>
 
-      <div class="grid grid-cols-2 gap-3">
+      <div class="grid gap-3 sm:grid-cols-2">
         <div>
           <label for="password" class="block text-sm mb-1">Password</label>
           <input id="password" type="password" name="password" autocomplete="new-password" aria-describedby="password-help" required class="w-full rounded-lg">
@@ -36,7 +36,7 @@
     </form>
 
     <p class="text-sm text-slate-600 mt-4">
-      Sudah punya akun? <a href="{{ route('login') }}" class="text-indigo-600">Masuk</a>
+      Sudah punya akun? <a href="{{ route('login') }}" class="text-brand">Masuk</a>
     </p>
   </div>
 @endsection
