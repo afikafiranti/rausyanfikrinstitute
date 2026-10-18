@@ -1,6 +1,6 @@
 # Catatan Jalur B
 
-## B-INTEGRATE — DONE lokal: push dev-B dan gabung develop (2026-10-18)
+## B-INTEGRATE — DONE: push dev-B dan gabung/push develop (2026-10-18)
 
 - Pengguna mengizinkan commit/push dev-B, kemudian merge dan push ke develop. Staging ditunda ke tahap akhir pengembangan sesuai arahan pengguna; bukan penghalang integrasi ini dan bukan bukti siap produksi.
 - Batch: UIUX-01/02, dashboard alumni, refleksi pribadi semua role dan pembatasan Laporan bagi pengelola, bersama PUB-04/PUB-03 yang sudah di-commit sebelumnya. Refleksi publik, materi, auth, file environment dan fixture/data QA tidak dikirim sebagai data baru.
@@ -10,7 +10,8 @@
 - Commit implementasi `7408828` berhasil dipush ke `origin/dev-B`. Merge ke develop mencakup PUB-04/PUB-03 `6961e18` dan implementasi terbaru tanpa konflik, mempertahankan hasil A yang sudah ada. Tidak menghapus branch dev-A/dev-B.
 - Verifikasi hasil gabungan pada develop: PHP 8.3.30 + ZIP/MySQL, database khusus terisolasi, **287 test/2172 assertion lulus**. `npm.cmd run build` (162 modul), Composer validate --strict/check-platform-reqs, **91 route**, migration pada database uji dan `git diff --check` lulus. Tambahan satu test/18 assertion terhadap snapshot 286 test menutup visibilitas Laporan pengelola nonaktif.
 - PRD/PLAN/TASK/AUDIT/SOP/README/AGENTS diselaraskan pada commit penggabungan ini: Refleksi saya semua role berbeda dari Refleksi publik; Laporan khusus pengelola; dashboard alumni pribadi; UI modern; migration lokal telah diterapkan. Status TODO/belum integrasi pada snapshot lama ditandai sebagai riwayat, bukan instruksi mengulang pekerjaan.
-- Push hasil develop dilanjutkan setelah commit merge; hash pengiriman aktual mengikuti Git `origin/develop`. CI remote untuk batch ini belum diklaim lulus; staging ditunda ke tahap akhir pengembangan sesuai pengguna, SMTP eksternal dan risiko produksi tetap terpisah dari integrasi kode.
+- Push hasil develop berhasil: merge `15020fe05acf3a84fd36ece6389d3a7f1b6f0a3f`, dengan parent baseline develop `355c791` dan dev-B `74088283c91ac599a9ead088047d2bacd00db1e9`. `git ls-remote` mengonfirmasi kedua branch sesuai hash tersebut. Working tree bersih sesudah merge; catatan pengiriman ini dicatat dalam commit dokumentasi lanjutan.
+- [CI GitHub snapshot merge 15020fe](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39086145972) sudah terpicu dan masih berjalan saat diperiksa, belum diklaim lulus. Commit dokumentasi lanjutan dapat memicu run baru sesuai concurrency workflow. Staging ditunda ke tahap akhir pengembangan sesuai pengguna; SMTP eksternal dan risiko produksi tetap terpisah dari integrasi kode.
 
 ## B1-MEMBER-REFLECTION — DONE lokal: draf pribadi dan tanggapan pengelola (2026-10-18)
 
