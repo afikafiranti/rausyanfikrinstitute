@@ -1,138 +1,79 @@
-# Website Alumni & Kajian — Rausyan Fikr
+# Website Alumni dan Kajian — Rausyan Fikr
 
-## 📖 Tentang Proyek
-Rausyan Fikr adalah website alumni kajian yang dikembangkan menggunakan **Laravel + Tailwind**.  
-Tujuan utama proyek ini adalah:
-1. Mengelola data alumni.
-2. Memberikan akses materi kajian (YouTube) berdasarkan level.
-3. Menyediakan sistem laporan kajian wilayah.
-4. Menyediakan homepage ringkas, artikel dan galeri untuk pengunjung publik, serta mempertahankan URL Refleksi existing.
+Aplikasi Laravel untuk data alumni, materi kajian bertingkat, laporan wilayah, tulisan publik, Galeri dan refleksi pribadi anggota.
 
-Pengembangan dilakukan bertahap dalam versi (incremental release):
-- **V1** — Data Alumni (MVP)
-- **V2** — Materi YouTube
-- **V3** — Rekap Laporan Kajian
+## Mulai untuk agent
 
-Status 2026-10-17: fitur inti V1–V3 tersedia pada hasil integrasi A+B di `develop`, termasuk A3-VERIFY, A4-AUTH dan A5-FIX. Suite gabungan PHP 8.3/MySQL terbaru lulus 260 test/1921 assertion; QA browser lokal impor Excel/batas wilayah dan SMTP lokal Mailpit juga lulus. CI remote batch 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. B0–B2, A5-QA operasional dan rilis tetap REVIEW untuk SMTP eksternal, staging dan risiko B3. Rincian bukti ada pada catatan Jalur A/B.
+Baca [AGENTS.md](AGENTS.md), lalu [dokumen induk perbaikan](docs/aturan_pengembangan/DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md), [TASK](docs/aturan_pengembangan/TASK.md), [PLAN](docs/aturan_pengembangan/PLAN.md#rencana-aktif), [PRD](docs/aturan_pengembangan/PRD.md), [AUDIT](docs/aturan_pengembangan/AUDIT.md) dan [SOP](docs/aturan_pengembangan/SOP.md).
 
-Matriks cakupan dan batas fitur ada di [PRD](docs/aturan_pengembangan/PRD.md#cakupan-dan-status-implementasi), urutan pekerjaan di [PLAN](docs/aturan_pengembangan/PLAN.md#tindak-lanjut-setelah-integrasi), dan bukti penyelesaian di [TASK](docs/aturan_pengembangan/TASK.md).
+Arahan aktif 4 November 2026:
 
----
+- Prioritaskan RFIX-01 (konfirmasi hapus) dan penataan DB sejak RFIX-02.
+- Skema belum final; tabel/kolom/relasi/migration boleh ditata ulang menurut kebutuhan web.
+- Data develop lama boleh dibuang dan dibangun kembali melalui seeder. Tidak diwajibkan jalur upgrade dataset lama.
+- Seeder, validasi, izin, model, query dan tes harus sesuai schema yang dipilih.
+- Perbaikan aplikasi masih direncanakan; sinkronisasi dokumentasi tidak menutup temuan kode.
 
-## ✨ Fitur Utama
+## Fitur yang tersedia pada source
 
-### Versi 1 (V1) — Data Alumni
-- Registrasi publik berstatus pending, login, reset password dan verifikasi email.
-- Profil, foto, perubahan password, serta pengelolaan data alumni sesuai izin.
-- Verifikasi oleh koorda/admin, pembatasan wilayah dan penetapan level awal.
-- Pencarian, filter, sorting, pagination dan dashboard data alumni.
-- Impor/ekspor CSV dan Excel `.xlsx`, template dengan nama wilayah, serta laporan baris impor gagal.
-- Audit log perubahan kritikal dan notifikasi dalam aplikasi.
+| Area | Kondisi |
+|---|---|
+| Akun/profil/alumni | Register pending, login, reset/verifikasi email, data profil, verifikasi anggota, filter/sort/pagination, level, audit dan notifikasi |
+| Impor/ekspor | CSV/XLSX, template dan laporan baris gagal |
+| Materi | Playlist/video dan akses akun aktif menurut level; metadata manual |
+| Dashboard | Statistik pengelola dan dashboard pribadi alumni terpisah |
+| Laporan | Draf/edit/kirim/review/rekap/CSV/foto privat; khusus pengelola aktif sesuai wilayah |
+| Refleksi saya | Semua role: draf privat, kiriman opsional dan tanggapan pengelola berwenang |
+| Publik | Hero, maksimal empat Artikel, maksimal empat Galeri, Footer; daftar/detail Artikel dan URL Refleksi publik |
+| Pengelolaan publik | Post/Artikel/Refleksi dan Galeri hanya oleh super admin aktif |
 
-### Versi 2 (V2) — Materi YouTube
-- Pengelolaan playlist/video oleh admin, pencarian dan detail materi.
-- Akses playlist/video bagi akun aktif sesuai level; tautan menonton dibuka di YouTube.
-- Judul dan durasi video diisi manual. Pengambilan/cache metadata YouTube otomatis masih ditunda.
-- Progres menonton bersifat opsional dan masih ditunda; tabel/model yang ada belum menjadi fitur pengguna.
+Refleksi saya adalah catatan internal. Mengirimnya untuk ditanggapi tidak membuatnya tampil publik. Artikel dan Refleksi publik merupakan dua jenis tulisan yang dikelola untuk pembaca umum.
 
-### Versi 3 (V3) — Laporan Kajian
-- Akses laporan hanya untuk admin, super admin, dan koorda aktif sesuai wilayah; alumni biasa tidak dapat mengakses endpoint laporan.
-- Draf, edit dan kirim laporan kajian dengan peserta laki-laki/perempuan, catatan serta foto privat.
-- Review koorda/admin sesuai wilayah, approve/reject dengan alasan penolakan.
-- Rekap dengan filter wilayah/status/tanggal dan ekspor CSV.
-- Laporan rejected belum mendukung revisi atau pengiriman ulang.
+Progres menonton dan metadata YouTube otomatis ditunda. Revisi/kirim ulang laporan rejected serta CRUD web khusus master belum tersedia. Agenda/tim-kontak dan section tambahan tidak termasuk homepage aktif.
 
-### Beranda Anggota dan Refleksi Pribadi (hasil penggabungan develop, 2026-10-18)
+## Kondisi verifikasi dan risiko
 
-- Alumni mendapat dashboard pribadi berisi status akun, level/wilayah, data profil dasar, akses materi sesuai kelayakan, dan notifikasi sendiri. Dashboard statistik pengelola tetap terpisah.
-- **Refleksi saya** tersedia bagi alumni, koorda, admin, dan super admin: catat pengalaman setelah materi, kajian, atau kegiatan lain; simpan/edit/hapus sebagai draf pribadi.
-- Pengiriman opsional memerlukan akun aktif dan wilayah. Setelah dikirim, isi dikunci; koorda wilayah kiriman serta admin/super admin dapat membaca dan memberi tanggapan. Draf tidak dapat dibaca pengelola lain; pemilik tidak dapat menanggapi kirimannya sendiri.
-- Refleksi pribadi memakai `/refleksi-saya`, antrean pengelola `/tinjau-refleksi`. Ini terpisah dari Refleksi publik di `/refleksi`; tidak otomatis diterbitkan.
-- Migration `2026_10_18_010000_create_member_reflections_table.php` hanya menambah tabel. Saat mengambil kode baru, jalankan migration pada database lokal yang sudah dikonfigurasi sebelum membuka fitur ini. Bukti dan status integrasi ada di catatan Jalur B.
+Basis kode yang diperiksa: bd9cdc1bc728916060e50d4566eccc64a172df9b. [CI 39086196915](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39086196915) completed/success dengan **280 warnings, 7 passed, 2172 assertions**. Ini bukti baseline, bukan hasil test patch RFIX.
 
-### Tampilan Publik
+[Audit bertanggal](docs/aturan_pengembangan/AUDIT_REPOSITORI_2026-11-03.md) memuat injeksi JavaScript konfirmasi hapus, aturan cascade laporan, akun pengelola/status, dependency, query/index dan URL publik. Source diperiksa ulang 4 November; perbaikan aplikasi belum diterapkan. SMTP eksternal/staging/pemulihan sebelum live belum dinyatakan selesai.
 
-- Cakupan terbaru pengguna 2026-10-17: **Hero → maksimal empat cuplikan Artikel → maksimal empat foto Galeri → Footer**, dengan tautan daftar/detail Artikel dan daftar Galeri. Konten berasal dari database; saat kosong halaman menampilkan empty state.
-- Artikel dan Refleksi memakai Post dengan pembeda jenis serta draf/terbit. URL Refleksi existing tetap tersedia. Pengelolaan Post dan Galeri hanya untuk super admin aktif; admin biasa tetap dapat mengelola materi sesuai izin existing.
-- PUB-04 dan navigasi PUB-03 tersedia pada hasil penggabungan develop, bersama UIUX-02, dashboard alumni dan Refleksi saya semua role. Commit implementasi `7408828` sudah dipush ke dev-B; bukti test/review/merge ada pada CATATAN_JALUR_B. Migration lokal Post dan tabel refleksi sudah diterapkan tanpa reset/seeder. Persetujuan konten resmi dan rilis tetap terpisah; staging dijadwalkan pada tahap akhir pengembangan sesuai pengguna. Agenda (PUB-01), tim/kontak (PUB-02), section tentang/statistik dan CTA terpisah tetap di luar cakupan homepage.
+## Teknologi
 
-Pengelolaan master role/wilayah/level melalui CRUD web khusus belum tersedia; rincian implementasinya perlu ditetapkan sebelum dikerjakan. Penetapan level akun melalui verifikasi/pengelolaan alumni sudah tersedia.
+- Laravel 12, target PHP 8.3; versi terpasang mengikuti composer.lock.
+- Blade, Tailwind 3, Vite, Alpine/Flowbite.
+- MySQL/MariaDB.
+- PhpSpreadsheet dan ekstensi ZIP untuk XLSX; ekstensi lain mengikuti lockfile.
+- Dashboard aktif mengambil ApexCharts melalui CDN; Chart.js juga masih terpasang. Penyeragaman dan penguncian versi merupakan RFIX-14.
+- Driver database untuk sesi/cache/antrean mengikuti konfigurasi baseline; dapat ditinjau bersama rancangan schema/hosting.
 
----
+## Instalasi develop baru
 
-## 🛠️ Tumpukan Teknologi
-- **Framework:** Laravel 12 (PHP 8.3)
-- **Frontend:** Blade + Tailwind (Notus Tailwind)
-- **Database:** MySQL/MariaDB
-- **Chart:** Chart.js
-- **Excel:** PhpSpreadsheet dan ekstensi ZIP PHP; kebutuhan platform mengikuti `composer.lock`.
-- **Opsional:** Redis untuk cache/queue; Laravel Sanctum/API belum menjadi fitur yang diimplementasikan.
-
----
-
-## 🚀 Instalasi Lokal
-
-```bash
+~~~bash
 git clone https://github.com/afikafiranti/rausyanfikrinstitute.git
 cd rausyanfikrinstitute
-
 cp .env.example .env
-# Isi database lokal terpisah pada .env terlebih dahulu.
+~~~
+
+Isi koneksi database develop pada .env terlebih dahulu, lalu:
+
+~~~bash
 composer install --prefer-dist --no-interaction
 npm ci
-# Hanya untuk instalasi lokal baru; jangan mengganti kunci environment existing.
 php artisan key:generate
+php artisan migrate --seed
+npm run dev
+~~~
 
-php artisan migrate
-# Master data untuk database lokal baru.
-php artisan db:seed --class=RoleSeeder
-php artisan db:seed --class=LevelSeeder
-php artisan db:seed --class=WilayahSeeder
+Jalankan php artisan serve pada terminal lain. Key generation di atas untuk environment develop baru. Seed baseline belum mencakup seluruh fixture rencana RFIX-23.
 
-# Jalankan Vite di terminal terpisah: npm run dev
-php artisan serve
-```
+Reset develop yang sudah diidentifikasi benar telah diizinkan pengguna. Prosedur target dan rebuild memakai [SOP](docs/aturan_pengembangan/SOP.md#3-reset-develop-yang-sudah-diizinkan). Database testing tetap terpisah berakhiran _testing.
 
-Gunakan PHP 8.3 dengan ekstensi sesuai lockfile, termasuk ZIP untuk Excel. Template email memakai mailer log; pengiriman email nyata memerlukan konfigurasi transport dan verifikasi tersendiri.
+## Catatan pengembangan dan rilis
 
-Jangan menjalankan seeder demo pada database berisi data nyata. Deployment staging, backup, dan pemulihan mengikuti
-[runbook Jalur B](docs/aturan_pengembangan/RUNBOOK_STAGING_JALUR_B.md);
-perintah instalasi lokal di atas bukan prosedur upgrade server.
+TASK adalah satu register progres aktual. Instruksi dan bukti lama dapat dibaca pada riwayat Git serta catatan jalur; jangan mengulang task yang sudah terintegrasi. Menulis dokumentasi atau menggabungkan kode tidak menjadi bukti rilis.
 
----
+[Runbook staging](docs/aturan_pengembangan/RUNBOOK_STAGING_JALUR_B.md) merupakan acuan lingkungan tujuan. Ketentuan konservatif data existing dalam runbook berlaku pada konteks operasionalnya; izin reset develop terbaru tidak berlaku pada produksi/sistem lain.
 
-## 🌱 Seeder Awal
-- **RoleSeeder** — role sistem (admin, koorda, alumni, super_admin)
-- **LevelSeeder** — level materi 1–4: dasar, menengah, lanjutan, akhir; terpisah dari role sistem
-- **WilayahSeeder** — struktur wilayah awal
-- **UserSeeder**, **PostSeeder**, **GallerySeeder** — data contoh untuk lokal/testing
+## Identitas dan lisensi
 
-`DatabaseSeeder` menjalankan master data dan hanya memanggil seeder contoh pada environment `local`/`testing`. `UserSeeder` juga membatasi dirinya ke kedua environment tersebut. Tidak ada kelas `DemoDataSeeder`.
-
----
-
-## 🗄️ Struktur Database (Ringkas)
-- `users` (alumni & pengelola)
-- `roles`, `role_user` (multi-role)
-- `levels` (level materi 1–4)
-- `wilayah` (hierarki wilayah)
-- `playlists`, `videos` (materi YouTube)
-- `video_progress` (schema tersedia; fitur progres belum aktif)
-- `kajian_reports` (laporan kajian)
-- `audit_logs` (jejak perubahan)
-- `notifications` (notifikasi dalam aplikasi)
-
----
-
-## 🤝 Kontribusi & Aturan Commit
-- Ikuti penugasan branch, kepemilikan file dan aturan integrasi pada [AGENTS.md](AGENTS.md).
-- Baca [PRD](docs/aturan_pengembangan/PRD.md), [PLAN](docs/aturan_pengembangan/PLAN.md), [TASK](docs/aturan_pengembangan/TASK.md), [AUDIT](docs/aturan_pengembangan/AUDIT.md) dan [SOP](docs/aturan_pengembangan/SOP.md) sebelum mengubah fitur.
-- Catat perubahan per jalur dan ajukan per batch A0/A1/A2 atau B0/B1/B2 sesuai rencana aktif; tindak lanjut publik memakai ID PUB-01–PUB-04.
-- Automated test memakai database sendiri berakhiran `_testing`; jangan memakai database kerja. Runner dan persyaratan CI dijelaskan di [catatan Jalur B](docs/aturan_pengembangan/CATATAN_JALUR_B.md#pemakaian-environment-dan-runner).
-- Aturan commit harian existing tetap berlaku: minimal satu commit per hari kerja dengan format `hari_<nomor> apa_yang_dikerjakan`, misalnya `hari_8 impor CSV dan laporan baris gagal`.
-
----
-
-## 📄 Lisensi
-Proyek ini bersifat internal untuk komunitas alumni kajian.  
-Hak cipta © 2025 Rausyan Fikr.
+Proyek internal komunitas Rausyan Fikr. Metadata lisensi skeleton dan keterangan pemilik perlu diselaraskan melalui RFIX-20/KEP-08; tidak menetapkan pilihan lisensi baru dalam pembaruan dokumentasi ini.
