@@ -1,309 +1,78 @@
-# SOP Pengembangan dan Sinkronisasi Dokumen
+# SOP Pengembangan dan Sinkronisasi
 
-Dokumen ini wajib diikuti sebelum, selama, dan setelah pengembangan fitur.
+Pembaruan 4 November 2026. Berlaku untuk rencana RFIX dan menggantikan aturan historis yang bertentangan tentang pelestarian dataset develop, perubahan migration lama dan kewajiban bekerja paralel.
 
-Pembaruan integrasi 2026-10-18: pengguna mengizinkan push dev-B lalu merge/push develop untuk PUB-04/PUB-03, UIUX-02, dashboard alumni dan Refleksi saya semua role. Penggabung menyelaraskan catatan pusat dari hasil implementasi yang diuji, mempertahankan seluruh hasil A, dan memverifikasi hasil merge. Staging dilakukan pada tahap akhir pengembangan sesuai arahan pengguna, bukan syarat merge saat ini. Jangan menandainya lulus atau menafsirkan merge sebagai persetujuan produksi. Migration tambahan lokal diterapkan hanya setelah target diverifikasi dan tanpa reset/seeder; fixture tetap di database QA terisolasi. Catatan larangan penerapan database kerja pada snapshot PUB-04 sebelumnya merekam kondisi sebelum arahan/perbaikan lokal yang sudah selesai.
+## 1. Masuk sesi dan pilih pekerjaan
 
-## 1. Dokumen Wajib
+1. Baca AGENTS, [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md), [TASK](TASK.md), [PLAN](PLAN.md), [PRD](PRD.md), [AUDIT](AUDIT.md) dan SOP ini.
+2. Periksa branch/status dan baseline source; pertahankan perubahan pengguna/pengembang lain.
+3. Pilih ID RFIX, peta berkas/domain dan kriteria penerimaannya. Ubah TASK menjadi IN_PROGRESS ketika pelaksanaan dimulai.
+4. Gunakan kondisi kode sebagai bukti. Jika source sudah berubah, perbarui penilaian sebelum mengerjakan temuan lama.
+5. Kerjakan perubahan minimum yang menyelesaikan alur. Jangan mengulang pembangunan fitur yang sudah ada atau menambahkan fitur di luar kebutuhan.
 
-Pengambilalihan Jalur B 2026-10-17: pengguna mempersempit homepage menjadi Hero/empat Artikel/empat Galeri/Footer dan menetapkan super admin sebagai satu-satunya pengelola Post/Galeri. PUB-04 dan navigasi terkait PUB-03 mengikuti cakupan ini; agenda/tim/kontak di luar cakupan aktif. Penggabung boleh menyelaraskan dokumen pusat atas perubahan cakupan eksplisit ini. Pengujian/migration tetap pada database baru terisolasi; jangan menjalankan migration atau menambahkan konten sintetis pada database kerja agar preview tampak terisi.
+## 2. Perancangan database develop
 
-Pembaruan A3–A5 2026-10-17: pengguna mengizinkan penggabung mengintegrasikan hasil dev-A ke develop dan menyinkronkan dokumen pusat. Merge ecee5b4 mempertahankan seluruh hasil A+B; suite terbaru 260 test/1921 assertion serta build/Composer/platform/route lulus pada PHP 8.3/MySQL dengan database baru terisolasi. QA browser memakai database sintetis terpisah tanpa migrate:fresh. SMTP lokal Mailpit bukan pengiriman eksternal. Staging/SMTP organisasi belum tersedia menurut pengguna; pertahankan REVIEW rilis dan tindak lanjut B3.
+- Skema belum final. Bandingkan kandidat menurut kebutuhan web, privasi, integritas, kesederhanaan kode dan pengukuran.
+- Nama/jumlah tabel, kolom, relasi dan migration baseline dapat berubah. Kontrak pengguna tidak boleh melemah akibat perubahan fisik schema.
+- Data develop yang ada boleh dibuang. Tidak perlu jalur upgrade, backfill, atau penyelamatan dataset lama develop.
+- Migration awal boleh ditata/digabung untuk membentuk schema dari kosong. Seeder/factory ikut diperbarui dan menjadi bagian syarat selesai.
+- Tentukan satu sumber aturan data yang jelas; gunakan kemampuan Laravel yang tersedia sebelum menambah lapisan/dependency.
+- Tabel framework dievaluasi bersama driver; tabel fitur tertunda diperiksa seluruh pemakainya sebelum dikeluarkan.
+- Artikel dan Refleksi publik adalah dua jenis tulisan untuk publik. Refleksi saya mempunyai draf pribadi dan pengiriman internal; pilihan tabel tidak boleh mencampurkan pembacanya.
 
-Pembaruan integrasi 2026-10-17: penggabung menyinkronkan hasil A+B atas instruksi pengguna. Target bersama PHP 8.3/MySQL atau MariaDB; test gabungan memakai database terisolasi dengan akhiran _testing melalui guard B. Instal dependency mengikuti lockfile gabungan (termasuk Excel A), jangan mengganti dengan lockfile salah satu jalur. Bukti merge lokal tidak menggantikan CI remote, QA staging dan persetujuan rilis.
+## 3. Reset develop yang sudah diizinkan
 
-Catatan historis integrasi 2026-10-16: pengguna mengizinkan jalur A digabung lebih dulu ke develop. Pengembang B kemudian mengambil hasil A dan mengintegrasikannya pada 2026-10-17. A0/A1/A2 tidak perlu dikerjakan ulang; status implementasi serta bukti terbaru mengikuti TASK dan catatan integrasi A+B.
+Izin pengguna untuk reset data develop sudah ada dan tidak perlu ditanyakan ulang untuk target proyek yang telah teridentifikasi.
 
-Semua pengembangan harus mengacu pada:
-- `PRD.md`: kebutuhan produk, role, fitur, acceptance criteria.
-- `PLAN.md`: urutan pengembangan dan prioritas.
-- `TASK.md`: task yang sudah, sedang, dan akan dikerjakan.
-- `AUDIT.md`: risiko, guardrail, dan keputusan audit.
-- `SOP.md`: aturan kerja dan sinkronisasi dokumen.
+Sebelum menjalankan perintah destruktif, periksa host, database, environment dan konfigurasi yang benar-benar dimuat, termasuk config cache. Jangan mengubah label environment untuk melewati pemeriksaan target. Izin ini tidak berlaku untuk produksi atau sistem lain.
 
-README menjadi ringkasan fitur/setup dan menautkan matriks cakupan PRD. Setiap pembaruan fitur menyelaraskan status pada README/PRD, urutan PLAN dan ID/status TASK; catatan historis diberi konteks tanggal. Tersedia/sebagian/direncanakan/ditunda menggambarkan cakupan implementasi, sedangkan DONE/REVIEW menggambarkan penyelesaian task berdasarkan bukti. Keduanya tidak menggantikan verifikasi rilis.
+Pada target develop yang telah benar, prosedur rebuild yang direncanakan:
 
-Riwayat cakupan publik sebelum penyederhanaan 2026-10-17 mencakup agenda, tim/kontak dan CTA Daftar melalui PUB-01–PUB-04. Cakupan aktif kini mengikuti keputusan ringkas di awal dokumen; bagian lama bukan perintah memulai PUB-01/PUB-02. Gunakan konten resmi dan sinkronkan dokumentasi atas instruksi pengguna sesuai pengecualian bagian 2A.
+~~~bash
+php artisan migrate:fresh --seed
+php artisan db:seed
+php artisan route:list
+~~~
 
-## 2. Aturan Sinkronisasi
+Pembentukan dari kosong dan pengulangan seeder harus berhasil tanpa duplikasi data referensi/fixture. Data contoh terbatas local/testing, memakai identitas sintetis dan tidak dianggap konten resmi.
 
-Sebelum mulai coding:
-1. Baca `PRD.md` untuk memahami kebutuhan.
-2. Baca `PLAN.md` untuk memastikan prioritas.
-3. Tambahkan atau update item di `TASK.md` sebagai `IN_PROGRESS`.
-4. Cek `AUDIT.md` untuk risiko terkait.
+Pengaman pengujian tetap terpisah: database _testing, TestDatabaseSafety dan pemeriksaan sebelum RefreshDatabase. Izin reset develop tidak menjadi alasan menonaktifkan pengaman test atau berbagi database test antar pelaksana.
 
-Saat coding:
-1. Jaga perubahan tetap sesuai scope task.
-2. Jika menemukan bug baru, catat di `AUDIT.md`.
-3. Jika task berubah scope, update `PRD.md` dan `PLAN.md`.
-4. Jika menemukan dependency baru, catat di `TASK.md`.
+## 4. Implementasi dan koordinasi
 
-Setelah coding:
-1. Jalankan cek sintaks atau test yang relevan.
-2. Cek workflow manual jika fitur menyentuh UI.
-3. Update `TASK.md` dengan hasil dan verifikasi.
-4. Update `AUDIT.md` jika ada risiko tersisa.
-5. Pastikan dokumen tidak saling bertentangan.
+1. Reproduksi masalah atau ukur kondisi awal sesuai risiko. Uji regresi dibuat untuk logika berisiko yang diubah.
+2. Selaraskan migration, model, relasi, validasi, query, seeder, factory, view dan tes yang terdampak.
+3. Pertahankan transaksi, row lock, audit, CSRF, scope wilayah, multi-role dan privasi.
+4. Hindari cache izin global yang dapat menyimpan role lama; hindari query berulang di view.
+5. Peta domain A/B dipakai saat ada pekerjaan bersama. Jangan menimpa edit orang lain atau memformat ulang seluruh file lintas domain.
+6. Instruksi ini tidak mewajibkan sub-agent atau paralelisasi. Ikuti penugasan/lingkungan yang sedang berlaku.
+7. Perubahan keputusan fungsi dicatat pada PRD dan dokumen induk; pilihan teknis serta hasilnya dicatat dengan ID KEP/RFIX yang sesuai.
 
-## 2A. Pengecualian Pencatatan Saat Dua Jalur Paralel
+## 5. Verifikasi
 
-Berlaku untuk pembagian A/B sejak 2026-10-16 dan menggantikan kewajiban mengedit dokumen pusat pada bagian 2 selama implementasi paralel.
+- Target bersama PHP 8.3 dan MySQL/MariaDB; gunakan lockfile yang sesuai.
+- Jalankan pemeriksaan domain yang relevan, kemudian integrasi yang terdampak. Tidak perlu tes baru untuk perubahan rendah dampak yang hanya menyalin implementasi.
+- Build aset tidak membuktikan perilaku browser/permission. Tes PHP tidak membuktikan handler JavaScript.
+- Uji rebuild schema kosong, seed ulang, keunikan/FK, status, hak akses dan fungsi pengguna sebelum menyebut penataan DB selesai.
+- Audit dependency dilaporkan dengan waktu, versi, ID advisory dan applicability. Angka severity tidak langsung menjadi bukti serangan ke endpoint.
+- Tampilkan rincian warning dan perbaiki penyebabnya; jangan menyembunyikannya agar CI hijau.
+- Catat perintah, commit, runtime, lingkungan, hasil, warning dan skip. Jangan menggunakan angka tes lama untuk patch baru.
+- Bukti staging, SMTP eksternal dan pemulihan sebelum live dipisahkan dari pekerjaan develop. Ketidaktersediaannya tidak menghalangi perancangan schema.
 
-- Baca AGENTS.md pada root saat memulai sesi. dev-A adalah Jalur A; dev-B adalah Jalur B. Ikuti kepemilikan file dan prioritas aktif dalam PLAN.md.
-- Sebelum coding dan setelah verifikasi, catat status task, perubahan, risiko, serta hasil test pada CATATAN_JALUR_A.md atau CATATAN_JALUR_B.md di folder ini. Buat file jalur sendiri saat mulai implementasi.
-- PLAN/PRD/TASK/AUDIT/SOP dan AGENTS.md tidak diedit kedua jalur selama implementasi. Pembaruan atas permintaan eksplisit pengguna tetap diperbolehkan.
-- Penggabung menyinkronkan dokumen pusat dari catatan kedua jalur setelah merge dan mencatat hasil pengujian gabungan.
-- Perubahan scope/kontrak lintas jalur dicatat untuk integrasi; jangan mengubah kepemilikan file atau kontrak bersama secara sepihak.
+## 6. Pencatatan dan penutupan
 
-## 3. Workflow Sub-Agen
+TASK adalah satu register progres aktif. Dokumen induk menyimpan keputusan dan kriteria. AUDIT menyimpan risiko/bukti; PLAN menyimpan urutan; PRD menyimpan fungsi/cakupan; catatan A/B menyimpan detail pelaksanaan.
 
-Pengembangan dikelola sebagai tim sub-agen spesialis. Dalam praktik kerja, sub-agen dapat bekerja simultan pada area yang tidak saling menimpa.
+Status PARTIAL berarti ada subtugas selesai tetapi pekerjaan belum memenuhi seluruh kriteria, bukan tanda pekerjaan sedang dikunci pelaksana. DONE memerlukan bukti kriteria; deployment memerlukan bukti lingkungan tujuan.
 
-### Product Owner dan PRD Strategist
-Tanggung jawab:
-- Menentukan kebutuhan dan acceptance criteria.
-- Mencegah scope melebar tanpa keputusan.
+Perbarui README jika ringkasan fitur/setup berubah. Saat terjadi perbedaan, periksa source dan instruksi pengguna terbaru, kemudian perbaiki pencatatan yang salah. Jangan menumpuk status aktif yang bertentangan di beberapa dokumen.
 
-Dokumen utama:
-- `PRD.md`
-- `PLAN.md`
+## 7. Skill project dan sumber teknis
 
-### Backend Laravel Engineer
-Tanggung jawab:
-- Controller, route, middleware, request validation, authorization, transaksi.
+Baca instruksi project skill pada .agents/skills saat relevan: diagnosing-bugs untuk diagnosis; tdd untuk perubahan berisiko; implement untuk pelaksanaan spesifikasi; code-review untuk review; ui-ux-pro-max/ui-styling untuk UI; qa/browser-use/remote-browser untuk QA browser; research untuk riset teknis sumber primer. Ketersediaan skill tidak mengharuskan perubahan stack atau pemasangan dependency.
 
-Dokumen utama:
-- `TASK.md`
-- `AUDIT.md`
+Jangan menjalankan konfigurasi penuh ekosistem skill, integrasi gateway, atau mengirim kredensial/data nyata ke layanan browser/gateway hanya karena tool tersebut tersedia. Ikuti cakupan tugas dan instruksi pengguna.
 
-### Database dan Data Integrity Specialist
-Tanggung jawab:
-- Migration, seeder, relasi, index, foreign key, enum, data consistency.
+## 8. Riwayat
 
-Dokumen utama:
-- `AUDIT.md`
-- `TASK.md`
-
-### UX Workflow Designer
-Tanggung jawab:
-- Alur form, tabel, feedback, empty state, error state, dan navigasi.
-
-Dokumen utama:
-- `PRD.md`
-- `AUDIT.md`
-
-### Frontend Blade dan Tailwind Engineer
-Tanggung jawab:
-- Implementasi view, komponen Blade, layout responsif, tampilan data.
-
-Dokumen utama:
-- `TASK.md`
-
-### QA dan Test Engineer
-Tanggung jawab:
-- Test plan, regression test, role test, dan validasi workflow.
-
-Dokumen utama:
-- `TASK.md`
-- `AUDIT.md`
-
-### Technical Writer dan Documentation Controller
-Tanggung jawab:
-- Menjaga semua dokumen sinkron.
-- Menolak penutupan task jika dokumen belum diperbarui.
-
-Dokumen utama:
-- Semua dokumen di folder ini.
-
-## 3A. Skill Wajib dan Aturan Penggunaan
-
-Skill project terpasang di `.agents/skills` dan berlaku untuk Codex dalam repo ini. Setiap skill eksternal wajib dibaca instruksinya saat relevan sebelum dipakai.
-
-### UI dan UX
-
-Gunakan `ui-ux-pro-max` saat:
-- Mendesain halaman baru.
-- Mereview UX halaman admin, dashboard, landing page, form, tabel, modal, dan navigasi.
-- Memilih sistem warna, tipografi, spacing, layout, aksesibilitas, atau pola visual.
-
-Gunakan `ui-styling` saat:
-- Mengimplementasikan Blade/Tailwind UI.
-- Merapikan form, tabel, badge, empty state, feedback state, responsivitas, dan dark/light style jika kelak dibutuhkan.
-
-Gunakan `design-system` saat:
-- Menetapkan token desain, standar komponen, dan aturan konsistensi UI.
-- Membuat atau memperbarui design system internal Rausyan Fikr.
-
-Gunakan `shadcn` hanya sebagai referensi pola komponen:
-- Project ini berbasis Laravel Blade/Tailwind, bukan React.
-- Jangan menginstal komponen shadcn React ke project kecuali ada keputusan migrasi/penambahan stack.
-- Ambil prinsip komponen, accessibility pattern, dan struktur UI jika relevan, lalu adaptasi ke Blade/Tailwind.
-
-### Backend, Arsitektur, dan Kualitas Kode
-
-Gunakan `diagnosing-bugs` saat:
-- Ada bug, error Laravel, data tidak tersimpan, route tidak berjalan, query gagal, atau workflow rusak.
-
-Gunakan `tdd` saat:
-- Membuat fitur baru yang punya risiko bisnis/data.
-- Memperbaiki bug yang perlu regression test.
-- Menambah test Feature/Unit Laravel.
-
-Gunakan `implement` saat:
-- Mengerjakan task yang sudah punya PRD/PLAN/TASK jelas.
-- Mengubah kode berdasarkan spesifikasi yang sudah disetujui.
-
-Gunakan `code-review` saat:
-- Mereview perubahan sebelum task ditutup.
-- Mengecek kesesuaian implementasi terhadap PRD dan SOP.
-
-Gunakan `codebase-design` saat:
-- Merapikan modul besar.
-- Menentukan batas tanggung jawab controller, model, middleware, service, dan view.
-
-Gunakan `domain-modeling` saat:
-- Mendefinisikan istilah domain seperti alumni, koorda, wilayah, level, kajian, materi, laporan, verifikasi, dan status.
-
-Gunakan `research` saat:
-- Membutuhkan riset teknis berbasis sumber primer.
-- Membandingkan pendekatan Laravel, Tailwind, Chart.js, browser automation, atau library lain.
-
-Gunakan `handoff` saat:
-- Pekerjaan panjang perlu dilanjutkan sesi/agen lain.
-- Konteks perlu dipadatkan menjadi dokumen serah-terima.
-
-Gunakan `setup-matt-pocock-skills` hanya jika perlu mengonfigurasi penuh ekosistem Matt Pocock skills untuk repo ini. Jika dijalankan, hasil konfigurasi wajib dicatat di `TASK.md` dan `AUDIT.md`.
-
-### Browser QA dan Automasi
-
-Gunakan `browser-use` saat:
-- Perlu mengendalikan browser untuk menguji workflow web.
-- Perlu screenshot atau inspeksi interaksi halaman.
-
-Gunakan `remote-browser` saat:
-- Codex berjalan di sandbox tanpa GUI tetapi perlu membuka dan menguji halaman.
-
-Gunakan `qa` saat:
-- Meminta skor kualitas halaman atau workflow end-to-end.
-- Melakukan QA eksplisit pada URL lokal/staging.
-
-Catatan keamanan:
-- Skill Browser-use dapat memakai browser/cloud/tunnel sesuai instruksi skill.
-- Jangan kirim kredensial nyata, data pribadi sensitif, atau token produksi ke browser automation tanpa izin eksplisit.
-- Untuk workflow lokal, gunakan akun dummy/test jika memungkinkan.
-
-### 9Router
-
-Gunakan `9router` sebagai entry point saat:
-- User secara eksplisit meminta 9Router.
-- Pengembangan membutuhkan gateway AI lokal/remote yang kompatibel OpenAI.
-- Perlu menyusun integrasi AI tanpa mengikat langsung ke provider tertentu.
-
-Gunakan `9router-chat` saat:
-- Membuat atau menguji panggilan chat/completion via 9Router.
-
-Gunakan `9router-web-search` dan `9router-web-fetch` hanya jika:
-- User meminta penggunaan 9Router untuk pencarian/fetch web.
-- Atau SOP task membutuhkan 9Router sebagai jalur riset.
-
-Catatan:
-- Untuk informasi teknis umum, tetap prioritaskan sumber primer dan aturan browsing yang berlaku.
-- Jangan memasukkan API key 9Router ke repo.
-
-### OpenCode
-
-Repo `anomalyco/opencode` telah dicek. Dari repo tersebut, skill yang terdeteksi untuk instalasi adalah `effect`, yang tidak relevan untuk project Laravel/Blade ini. Karena itu tidak dipasang.
-
-OpenCode tetap dicatat sebagai referensi kompatibilitas skill:
-- OpenCode dapat membaca skill berbasis `SKILL.md`.
-- Jika tim memakai OpenCode di luar Codex, gunakan folder skill yang kompatibel dan ikuti dokumentasi OpenCode.
-- Jangan menambahkan konfigurasi OpenCode ke repo ini tanpa kebutuhan operasional yang jelas.
-
-## 4. Urutan Eksekusi Standar
-
-Setiap fitur harus melewati urutan ini:
-
-1. Requirement
-   - Pastikan kebutuhan ada di PRD.
-   - Jika belum ada, tambahkan dulu.
-
-2. Planning
-   - Tempatkan task di PLAN sesuai prioritas.
-   - Pecah task besar menjadi beberapa task kecil.
-
-3. Task Registration
-   - Catat task di TASK.
-   - Tetapkan status `IN_PROGRESS`.
-
-4. Audit Pre-Check
-   - Cek risiko database, permission, UX, dan dependency.
-
-5. Implementation
-   - Kerjakan kode sesuai scope.
-   - Jangan melakukan refactor besar yang tidak terkait.
-
-6. Verification
-   - Jalankan test atau cek sintaks.
-   - Lakukan uji manual untuk workflow UI.
-   - Cek log jika workflow pernah error.
-
-7. Documentation Sync
-   - Update TASK.
-   - Update AUDIT.
-   - Update PRD/PLAN jika ada perubahan scope.
-
-8. Handover
-   - Laporkan perubahan, file yang disentuh, dan verifikasi.
-
-## 5. Aturan UX Wajib
-
-1. Setiap form harus punya feedback sukses dan error.
-2. Error validasi harus terlihat dekat dengan field atau di area yang mudah dilihat.
-3. Modal form harus tetap terbuka jika validasi gagal.
-4. Tabel harus punya empty state yang jelas.
-5. Filter aktif harus mudah dipahami dan dapat di-reset.
-6. Aksi penting harus punya permission yang tepat.
-7. Jangan membuat user berpindah sesi tanpa disengaja.
-8. Jangan menampilkan data dummy sebagai data nyata.
-
-## 6. Aturan Database Wajib
-
-1. Field yang dipakai controller harus ada di migration.
-2. Field yang diisi mass assignment harus ada di `$fillable`.
-3. Relasi Eloquent harus sesuai foreign key.
-4. Nilai enum di form, seeder, dan database harus sama.
-5. Perubahan schema harus disertai audit dampak.
-6. Insert multi-tabel penting harus memakai transaksi.
-7. Automated test wajib memakai database sendiri berakhiran `_testing` pada MySQL/MariaDB; default PHPUnit/CI saat ini `rf_b_testing`. Jangan berbagi database test antar jalur.
-8. Jangan menjalankan `RefreshDatabase` pada database development `rf_db`.
-
-## 7. Aturan Permission Wajib
-
-1. Route admin harus dilindungi middleware `auth` dan gate yang sesuai.
-2. Koorda hanya boleh mengakses data wilayahnya kecuali ada keputusan khusus.
-3. Super admin dan admin harus dibedakan jika ada aksi berisiko tinggi.
-4. Helper role di model harus konsisten dengan middleware.
-
-## 8. Template Handover Setelah Task
-
-Gunakan format berikut saat melaporkan hasil:
-
-```text
-Task:
-Status:
-File diubah:
-Perubahan utama:
-Verifikasi:
-Risiko tersisa:
-Dokumen yang diperbarui:
-```
-
-## 9. Larangan
-
-- Jangan mulai fitur baru tanpa update `TASK.md`.
-- Jangan menutup task tanpa verifikasi.
-- Jangan mengubah schema tanpa update `AUDIT.md`.
-- Jangan membiarkan error validasi tersembunyi.
-- Jangan menambah role/permission tanpa mencatat dampaknya.
-- Jangan menghapus perubahan user tanpa instruksi eksplisit.
+[SOP baseline 18 Oktober](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/SOP.md) menyimpan prosedur historis lengkap. Larangan reset dataset develop dan perubahan migration lama di sana telah diganti arahan pengguna 4 November. Prosedur perlindungan lingkungan lain serta pemulihan sebelum penggunaan nyata tetap diperiksa sesuai konteks.

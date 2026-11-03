@@ -1,14 +1,30 @@
 # PRD Website Alumni dan Kajian Rausyan Fikr
 
-## Pembaruan aktif 2026-10-18
+## Acuan Aktif 4 November 2026
 
-Pengguna mengizinkan push dan penggabungan Jalur B ke `develop`. PUB-04/PUB-03, modernisasi UIUX-02, dashboard pribadi alumni dan Refleksi saya bagi empat role sudah tersedia pada hasil gabungan. Commit implementasi `7408828` sudah dikirim ke dev-B; bukti verifikasi dan pengiriman hasil integrasi mengikuti CATATAN_JALUR_B. Staging dijadwalkan pada tahap akhir pengembangan sesuai arahan pengguna, bukan prasyarat merge saat ini. SMTP eksternal dan kesiapan produksi belum dinyatakan lulus. Pernyataan belum terintegrasi/belum diterapkan pada database kerja dalam snapshot lama di bawah dibaca sebagai riwayat.
+[Dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md) mencatat arahan perbaikan terbaru. [TASK](TASK.md) memuat progres aktual; [PLAN](PLAN.md) memuat urutan; [AUDIT](AUDIT.md) memuat kondisi source dan bukti.
 
-Refleksi saya berbeda dari Refleksi publik: semua role dapat menyimpan draf pribadi; hanya penulis dapat membaca/mengedit/menghapus draf. Pengiriman opsional memerlukan akun aktif dan wilayah; isi terkunci setelah dikirim. Koorda wilayah kiriman serta admin/super admin aktif dapat membaca dan menanggapi, tanpa menanggapi kiriman sendiri. Tidak ada penerbitan publik otomatis. Laporan kajian hanya untuk pengelola aktif sesuai role/wilayah; alumni biasa ditolak pada menu maupun endpoint.
+Fitur pada matriks di bawah sudah tersedia pada develop hasil integrasi 18 Oktober. Ketersediaan tersebut tidak berarti seluruh bug dan kesiapan rilis selesai. Perbaikan RFIX aplikasi belum diterapkan; subtugas sinkronisasi dokumentasi RFIX-20 sudah dikerjakan.
+
+### Kebutuhan fungsi dan rancangan fisik database
+
+Skema masih dicari dan dikembangkan. Nama/jumlah tabel, kolom, model, relasi dan migration pada source bukan desain final. Kandidat boleh disusun ulang bila memenuhi kebutuhan web dan diuji menurut dokumen induk.
+
+Data develop lama boleh dihapus dan dibuat ulang melalui seeder. Migration develop boleh dikonsolidasikan; tidak diperlukan pelestarian atau jalur upgrade dataset develop lama. Seeder wajib mendukung data dasar dan contoh penggunaan. Testing terpisah dan lingkungan selain develop tetap mengikuti kewenangannya.
+
+Kebutuhan pengguna dipisahkan dari nama tabel. Artikel/Refleksi publik dan Refleksi saya mempunyai tujuan serta pembaca berbeda; setiap rancangan penyimpanan harus menjaga perbedaannya.
+
+### Penjelasan untuk pengguna
+
+- Artikel membagikan penjelasan/pembahasan topik kepada pengunjung.
+- Refleksi publik membagikan pengalaman/renungan yang sengaja diterbitkan untuk umum.
+- Refleksi saya menyimpan catatan belajar masing-masing pengguna; draf hanya penulis. Pengiriman opsional membuka catatan kepada koorda wilayah kiriman serta admin/super admin aktif untuk tanggapan, tanpa penerbitan otomatis.
+
+Super admin aktif mengelola Post/Galeri. Admin tetap mengelola materi dan dapat menanggapi refleksi lintas wilayah, tetapi tidak mendapat izin menerbitkan tulisan publik. Koorda menanggapi kiriman sesuai wilayahnya. Semua role mempunyai catatan sendiri dan tidak menanggapi kirimannya sendiri.
 
 ## 1. Ringkasan Produk
 
-Riwayat integrasi 2026-10-17: A0–A5 dan B0/B1/B2 digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite saat itu lulus 260 test/1921 assertion dan CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. Bukti A3–A5 ada pada CATATAN_JALUR_A.md dan catatan integrasi Jalur B. Tindak lanjut operasional/produksi tetap terpisah. Status terkini PUB-04/PUB-03, dashboard dan refleksi mengikuti pembaruan aktif 2026-10-18 di atas.
+Riwayat integrasi 2026-10-17: A0–A5 dan B0/B1/B2 digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite saat itu lulus 260 test/1921 assertion dan CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. Bukti A3–A5 ada pada CATATAN_JALUR_A.md dan catatan integrasi Jalur B. Tindak lanjut operasional/produksi tetap terpisah. Status source dan arah perbaikan mengikuti acuan aktif 4 November 2026 di atas.
 
 Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
 
@@ -22,7 +38,7 @@ Produk ini harus mengutamakan:
 
 Perubahan cakupan pengguna 2026-10-17: halaman publik aktif disederhanakan menjadi Hero, maksimal empat cuplikan Artikel, maksimal empat foto Galeri dan footer; navbar menghubungkan halaman yang tersedia. Artikel memiliki daftar/detail publik dan draf/terbit melalui pengelolaan Post yang sama dengan Refleksi publik. Seluruh pengelolaan Post dan Galeri hanya untuk super admin aktif. URL Refleksi publik existing tetap tersedia dan berbeda dari Refleksi saya. Agenda, tim/kontak, tentang/statistik serta CTA terpisah tidak masuk homepage. Implementasi PUB-04/PUB-03 telah diuji, migration lokal diterapkan, dan kode masuk hasil penggabungan develop pada 2026-10-18. Persetujuan konten resmi dan rilis tetap terpisah dari integrasi.
 
-Matriks ini menjadi acuan cakupan fitur per 2026-10-17. Tersedia berarti implementasi ada, sebagian berarti baru memenuhi sebagian alur, direncanakan berarti akan dibuat, dan ditunda berarti pengembangan lanjut belum dijalankan. Status task DONE/REVIEW dan persetujuan rilis tetap mengikuti TASK.md serta bukti verifikasi, bukan hanya keberadaan fitur.
+Matriks ini menggambarkan fitur pada source bd9cdc1 yang diperiksa 4 November 2026. Tersedia berarti implementasi ada, sebagian berarti baru memenuhi sebagian alur, direncanakan berarti akan dibuat, dan ditunda berarti pengembangan lanjut belum dijalankan. Status task DONE/REVIEW dan persetujuan rilis tetap mengikuti TASK.md serta bukti verifikasi, bukan hanya keberadaan fitur.
 
 | Fitur | Status | Bukti dan batas saat ini |
 |---|---|---|
@@ -39,7 +55,7 @@ Matriks ini menjadi acuan cakupan fitur per 2026-10-17. Tersedia berarti impleme
 | Artikel publik | Tersedia pada hasil gabungan | Daftar/detail dan draf/terbit melalui Post; pengelolaan hanya super admin. Refleksi publik existing tetap tersedia |
 | Agenda kajian publik | Di luar cakupan aktif | PUB-01 tidak dilanjutkan dalam homepage ringkas atas keputusan pengguna |
 | Profil tim dan informasi kontak resmi | Di luar cakupan aktif | PUB-02 tidak dilanjutkan dalam homepage ringkas atas keputusan pengguna |
-| Navigasi publik | Tersedia pada dev-B | PUB-03 REVIEW; Artikel/Galeri, Hero membaca artikel dan Masuk/Area anggota. CTA Daftar tambahan di luar cakupan aktif; route register tetap tersedia |
+| Navigasi publik | Tersedia pada develop | Menu Artikel/Galeri dan Masuk/Area anggota; URL Refleksi publik tetap ada tetapi belum ditautkan di menu utama/footer. Penambahan tautan merupakan pilihan UX RFIX-21 |
 | CRUD web khusus master role/wilayah/level | Direncanakan | Tujuan pengelolaan super admin; rincian task/acceptance criteria belum ditetapkan. Penetapan level akun sudah tersedia |
 
 ## 2. Tujuan Produk
@@ -265,4 +281,3 @@ Sebuah fitur dianggap selesai jika:
 - UX error/success terlihat jelas.
 - Dokumen PRD, PLAN, TASK, dan AUDIT diperbarui jika scope berubah.
 - Tidak ada error baru di log Laravel untuk workflow yang disentuh.
-

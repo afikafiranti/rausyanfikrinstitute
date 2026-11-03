@@ -1,6 +1,23 @@
 # Catatan Jalur B
 
-## B-INTEGRATE — DONE: push dev-B dan gabung/push develop (2026-10-18)
+## DOK-SYNC-2026-11-04 — dokumentasi tersinkron dengan source
+
+- Pengguna meminta dokumen perbaikan masuk GitHub agar agent dapat langsung memahami konteks.
+- Kode develop diperiksa ulang terhadap bd9cdc1bc728916060e50d4566eccc64a172df9b; belum ada patch aplikasi/schema setelah audit awal.
+- Dokumen induk dan snapshot audit ditambahkan; AGENTS/README/PRD/PLAN/TASK/AUDIT/SOP menunjuk rujukan aktif yang sama.
+- Schema belum final; data develop boleh dibuat ulang; migration/seeder dapat disusun ulang. Aturan lama tentang pelestarian dataset develop diganti oleh instruksi terbaru tersebut.
+- TASK menjadi satu register progres. RFIX-20 PARTIAL untuk pencatatan yang selesai; aplikasi dan pembersihan aset/lisensi belum dikerjakan.
+- CI source baseline [39086196915](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39086196915) completed/success: 280 warnings, 7 passed, 2172 assertions. Tidak menganggap ringkasan lokal historis sebagai bukti CI baru yang bersih.
+- Verifikasi pembaruan ini memeriksa kesesuaian source, referensi dokumen/anchor/ID, tabel Markdown dan batas perubahan dokumentasi. PHP/Composer/database lokal belum tersedia; tidak mengklaim menjalankan suite aplikasi pada sinkronisasi ini.
+- Dokumen diterbitkan pada develop dalam dua commit dokumentasi melalui browser GitHub; verifikasi remote memeriksa kesamaan isi berkas dan memastikan perubahan hanya dokumentasi. Status DOK-SYNC DONE; RFIX-20 tetap PARTIAL.
+- Tindak lanjut mengikuti [PLAN](PLAN.md#rencana-aktif), [TASK](TASK.md#register-rfix) dan [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md).
+
+## Riwayat sampai 18 Oktober 2026
+
+Bagian berikut dipertahankan sebagai catatan tanggalnya. Status “CI masih berjalan”, “belum merge”, larangan reset dan prioritas lama tidak menggantikan pembaruan di atas. Periksa source/TASK sebelum melanjutkan.
+
+
+### B-INTEGRATE — DONE: push dev-B dan gabung/push develop (2026-10-18)
 
 - Pengguna mengizinkan commit/push dev-B, kemudian merge dan push ke develop. Staging ditunda ke tahap akhir pengembangan sesuai arahan pengguna; bukan penghalang integrasi ini dan bukan bukti siap produksi.
 - Batch: UIUX-01/02, dashboard alumni, refleksi pribadi semua role dan pembatasan Laporan bagi pengelola, bersama PUB-04/PUB-03 yang sudah di-commit sebelumnya. Refleksi publik, materi, auth, file environment dan fixture/data QA tidak dikirim sebagai data baru.
@@ -13,7 +30,7 @@
 - Push hasil develop berhasil: merge `15020fe05acf3a84fd36ece6389d3a7f1b6f0a3f`, dengan parent baseline develop `355c791` dan dev-B `74088283c91ac599a9ead088047d2bacd00db1e9`. `git ls-remote` mengonfirmasi kedua branch sesuai hash tersebut. Working tree bersih sesudah merge; catatan pengiriman ini dicatat dalam commit dokumentasi lanjutan.
 - [CI GitHub snapshot merge 15020fe](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39086145972) sudah terpicu dan masih berjalan saat diperiksa, belum diklaim lulus. Commit dokumentasi lanjutan dapat memicu run baru sesuai concurrency workflow. Staging ditunda ke tahap akhir pengembangan sesuai pengguna; SMTP eksternal dan risiko produksi tetap terpisah dari integrasi kode.
 
-## B1-MEMBER-REFLECTION — DONE lokal: draf pribadi dan tanggapan pengelola (2026-10-18)
+### B1-MEMBER-REFLECTION — DONE lokal: draf pribadi dan tanggapan pengelola (2026-10-18)
 
 - Arahan pengguna: Refleksi setelah materi/kajian atau kegiatan lain tersedia bagi **semua role** (alumni, koorda, admin, super admin). Pengguna memilih keduanya: catatan pribadi dan kiriman untuk ditinjau. Refleksi pribadi dipisah dari Post/Refleksi publik yang tetap dikelola super admin.
 - Alur minimal: pemilik menyimpan/mengedit/menghapus draf miliknya; memilih kirim setelah akun aktif dan wilayah terisi. Kiriman dikunci, lalu pengelola aktif lain memberi tanggapan. Koorda hanya wilayah kiriman miliknya; admin/super admin lintas wilayah. Draf tetap privat termasuk dari pengelola, tidak ada penerbitan publik otomatis.
@@ -27,21 +44,21 @@
 - Database lokal target diverifikasi environment `local`, MySQL `127.0.0.1`, `rausyan_fikr`; hanya migration tabel refleksi baru diterapkan, tercatat batch 3/Ran, tanpa fresh/reset/seeder. Server 8000 pada homepage/artikel/refleksi publik/galeri/login/register seluruhnya HTTP 200. Fixture refleksi hanya pada database QA, tidak dimasukkan ke database kerja.
 - README mencatat cakupan baru; sinkronisasi dokumen pusat menunggu integrasi. Perubahan belum commit/push/merge; staging dan perangkat fisik belum diuji. Proses browser/server QA terpisah ditutup setelah pemeriksaan, server pengguna tetap berjalan.
 
-## B1-ALUMNI-DASH — DONE lokal: beranda pribadi alumni (2026-10-18)
+### B1-ALUMNI-DASH — DONE lokal: beranda pribadi alumni (2026-10-18)
 
 - Pengguna menyetujui dashboard khusus alumni: sapaan, status akun/level materi, informasi kelengkapan profil/persetujuan dan tautan Materi/Profil/Notifikasi. Menggunakan route/data existing dan gaya UIUX-02; tanpa progres menonton, statistik global, migration, dependency atau perubahan kebijakan akses.
 - Implementasi terbatas pada percabangan role DashboardController, view alumni dan test regresi. Admin/super admin/koorda mempertahankan dashboard existing; registrasi tetap menuju pelengkapan profil. Tujuan default login sudah `/dashboard`, sehingga tidak perlu mengubah controller auth milik A.
 - Verifikasi: RED membuktikan alumni masih diarahkan ke profil; GREEN menunjukkan view pribadi tanpa statistik global. Status aktif/pending/suspended/tanpa level, notifikasi milik sendiri, HTML escaping, login, legacy tanpa role dan prioritas role ganda diuji. Review independen tanpa temuan implementasi; suite gabungan terakhir **286 test/2154 assertion lulus** dan build lulus.
 - QA browser pada empat status akun serta lebar 1366/820/390/320 px lulus; CTA materi hanya untuk akun aktif berlevel, CTA profil/notifikasi/refleksi menuju halaman existing. Database kerja tidak diisi fixture. Koreksi berikutnya menambahkan Refleksi saya untuk semua role dan menutup menu/endpoint Laporan bagi alumni biasa, dirinci pada B1-MEMBER-REFLECTION.
 
-## PUB-04-LOCAL — DONE: sinkronisasi database Live Preview (2026-10-18)
+### PUB-04-LOCAL — DONE: sinkronisasi database Live Preview (2026-10-18)
 
 - Pengguna melaporkan HTTP 500 pada server 8000: query artikel membutuhkan `posts.type`, sedangkan migration PUB-04 masih Pending pada database kerja. Sebelumnya migration memang hanya dijalankan pada database test/QA; ini perbedaan lingkungan, bukan regresi CSS.
 - Pemeriksaan awal: environment `local`, MySQL `127.0.0.1`, database `rausyan_fikr`, kolom type belum ada, jumlah Post 0. Homepage direproduksi HTTP 500.
 - Dijalankan dengan PHP 8.3.30: `artisan migrate --path=database/migrations/2026_10_17_210000_add_type_to_posts_table.php`. Hanya migration tersebut diterapkan, tanpa fresh/reset/seeder; kolom dan indeks ditambahkan dengan default `reflection`.
 - Verifikasi: kolom type tersedia, migration tercatat batch 2/Ran, jumlah Post tetap 0. Request nyata ke server pengguna pada `/`, `/artikel`, `/refleksi`, `/galeri`, `/login`, `/register` seluruhnya HTTP 200. Tidak mengubah source aplikasi atau `.env`, dan tidak mengulang suite test pada database kerja. Catatan “belum diterapkan pada database kerja” di snapshot sebelumnya adalah status historis, digantikan hasil ini.
 
-## UIUX-02 — DONE lokal: implementasi, review dan QA lokal selesai (2026-10-18)
+### UIUX-02 — DONE lokal: implementasi, review dan QA lokal selesai (2026-10-18)
 
 - Pengguna mengizinkan implementasi hasil UIUX-01. Cakupan: delapan temuan audit dan penyelarasan visual modern ekspresif; tetap Hero/empat Artikel/empat Galeri/Footer, tanpa perubahan backend, role, database atau fitur baru.
 - Prioritas: dashboard mobile, kontras/placeholder, identitas dan komponen bersama, kemudahan daftar pengelolaan mobile serta komposisi publik. Memakai Blade/Tailwind/aset logo existing; tidak menambah dependency, font eksternal, atau aset resmi fiktif.
@@ -52,7 +69,7 @@
 - Bukti lokal ignored: `storage/framework/testing/pub04qa/uiux02-*.png` dan `uiux02-checks.py`. Tidak menerapkan migration pada database kerja atau menyentuh server pengguna port 8000. Tidak menguji email/staging atau seluruh role/state/perangkat fisik pada batch visual ini.
 - Review independen awal terhenti oleh batas kuota. Dilanjutkan pada B-INTEGRATE: review selesai, satu ketidaksesuaian visibilitas menu Laporan untuk pengelola nonaktif diperbaiki dan diuji RED/GREEN; tidak ada temuan substantif lainnya. Status commit/push/integrasi mengikuti catatan pengiriman terbaru di atas.
 
-## UIUX-01 — DONE: audit tampilan dan arah modern (2026-10-18)
+### UIUX-01 — DONE: audit tampilan dan arah modern (2026-10-18)
 
 - Pengguna meminta audit/analisis frontend khusus tampilan UI/UX setelah pengiriman PUB-04/PUB-03. Preferensi visual dipilih: modern ekspresif, warna lebih berani dan komposisi dinamis. Belum menerapkan redesign atau mengubah alur backend.
 - Baseline kode: commit `6961e18` pada dev-B. Push awal ditolak pemeriksaan persetujuan otomatis karena meminta persetujuan eksplisit atas tujuan remote dan batch kode/dokumentasi. Manifest 30 file diperiksa: tidak menyertakan `.env`, berkas storage/data QA atau dump database. Setelah pengguna mengizinkan commit dan remote secara eksplisit pada 2026-10-18, push berhasil; `git ls-remote` mengonfirmasi origin/dev-B pada `6961e1823003eefb8a7a66af8a97a49eba9c6295`. Dokumen audit tidak ikut dikirim.
@@ -60,13 +77,13 @@
 - Temuan utama: dashboard mobile kosong, kontras beberapa aksi Galeri kurang, fallback gambar hilang, identitas antarshell berbeda, form/aksi tabel pengelolaan kurang mudah ditemukan di mobile. Belum menerapkan perbaikan; tidak ada perubahan CSS/view/backend dalam batch audit. Screenshot hanya di direktori QA ignored; proses browser/server QA sudah ditutup.
 - Audit mencakup halaman representatif, bukan semua role/state, tablet, screen reader atau sertifikasi WCAG. Materi alumni tidak dibuka karena fixture super admin mendapat tampilan pengelolaan. Suite/build tidak diulang untuk perubahan dokumentasi saja. Dokumen audit belum di-commit/push.
 
-## Pengiriman PUB-04/PUB-03 — 2026-10-18
+### Pengiriman PUB-04/PUB-03 — 2026-10-18
 
 - Pengguna meminta commit dan push hasil yang sudah diverifikasi ke branch `dev-B`, kemudian audit khusus tampilan UI/UX untuk arah modern. Audit berikutnya tidak otomatis menerapkan redesign atau mengubah backend.
 - Commit `6961e18` berhasil dikirim ke `https://github.com/afikafiranti/rausyanfikrinstitute.git`, branch `dev-B`, setelah izin eksplisit pengguna. Branch lokal kini melacak origin/dev-B; hash remote diverifikasi sesuai. Belum merge ke develop.
 - Pernyataan “belum commit/push” pada snapshot verifikasi di bawah merekam kondisi sebelum permintaan pengiriman ini; status pengiriman aktual mengikuti commit dan remote Git. Integrasi ke develop tetap terpisah.
 
-## PUB-04 / PUB-03 — REVIEW: homepage ringkas dan artikel (2026-10-18)
+### PUB-04 / PUB-03 — REVIEW: homepage ringkas dan artikel (2026-10-18)
 
 - Pengguna menyerahkan pekerjaan Jalur B kepada agen sesi ini setelah A3–A5 selesai. Branch dev-B dibuat dari develop 355c791 dengan working tree bersih; dev-A tetap dipertahankan.
 - Scope awal: artikel publik dengan daftar/detail/navigasi dan pengelolaan admin, memakai alur Post existing; URL/alur refleksi, gate manage-content, serta keamanan upload tetap dipertahankan.
@@ -74,7 +91,7 @@
 - Cakupan publik dipersempit pengguna: Hero, maksimal empat cuplikan artikel, maksimal empat foto Galeri, dan footer. Navbar tetap sebagai navigasi utilitas. Section statistik/tentang/agenda/CTA terpisah serta tim/kontak tidak masuk homepage; PUB-01/PUB-02 dikeluarkan dari cakupan aktif sekarang. Tidak membuat konten resmi fiktif.
 - Persiapan read-only mencakup model/controller Post, LandingController, view pengelolaan/refleksi, routes publik, factory/seeder dan test konten. Migration baru terpisah diperlukan bila pembeda jenis disetujui; migration existing tidak diubah. Test wajib memakai database baru berakhiran _testing, terpisah dari database kerja dan QA browser.
 
-### Implementasi dan verifikasi lokal
+#### Implementasi dan verifikasi lokal
 
 - Post memiliki jenis `reflection`/`article`; migration `2026_10_17_210000_add_type_to_posts_table.php` memberi default Refleksi untuk data lama. Daftar/detail `/artikel` terpisah dari `/refleksi`; draf dan tanggal terbit masa depan tidak terbuka untuk publik.
 - Homepage hanya Hero, empat artikel terbit terbaru, empat foto Galeri dan footer. Navigasi Artikel/Galeri serta Masuk/Area anggota memakai route yang tersedia; empty state tetap ditampilkan bila konten kosong.
@@ -89,7 +106,7 @@
 - Status REVIEW kini untuk persetujuan konten resmi dan penerapan/integrasi lingkungan target; implementasi, review independen, suite dan QA lokal batch ini selesai.
 - Batas: migration hanya diterapkan pada database test/QA, **belum pada database kerja untuk Live Preview port 8000**. Tidak mengubah `.env`, menambah konten resmi fiktif, atau menyentuh server pengguna. Batch ini belum di-commit/push; CI remote batch PUB-04, staging dan SMTP eksternal belum dijalankan. Konten resmi tetap diisi/disetujui super admin; B3-RELEASE tetap terpisah.
 
-## B0.1 / P0 — Proteksi dashboard
+### B0.1 / P0 — Proteksi dashboard
 
 - Status: REVIEW (2026-10-16); perbaikan dan test akses tamu selesai, B0 keseluruhan belum selesai.
 - Branch: dev-B, dibuat dari baseline develop cc7ab2f.
@@ -105,7 +122,7 @@
 - Risiko: statistik dan scope dashboard belum diperbaiki, termasuk dalam B1.
 - Perubahan pengguna pada package-lock.json dipertahankan tanpa diedit.
 
-## B0.2 / P0 — Composer, CI dan isolasi database test
+### B0.2 / P0 — Composer, CI dan isolasi database test
 
 - Status: REVIEW (2026-10-16); implementasi dan verifikasi lokal selesai, workflow remote belum dijalankan.
 - Scope: target PHP 8.3, service MariaDB CI, konfigurasi PHPUnit, pengaman database sebelum setup test, build frontend CI.
@@ -131,7 +148,7 @@
   - Perbaikan .env.dev/.env.staging/.env.testing dan run-ci.sh dilanjutkan dan diverifikasi pada B0.3 di bawah.
   - Perubahan package-lock.json pengguna dipertahankan (diff tetap 23 baris dihapus).
 
-## B0.3 / P0 — Environment dan runner CI aman
+### B0.3 / P0 — Environment dan runner CI aman
 
 - Status: REVIEW (2026-10-16); implementasi dan runner lengkap lulus lokal pada PHP 8.3.33, CI remote belum dijalankan.
 - Scope: hentikan pelacakan environment rahasia tanpa mengubah salinan lokal; template MySQL tanpa rahasia; runner CI memakai konfigurasi test eksplisit dan tidak menimpa environment/memanggil seeder akun.
@@ -159,7 +176,7 @@
   - Build tetap memiliki peringatan metadata browser lama; npm memperingatkan install script esbuild belum tercakup allowScripts pada versi npm lokal, tetapi build berhasil.
   - Workflow GitHub Actions dan service MariaDB CI remote belum dijalankan. B0 belum dinyatakan siap rilis hanya dari verifikasi lokal.
 
-### Pemakaian environment dan runner
+#### Pemakaian environment dan runner
 
 - Instalasi baru: salin `.env.example` ke `.env` hanya jika `.env` belum ada, isi koneksi database lokal milik sendiri, lalu buat APP_KEY lokal. Template dev/staging tersedia sebagai `.env.dev.example` dan `.env.staging.example`; jangan menimpa konfigurasi server yang sudah berjalan.
 - Test manual: salin `.env.testing.example` ke `.env.testing` hanya jika belum ada, isi akun database test milik sendiri, dan jalankan `php artisan key:generate --env=testing` hanya pada environment test yang baru dibuat. Sesuaikan DB_DATABASE bila perlu; nama wajib berakhiran `_testing`. Jangan berbagi database test antara A dan B.
@@ -179,7 +196,7 @@
 - Sebelum rekan menarik commit penghapusan tracking, simpan salinan environment mereka sendiri di lokasi aman. Hanya file `*.example` yang boleh masuk Git; salinan lokal environment tetap diabaikan.
 - Kunci yang pernah di-commit masih ada dalam histori. Pengelola server perlu menginventarisasi pemakaian APP_KEY (termasuk field/file terenkripsi, cookie dan sesi) serta kredensial DB/mail sebelum menetapkan rotasi. Tidak ada kunci server yang diganti dan histori Git tidak ditulis ulang dalam batch ini.
 
-## B1.1 / P1 — Statistik dashboard sesuai wilayah
+### B1.1 / P1 — Statistik dashboard sesuai wilayah
 
 - Status: REVIEW (2026-10-16); implementasi, regression test, suite lengkap dan build lulus lokal pada PHP 8.3.33.
 - Scope: dashboard dan endpoint chart mengikuti izin statistik (pengelola) dan wilayah koorda; hitungan bulan mencakup tahun; hapus grafik kajian dummy dan request grafik global yang tidak dipakai.
@@ -204,7 +221,7 @@
   - Browser/eksekusi grafik CDN tidak diuji dalam batch ini. Layout dashboard existing masih khusus desktop (hidden md:block); perbaikan responsivitas dan QA browser dicatat untuk tahap QA berikutnya.
   - Risiko rilis B0 (CI remote, advisory dependency, inventarisasi kunci server) tetap terbuka; statistik kajian belum tersedia sampai B2.
 
-## B1.2 / P1 — Penyimpanan gambar dan route konten
+### B1.2 / P1 — Penyimpanan gambar dan route konten
 
 - Status: REVIEW (2026-10-16); implementasi, test kegagalan, suite lengkap dan build lulus lokal pada PHP 8.3.33.
 - Scope: file baru dibersihkan bila penyimpanan record gagal; gambar lama bertahan hingga transaksi berhasil; slug post unik; resource route hanya action yang tersedia; feedback validasi dan input lama pada form.
@@ -229,7 +246,7 @@
 - Batas integrasi: gate manage-content tetap milik A0. Test bisnis memakai fixture admin; test izin koorda ke endpoint ini harus diulang pada hasil merge karena gate existing masih mengizinkannya.
 - Batas operasional: disk yang menolak penghapusan dapat menyisakan file yatim yang tercatat di log; transaksi SQL dan filesystem bukan transaksi tunggal. Kegagalan infrastruktur mengembalikan error server, sedangkan validasi input kembali ke form dengan pesan. Interaksi modal belum diuji dalam browser; HTTP/DOM escaping dan old input sudah diuji. Layout management existing masih khusus desktop dan menunggu QA responsif.
 
-## B1.3 / P1 — Konten publik dari database
+### B1.3 / P1 — Konten publik dari database
 
 - Status: REVIEW (2026-10-16); implementasi, suite lengkap, build dan review kode lulus lokal pada PHP 8.3.33.
 - Scope: homepage aktif memakai controller dan post published; galeri database; daftar/detail publik; empty state; ganti materi/tautan template aktif dengan informasi yang dapat dipertanggungjawabkan.
@@ -259,7 +276,7 @@
   - Materi artikel ditampilkan sebagai teks; bila rich text dibutuhkan nanti, perlu sanitizer/kontrak editor yang jelas. Nama tim, kontak dan agenda resmi memerlukan sumber dari pengelola, bukan data contoh.
   - Risiko rilis B0 serta izin manage-content A0 tetap mengikuti catatan batch sebelumnya.
 
-## B1.4 / P1 — Status laporan yang belum tersedia
+### B1.4 / P1 — Status laporan yang belum tersedia
 
 - Status: REVIEW (2026-10-16); implementasi, enam test domain, suite lengkap dan build lulus lokal pada PHP 8.3.33.
 - Scope: hapus form/riwayat laporan demo, tampilkan status belum tersedia yang bisa dibaca desktop/mobile, lindungi halaman laporan dengan auth, dan perbaiki review placeholder tanpa alias middleware yang belum terdaftar.
@@ -280,7 +297,7 @@
   - Hash keempat environment nyata dan package-lock.json tetap cocok dengan baseline preservasi; diff pengguna pada package-lock.json tetap 23 baris dihapus.
 - Batas verifikasi/lanjutan: status ini memang sementara; test availability harus disesuaikan saat workflow B2 aktif. Interaksi/tampilan browser belum diuji. Endpoint debug.scope existing perlu dievaluasi pada kesiapan staging/rilis. Risiko integrasi gate A serta risiko rilis B0 tetap terbuka.
 
-## B2.1 / P2 — Draf laporan tersimpan dan detail privat
+### B2.1 / P2 — Draf laporan tersimpan dan detail privat
 
 - Status: REVIEW (2026-10-16); implementasi dan verifikasi lokal selesai pada PHP 8.3.33.
 - Acuan: PRD modul Laporan Kajian dan PLAN Rencana Aktif B2; jalankan langsung per langkah dalam batch ini.
@@ -310,7 +327,7 @@
   - Hash .env/.env.dev/.env.staging/.env.testing dan package-lock.json cocok baseline; perubahan pengguna di package-lock.json tetap 0 tambahan/23 baris dihapus.
 - Batas verifikasi: belum diuji dalam browser atau CI remote. Foto legacy di luar format/path privat tidak dimigrasikan. Edit draf, submit, approve/reject, rekap dan ekspor belum diaktifkan. Risiko rilis B0/integrasi A0 tetap mengikuti catatan sebelumnya.
 
-## B2.2 / P2 — Edit draf dan pengiriman
+### B2.2 / P2 — Edit draf dan pengiriman
 
 - Status: REVIEW (2026-10-16); implementasi dan verifikasi lokal selesai pada PHP 8.3.33.
 - Scope: hanya pemilik draf yang dapat mengedit/mengirim, tetap mengikuti status akun dan wilayah B2.1. Admin dapat membaca lintas wilayah, tetapi tidak mengedit/mengirim atas nama pelapor lain. Wilayah laporan tidak berubah saat edit. Foto opsional dapat diganti dengan cleanup aman.
@@ -333,7 +350,7 @@
   - Review independen readonly tidak menemukan blocker. Hash keempat environment nyata dan package-lock.json tetap sama dengan baseline preservasi.
 - Batas verifikasi: browser dan CI remote belum dijalankan; test interleaving status bukan pengujian beban dua koneksi database bersamaan. Laporan legacy tanpa wilayah tetap tidak dapat dikirim sebelum datanya diperbaiki; batch ini tidak menyediakan pemindahan wilayah. Risiko B0/A0 yang dicatat sebelumnya tetap terbuka.
 
-## B2.3 / P2 — Antrean review dan keputusan laporan
+### B2.3 / P2 — Antrean review dan keputusan laporan
 
 - Status: REVIEW (2026-10-16); implementasi dan verifikasi lokal selesai pada PHP 8.3.33.
 - Scope: antrean submitted, approve/reject untuk akun reviewer aktif. Koorda wilayah sendiri; admin/super admin lintas wilayah. Pelapor tidak boleh mereview laporannya sendiri. Alasan reject wajib string maksimal 16383 karakter (batas aman TEXT utf8mb4).
@@ -355,7 +372,7 @@
   - Review independen readonly tidak menemukan blocker. Hash keempat environment nyata dan package-lock.json cocok baseline preservasi.
 - Batas verifikasi: browser/CI remote belum dijalankan; simulasi interleaving bukan load test dua koneksi serentak. Rekap/ekspor serta alur revisi rejected di luar batch ini. Tidak menambah notifikasi atau audit lintas domain; metadata keputusan tersimpan pada schema laporan existing. Risiko rilis B0/integrasi A0 tetap mengikuti catatan sebelumnya.
 
-## B2.4 / P2 — Rekap dan ekspor laporan
+### B2.4 / P2 — Rekap dan ekspor laporan
 
 - Status: REVIEW (2026-10-16); implementasi dan verifikasi lokal selesai pada PHP 8.3.33.
 - Scope: rekap reviewer aktif (admin/super admin global atau filter wilayah; koorda hanya wilayah akun), hanya submitted/approved/rejected. Filter tanggal kegiatan dari/sampai inklusif dan status; statistik jumlah per status serta total komponen peserta untuk seluruh hasil filter, bukan halaman saja. Peserta adalah jumlah kehadiran, bukan orang unik.
@@ -377,7 +394,7 @@
   - Review independen readonly tidak menemukan blocker. Hash keempat environment nyata dan package-lock.json tetap cocok baseline preservasi.
 - Batas verifikasi: browser/CI remote belum diuji. CSV merupakan pembacaan data berjalan, bukan snapshot terkunci; keputusan review yang berlangsung selama ekspor dapat memengaruhi hasil filter status. CSV dan halaman memiliki urutan berbeda tetapi himpunan/filter sama. Pengujian format melalui parser CSV lokal; belum membuka file di aplikasi spreadsheet. Risiko B0/integrasi A0 tetap mengikuti catatan sebelumnya.
 
-## B2.5 / P2 — QA publik, mobile, keyboard dan alur laporan
+### B2.5 / P2 — QA publik, mobile, keyboard dan alur laporan
 
 - Status: REVIEW (2026-10-16); dua sesi browser cloud dan verifikasi lokal selesai.
 - Scope: browser nyata untuk halaman publik dan alur laporan pada data sintetis terisolasi; periksa viewport mobile, keyboard, feedback/validasi, console/network dan ekspor. Perbaikan hanya pada domain/UI B, kebutuhan A dicatat untuk integrasi.
@@ -395,7 +412,7 @@
 - Integrasi A: label Email/Password di auth/login belum memiliki asosiasi for/id lengkap dan tombol toggle password belum bernama aksesibel. Dicatat pada laporan QA; file A tidak diubah. Skor browser bukan klaim aksesibilitas menyeluruh atau persetujuan rilis.
 - Batas: artifact screenshot/CSV tetap pada outputs sesi Browser Use, tidak disalin lokal; laporan Markdown merekam hasil tool dan URL tunnel yang kini ditutup. Login/profile A secara menyeluruh, pembaca layar lintas platform, CI remote, staging, backup/pemulihan dan risiko B0/A0 belum tertutup.
 
-## B2.6 / P2 — Kesiapan staging/rilis dan latihan pemulihan
+### B2.6 / P2 — Kesiapan staging/rilis dan latihan pemulihan
 
 - Status: REVIEW (2026-10-17) untuk persiapan dan drill lokal; verifikasi staging nyata belum dilakukan.
 - Scope: panduan deploy/backup/restore/rollback dan latihan lokal pada dua database baru khusus uji; dump SQL, file publik/privat, checksum dan dekripsi dengan kunci sintetis dipulihkan bersama. Tidak deploy, seed atau restore ke lingkungan kerja/staging/produksi.
@@ -417,7 +434,7 @@
   - Hash .env/.env.dev/.env.staging/.env.testing dan package-lock.json tetap cocok baseline preservasi. Build frontend tidak diulang karena batch ini tidak mengubah frontend/dependensi; bukti build terakhir B2.5 tetap berlaku dalam batas perubahan tersebut.
 - Batas/lanjutan: belum ada target/akses staging yang diterima pada sesi ini. Belum deploy, uji MariaDB dump/client, pemulihan staging/offsite terenkripsi, retensi/RTO/RPO nyata, CI remote atau integrasi A. Key/env aktual tidak dicadangkan oleh drill. Rilis tetap menunggu P0 A0/B0, advisory dependency dan verifikasi hasil merge. Detail hasil tersimpan pada BUKTI_PEMULIHAN_B26.md.
 
-## Integrasi Jalur B ke develop bersama Jalur A — 2026-10-17
+### Integrasi Jalur B ke develop bersama Jalur A — 2026-10-17
 
 - Atas instruksi pengguna, target development dipetakan ke branch develop yang memang tersedia. Fetch menemukan origin/develop c411747 sudah berisi A0/A1/A2, termasuk Excel. Commit B a31cecf menyimpan B0–B2.6; perubahan asli pengguna package-lock.json (23 baris dihapus) dikecualikan dan tetap sebagai working change.
 - origin/develop digabung ke B terlebih dahulu. Blok route menyatu otomatis dan tetap memuat alumni/materi A serta dashboard/chart/publik/konten/laporan B. Satu konflik composer.lock hanya metadata hash/platform; seluruh paket/versi Excel A dipertahankan bersama PHP ^8.3 dan config.platform.php 8.3.0 B. Tidak ada paket lama diperbarui; lima paket Excel dipasang mengikuti lockfile.
@@ -428,7 +445,7 @@
 - PLAN/PRD/TASK/AUDIT/SOP disinkronkan oleh penggabung sesuai pengecualian aturan paralel. Identitas commit memakai Codex <codex@localhost> per perintah karena mesin belum memiliki user Git; konfigurasi global tidak diubah.
 - Integrasi hanya lokal; tidak push, tidak deploy dan tidak menjalankan CI remote. Branch dev-B dipertahankan. Staging belum tersedia, advisory/penilaian kunci historis serta QA browser A/email nyata tetap tindak lanjut sebelum rilis.
 
-## DOC-SYNC — Sinkronisasi dokumentasi setelah integrasi
+### DOC-SYNC — Sinkronisasi dokumentasi setelah integrasi
 
 - Status: DONE (2026-10-17), atas instruksi pengguna pada develop.
 - Scope: README dan dokumen pusat; pengguna mengonfirmasi agenda, tim/kontak dan navigasi publik tetap akan dibuat, serta menambahkan artikel publik. Dicatat sebagai PUB-01–PUB-04; tidak mengimplementasikan UI atau mengubah pembagian kepemilikan kode.
@@ -436,9 +453,9 @@
 - Hasil: matriks cakupan PRD/README, tindak lanjut PLAN, task publik TODO, status materi/laporan, konteks riwayat audit dan aturan database test SOP diselaraskan. B0–B2 dan integrasi tetap REVIEW; tidak menetapkan fitur publik atau rilis selesai.
 - Verifikasi: 56 pemeriksaan ID task, cakupan artikel, tautan lokal/anchor, referensi seeder dan status task lulus; git diff --check lulus. Pemeriksaan kode sumber membedakan route/view aktif dari template yang belum dipasang. Test aplikasi/build tidak dijalankan ulang untuk perubahan dokumentasi.
 
-## Tahap berikutnya
+### Tahap berikutnya
 
-### Arahan Berikutnya untuk Pemilik Jalur B
+#### Arahan Berikutnya untuk Pemilik Jalur B
 
 - Bukti remote sesudah pengiriman integrasi: [CI develop 39041927907](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39041927907), snapshot 13da2b5, completed/success pada PHP 8.3/MariaDB 11.4. Checklist CI remote batch ini tertutup; advisory/kunci historis/email eksternal/staging tetap belum tertutup. Label CI belum dilakukan pada catatan historis di bawah merekam kondisi saat batch tersebut ditulis.
 
