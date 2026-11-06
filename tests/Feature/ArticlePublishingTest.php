@@ -71,6 +71,21 @@ class ArticlePublishingTest extends TestCase
         $this->get('/artikel/'.$post->slug)->assertNotFound();
     }
 
+    public function test_renaming_published_article_or_reflection_keeps_its_existing_url(): void
+    {
+        $this->asRole('super_admin');
+        foreach (['article' => '/artikel/', 'reflection' => '/refleksi/'] as $type => $path) {
+            $post = Post::create(['title' => 'Judul Awal', 'type' => $type, 'published_at' => now()]);
+            $originalSlug = $post->slug;
+
+            $this->put('/management/post/'.$post->id, ['title' => 'Judul Baru'])
+                ->assertRedirect()->assertSessionHasNoErrors();
+
+            $this->assertSame($originalSlug, $post->fresh()->slug);
+            $this->get($path.$originalSlug)->assertOk()->assertSee('Judul Baru');
+        }
+    }
+
     public function test_legacy_post_submission_defaults_to_published_reflection_and_invalid_state_is_rejected(): void
     {
         $this->asRole('super_admin');

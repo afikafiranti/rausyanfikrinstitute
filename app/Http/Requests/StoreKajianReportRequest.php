@@ -8,13 +8,12 @@ class StoreKajianReportRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->status === 'active'
-            && $this->user()->hasAnyRole(['super_admin', 'admin', 'koorda', 'alumni']);
+        return $this->user()?->can('review-report') ?? false;
     }
 
     protected function prepareForValidation(): void
     {
-        if ($this->user() && ! $this->user()->hasAnyRole(['super_admin', 'admin'])) {
+        if ($this->user()?->hasRole('koorda') && ! $this->user()->hasAnyRole(['super_admin', 'admin'])) {
             $this->merge(['wilayah_id' => $this->user()->wilayah_id]);
         }
     }

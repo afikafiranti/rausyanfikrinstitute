@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\ValidationException;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use ZipArchive;
 
@@ -176,6 +177,11 @@ class AlumniCsvController extends Controller
         $this->ensureRegion($request->user());
         abort_unless(class_exists(ZipArchive::class), 503, 'Ekstensi ZIP PHP diperlukan untuk berkas Excel.');
         $query = User::alumniListing($request->user(), $request->validated());
+        if ((clone $query)->count() > AlumniExcel::MAX_EXPORT_ROWS) {
+            throw ValidationException::withMessages([
+                'export' => AlumniExcel::EXPORT_LIMIT_MESSAGE,
+            ]);
+        }
         $book = AlumniExcel::export($query);
         return response()->streamDownload(fn () => (new Xlsx($book))->save('php://output'),
             'alumni.xlsx', ['Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet']);

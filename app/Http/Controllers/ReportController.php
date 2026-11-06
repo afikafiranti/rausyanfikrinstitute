@@ -186,18 +186,14 @@ class ReportController extends Controller
     private function visibleReports(Request $request): Builder
     {
         $user = $request->user();
-        abort_unless($user->status === 'active' && $user->hasAnyRole(['super_admin', 'admin', 'koorda', 'alumni']), 403);
+        abort_unless($user?->can('review-report'), 403);
         $query = KajianReport::query();
         if ($user->hasAnyRole(['super_admin', 'admin'])) {
             return $query;
         }
         abort_unless($user->wilayah_id, 403);
         $query->where('wilayah_id', $user->wilayah_id);
-        if ($user->hasRole('koorda')) {
-            return $query->where(fn ($query) => $query->where('status', '!=', KajianReport::STATUS_DRAFT)->orWhere('user_id', $user->id));
-        }
-
-        return $query->where('user_id', $user->id);
+        return $query->where(fn ($query) => $query->where('status', '!=', KajianReport::STATUS_DRAFT)->orWhere('user_id', $user->id));
     }
 
     public function index(Request $request)

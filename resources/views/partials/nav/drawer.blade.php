@@ -23,16 +23,6 @@
             <a href="{{ route('materi.index') }}" class="{{ $link(request()->routeIs('materi.*')) }}">
                 <i class="fas fa-book-open w-5 text-center"></i><span>Materi</span>
             </a>
-            @if (auth()->user()->hasAnyRole(['alumni', 'koorda', 'admin', 'super_admin']))
-                <a href="{{ route('reflections.index') }}" class="{{ $link(request()->routeIs('reflections.*') && ! request()->routeIs('reflections.review.*')) }}">
-                    <i class="fas fa-pen w-5 text-center" aria-hidden="true"></i><span>Refleksi saya</span>
-                </a>
-            @endif
-            @can('review-report')
-                <a href="{{ route('reflections.review.index') }}" class="{{ $link(request()->routeIs('reflections.review.*')) }}">
-                    <i class="fas fa-comment w-5 text-center" aria-hidden="true"></i><span>Tinjau refleksi</span>
-                </a>
-            @endcan
             @can('review-report')
             <a href="{{ route('laporan.index') }}" class="{{ $link(request()->routeIs('laporan.index')) }}">
                 <i class="fas fa-file-lines w-5 text-center"></i><span>Laporan</span>
@@ -56,7 +46,7 @@
             @can('manage-content')
                 @if (auth()->user()->hasRole('super_admin'))
                     <a href="{{ route('management.post.index') }}" class="{{ $link(request()->routeIs('management.post.*')) }}">
-                        <i class="fas fa-newspaper w-5 text-center"></i><span>Artikel &amp; Refleksi</span>
+                        <i class="fas fa-newspaper w-5 text-center"></i><span>Artikel</span>
                     </a>
                     <a href="{{ route('management.galeri.index') }}" class="{{ $link(request()->routeIs('management.galeri.*')) }}">
                         <i class="fas fa-images w-5 text-center"></i><span>Galeri</span>

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use App\Models\AuditLog;
+use App\Support\AccountIntegrity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Validation\Rules\Password;
+use Illuminate\Validation\ValidationException;
 use App\Http\Requests\ProfileUpdateRequest;
 
 
@@ -35,8 +37,8 @@ class ProfileController extends Controller
             'name', 'email', 'phone', 'angkatan', 'pekerjaan', 'wilayah_id', 'photo_url', 'status',
             'tempat_lahir', 'tanggal_lahir', 'pendidikan_terakhir', 'kampus', 'status_pernikahan', 'ab',
         ];
-        $before = $user->only($fields);
-        $oldPhotoUrl = $user->photo_url;
+        $before = [];
+        $oldPhotoUrl = null;
         $newPhotoPath = null;
 
         try {
@@ -47,7 +49,10 @@ class ProfileController extends Controller
                 }
             }
 
-            $criticalChanged = DB::transaction(function () use ($request, $user, $fields, $before, $newPhotoPath) {
+            $criticalChanged = DB::transaction(function () use ($request, $user, $fields, &$before, &$oldPhotoUrl, $newPhotoPath) {
+                $user = AccountIntegrity::lockUser($user);
+                $before = $user->only($fields);
+                $oldPhotoUrl = $user->photo_url;
                 $data = $request->safe()->except('photo');
                 if ($newPhotoPath !== null) {
                     $data['photo_url'] = Storage::url($newPhotoPath);
@@ -59,7 +64,10 @@ class ProfileController extends Controller
                 }
 
                 $criticalChanged = $user->isDirty('wilayah_id') || $user->isDirty('angkatan');
-                if ($criticalChanged) {
+                if ($criticalChanged && $user->status !== User::STATUS_SUSPENDED) {
+                    if ($reason = AccountIntegrity::deactivationError($user)) {
+                        throw ValidationException::withMessages(['status' => $reason]);
+                    }
                     $user->status = User::STATUS_PENDING;
                 }
 
@@ -83,13 +91,14 @@ class ProfileController extends Controller
                     ]);
                 }
 
-                if ($criticalChanged) {
+                $needsVerification = $criticalChanged && $user->status === User::STATUS_PENDING;
+                if ($needsVerification) {
                     $user->notify(new \App\Notifications\AccountStatusNotification('pending', [
                         'by' => $user->name,
                     ]));
                 }
 
-                return $criticalChanged;
+                return $needsVerification;
             });
         } catch (\Throwable $error) {
             if ($newPhotoPath !== null) {
@@ -98,6 +107,7 @@ class ProfileController extends Controller
             throw $error;
         }
 
+        $user->refresh();
         if ($newPhotoPath !== null && is_string($oldPhotoUrl)
             && preg_match('#^/storage/avatars/[^/]+$#', $oldPhotoUrl)) {
             Storage::disk('public')->delete(substr($oldPhotoUrl, strlen('/storage/')));
@@ -133,7 +143,12 @@ class ProfileController extends Controller
             'password' => ['required', 'current_password'],
         ]);
 
-        DB::transaction(function () use ($user) {
+        $avatarUrl = DB::transaction(function () use ($user) {
+            $user = AccountIntegrity::lockUser($user);
+            if ($reason = AccountIntegrity::deletionError($user)) {
+                throw ValidationException::withMessages(['delete' => $reason])->errorBag('userDeletion');
+            }
+
             AuditLog::create([
                 'actor_id' => $user->id,
                 'action' => 'profile.delete',
@@ -143,7 +158,10 @@ class ProfileController extends Controller
                 'created_at' => now(),
             ]);
             $user->delete();
+            return $user->photo_url;
         });
+
+        AccountIntegrity::removeOwnedAvatar($avatarUrl);
 
         Auth::logoutCurrentDevice();
 

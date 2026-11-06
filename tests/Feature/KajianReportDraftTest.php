@@ -43,6 +43,21 @@ class KajianReportDraftTest extends TestCase
         $this->assertSame('submitted', $report->fresh()->status);
     }
 
+    public function test_request_and_controller_still_reject_alumni_if_route_middleware_is_absent(): void
+    {
+        $region = Wilayah::create(['name' => 'Wilayah Alumni']);
+        $alumni = $this->member('alumni', $region->id);
+
+        $this->actingAs($alumni)->withoutMiddleware([
+            \Illuminate\Auth\Middleware\Authorize::class,
+            \App\Http\Middleware\ScopeWilayah::class,
+        ])
+            ->get('/laporan')->assertForbidden();
+        $this->post('/laporan', $this->data() + ['wilayah_id' => $region->id])
+            ->assertForbidden();
+        $this->assertDatabaseCount('kajian_reports', 0);
+    }
+
     public function test_member_saves_a_draft_with_server_owned_identity_region_totals_and_status(): void
     {
         $local = Wilayah::create(['name' => 'Wilayah Lokal']);

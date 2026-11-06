@@ -36,7 +36,7 @@ class AccountSeedingTest extends TestCase
     {
         $this->artisan('db:seed')->assertExitCode(0);
 
-        $admin = User::where('email', 'arif@rausyanfikr.com')->firstOrFail();
+        $admin = User::where('email', 'arif@rausyanfikr.test')->firstOrFail();
         $admin->update(['name' => 'Updated Administrator', 'password' => Hash::make('private-password')]);
         $admin->roles()->detach();
         $level = Level::findOrFail($admin->level_id);
@@ -49,7 +49,7 @@ class AccountSeedingTest extends TestCase
         $this->assertTrue(Hash::check('private-password', $admin->password));
         $this->assertCount(0, $admin->roles);
         $this->assertSame('custom akhir', $level->refresh()->description);
-        $this->assertSame(1, User::where('email', 'arif@rausyanfikr.com')->count());
+        $this->assertSame(1, User::where('email', 'arif@rausyanfikr.test')->count());
     }
 
     public function test_user_seed_works_when_existing_role_has_a_different_id(): void
@@ -59,6 +59,6 @@ class AccountSeedingTest extends TestCase
         $this->artisan('db:seed', ['--class' => UserSeeder::class])->assertExitCode(0);
 
         $this->assertSame(4, Role::whereIn('name', ['alumni', 'koorda', 'admin', 'super_admin'])->count());
-        $this->assertSame($adminRole->id, User::where('email', 'arif@rausyanfikr.com')->firstOrFail()->roles()->firstOrFail()->id);
+        $this->assertSame($adminRole->id, User::where('email', 'arif@rausyanfikr.test')->firstOrFail()->roles()->firstOrFail()->id);
     }
 }

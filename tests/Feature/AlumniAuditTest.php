@@ -32,6 +32,23 @@ class AlumniAuditTest extends TestCase
         $this->assertSame($level->id, AuditLog::where('action', 'alumni.level.update')->firstOrFail()->payload_json['after']['level_id']);
     }
 
+    public function test_manager_edit_preserves_suspended_status_and_does_not_send_pending_notice(): void
+    {
+        [$admin, $alumni] = $this->accounts();
+        $alumni->update(['status' => User::STATUS_SUSPENDED, 'angkatan' => 2020]);
+
+        $this->actingAs($admin)->patch(route('alumni.update', $alumni), [
+            'name' => $alumni->name,
+            'email' => $alumni->email,
+            'angkatan' => 2021,
+        ])->assertSessionHasNoErrors()->assertSessionHas('success', "Data alumni {$alumni->name} berhasil diperbarui.");
+
+        $this->assertSame(User::STATUS_SUSPENDED, $alumni->fresh()->status);
+        $this->assertSame(2021, $alumni->fresh()->angkatan);
+        $this->assertSame(0, $alumni->notifications()->count());
+        $this->assertDatabaseHas('audit_logs', ['action' => 'alumni.update', 'entity_id' => $alumni->id]);
+    }
+
     public function test_delete_preserves_an_audit_record_of_the_deleted_account(): void
     {
         [$admin, $alumni] = $this->accounts();

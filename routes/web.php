@@ -35,16 +35,6 @@ Route::get('/galeri', [\App\Http\Controllers\LandingController::class, 'gallery'
 //Route::view('/dashboard', 'dashboard')->name('dashboard'); // hapus definisi '/' lain
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth')->name('dashboard');
 
-Route::middleware('auth')->group(function () {
-    Route::resource('refleksi-saya', \App\Http\Controllers\MemberReflectionController::class)
-        ->parameters(['refleksi-saya' => 'reflection'])->names('reflections');
-    Route::post('/refleksi-saya/{reflection}/kirim', [\App\Http\Controllers\MemberReflectionController::class, 'submit'])->name('reflections.submit');
-    Route::get('/tinjau-refleksi', [\App\Http\Controllers\MemberReflectionController::class, 'reviewIndex'])->name('reflections.review.index');
-    Route::get('/tinjau-refleksi/{reflection}', [\App\Http\Controllers\MemberReflectionController::class, 'reviewShow'])->name('reflections.review.show');
-    Route::patch('/tinjau-refleksi/{reflection}', [\App\Http\Controllers\MemberReflectionController::class, 'reviewUpdate'])->name('reflections.review.update');
-});
-
-
 // NOTIFIKASI
 Route::middleware(['auth'])->prefix('notifikasi')->name('notifications.')->group(function () {
     Route::get('/', [NotificationController::class, 'index'])->name('index');

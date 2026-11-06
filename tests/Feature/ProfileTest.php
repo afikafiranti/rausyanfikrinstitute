@@ -183,6 +183,22 @@ class ProfileTest extends TestCase
         $this->assertSame(['after' => 2021, 'before' => 2020], $angkatanChange);
     }
 
+    public function test_suspended_account_stays_suspended_after_critical_self_update(): void
+    {
+        $user = User::factory()->create(['status' => User::STATUS_SUSPENDED, 'angkatan' => 2020]);
+
+        $this->actingAs($user)->patch('/profile', [
+            'name' => $user->name,
+            'email' => $user->email,
+            'angkatan' => 2021,
+        ])->assertSessionHasNoErrors()->assertSessionHas('success', 'Profil disimpan.');
+
+        $this->assertSame(User::STATUS_SUSPENDED, $user->fresh()->status);
+        $this->assertSame(2021, $user->fresh()->angkatan);
+        $this->assertSame(0, $user->notifications()->count());
+        $this->assertDatabaseHas('audit_logs', ['action' => 'profile.update', 'entity_id' => $user->id]);
+    }
+
     public function test_replacing_local_photo_removes_old_file(): void
     {
         Storage::fake('public');

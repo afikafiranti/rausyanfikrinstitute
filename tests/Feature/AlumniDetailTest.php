@@ -41,8 +41,8 @@ class AlumniDetailTest extends TestCase
 
         $finalLevel = Level::where('description', 'akhir')->firstOrFail();
 
-        $superAdmin = User::where('email', 'afika@rausyanfikr.com')->firstOrFail();
-        $admin = User::where('email', 'arif@rausyanfikr.com')->firstOrFail();
+        $superAdmin = User::where('email', 'afika@rausyanfikr.test')->firstOrFail();
+        $admin = User::where('email', 'arif@rausyanfikr.test')->firstOrFail();
 
         $this->assertSame($finalLevel->id, $superAdmin->level_id);
         $this->assertSame($finalLevel->id, $admin->level_id);

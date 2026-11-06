@@ -153,6 +153,26 @@ class AlumniDestroyTest extends TestCase
             ->assertDontSee('action="' . route('alumni.destroy', $otherAdmin) . '"', false);
     }
 
+    public function test_delete_confirmation_does_not_interpret_a_user_name_as_javascript(): void
+    {
+        $admin = $this->userWithRole('admin');
+        $names = [
+            "O'Brien",
+            'Nama "berkutip"',
+            '<strong>Nama</strong>',
+            "');window.__rf_marker=1;//",
+        ];
+
+        foreach ($names as $name) {
+            $alumni = $this->userWithRole('alumni', ['name' => $name]);
+            $response = $this->actingAs($admin)->get(route('alumni.index'))->assertOk();
+            $html = $response->getContent();
+            $action = preg_quote(route('alumni.destroy', $alumni), '/');
+            $this->assertSame(1, preg_match('/<form[^>]*action="'.$action.'"[^>]*onsubmit="([^"]*)"/s', $html, $match));
+            $this->assertSame("return confirm('Hapus akun ini? Tindakan ini tidak dapat dibatalkan.');", $match[1]);
+        }
+    }
+
     private function userWithRole(string $roleName, array $attributes = []): User
     {
         $role = Role::firstOrCreate(['name' => $roleName]);

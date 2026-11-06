@@ -12,8 +12,6 @@
             $r = Route::currentRouteName();
             $pageTitle = match (true) {
                 $r === 'dashboard' => 'Dashboard',
-                str_starts_with($r, 'reflections.review.') => 'Tinjau refleksi',
-                str_starts_with($r, 'reflections.') => 'Refleksi saya',
                 str_starts_with($r, 'materi.') => 'Materi',
                 $r === 'laporan.review' => 'Review Laporan',
                 str_starts_with($r, 'laporan.') => 'Laporan',
@@ -21,7 +19,7 @@
                 str_starts_with($r, 'alumni.') => 'Alumni',
                 str_starts_with($r, 'notifications.') => 'Notifikasi',
                 $r === 'profile.edit' => 'Profil',
-                str_starts_with($r, 'management.post.') => 'Artikel & Refleksi',
+                str_starts_with($r, 'management.post.') => 'Artikel',
                 str_starts_with($r, 'management.galeri.') => 'Galeri',
                 default => \Illuminate\Support\Str::headline(request()->segment(1)) ?: 'Dashboard',
             };

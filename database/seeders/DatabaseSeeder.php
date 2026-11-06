@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         ]);
 
         if (app()->environment(['local', 'testing'])) {
-            $this->call([UserSeeder::class, PostSeeder::class, GallerySeeder::class]);
+            $this->call([UserSeeder::class, PostSeeder::class, GallerySeeder::class, WorkflowExampleSeeder::class]);
         }
     }
 }

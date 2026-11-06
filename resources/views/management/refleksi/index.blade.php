@@ -71,7 +71,7 @@
         {{-- ================= DAFTAR BERITA ================= --}}
         <section class="rf-card min-w-0 order-1 lg:order-2 lg:col-span-8">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-lg font-semibold">Daftar artikel &amp; refleksi</h2>
+                <h2 class="text-lg font-semibold">Daftar tulisan</h2>
                 <div class="text-sm text-slate-500">{{ $totalRows }} item</div>
             </div>
 
@@ -170,7 +170,7 @@
 {{-- ===================== MODAL EDIT ===================== --}}
 <div id="editModal" role="dialog" aria-modal="true" aria-labelledby="editPostHeading" aria-hidden="true" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50 p-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-full overflow-y-auto">
-        <h2 id="editPostHeading" class="text-lg font-semibold mb-3">Edit Artikel &amp; Refleksi</h2>
+        <h2 id="editPostHeading" class="text-lg font-semibold mb-3">Edit tulisan</h2>
         @if ($errors->any() && old('_editing_id'))
             @include('management.feedback')
         @endif

@@ -78,20 +78,11 @@ class VerificationRoleAccessTest extends TestCase
         $this->assertSame(1, $koorda->notifications()->count());
     }
 
-    public function test_admin_can_reactivate_lone_super_admin_after_profile_change(): void
+    public function test_admin_can_reactivate_an_existing_pending_lone_super_admin(): void
     {
-        $superAdmin = $this->account('super_admin', null, User::STATUS_ACTIVE);
-        $superAdmin->angkatan = 2020;
-        $superAdmin->save();
+        $superAdmin = $this->account('super_admin', null, User::STATUS_PENDING);
         $admin = $this->account('admin', null, User::STATUS_ACTIVE);
         $level = Level::create(['name' => 'Dasar', 'is_active' => true]);
-
-        $this->actingAs($superAdmin)->patch(route('profile.update'), [
-            'name' => $superAdmin->name,
-            'email' => $superAdmin->email,
-            'angkatan' => 2021,
-        ])->assertSessionHasNoErrors()->assertRedirect();
-        $this->assertSame(User::STATUS_PENDING, $superAdmin->fresh()->status);
 
         $this->actingAs($admin)->post(route('verification.approve', $superAdmin), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();

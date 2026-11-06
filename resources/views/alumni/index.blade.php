@@ -2,15 +2,13 @@
 
 @section('page-content')
     @php
-        $canDeleteAlumniAccounts = auth()->user()?->hasAnyRole(['super_admin', 'admin']);
+        $showCreateModal = old('_form') === 'alumni-create' && $errors->any();
     @endphp
-
     <div class="rounded-xl bg-white p-6 shadow max-w-7xl mx-auto">
         <h2 class="text-2xl font-semibold mb-6">Daftar Alumni</h2>
 
         <div class="mb-4 flex flex-wrap gap-2">
-            <button onclick="document.getElementById('modal-register-alumni').classList.remove('hidden')"
-                class="rf-btn">
+            <button type="button" id="open-alumni-modal" aria-controls="modal-register-alumni" aria-expanded="{{ $showCreateModal ? 'true' : 'false' }}" class="rf-btn">
                 <i class="fas fa-plus"></i> Tambah Alumni
             </button>
             <a href="{{ route('alumni.csv.index', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Impor Excel</a>
@@ -25,7 +23,7 @@
 
         @if ($errors->any())
             <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <div class="font-semibold">Data alumni belum tersimpan.</div>
+                <div class="font-semibold">Permintaan belum berhasil.</div>
                 <ul class="mt-2 list-disc pl-5">
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
@@ -201,6 +199,11 @@
 
                             {{-- Aksi --}}
                             <td class="px-4 py-2 text-center">
+                                @php
+                                    $roleNames = $item->roles->pluck('name');
+                                    $canManageTarget = ($roleNames->contains('alumni') || $roleNames->contains('koorda'))
+                                        && !$roleNames->contains('super_admin') && !$roleNames->contains('admin');
+                                @endphp
                                 <div class="flex flex-wrap justify-center gap-2">
                                     <a href="{{ route('alumni.show', $item->id) }}"
                                         class="rf-btn inline-flex h-8 w-8 items-center justify-center bg-brand p-0 text-sm text-white hover:bg-brand-dark rounded-lg"
@@ -208,7 +211,7 @@
                                         <i class="fas fa-eye"></i>
                                     </a>
 
-                                    @if ($canDeleteAlumniAccounts && $item->hasAnyRole(['alumni', 'koorda']) && !$item->hasAnyRole(['super_admin', 'admin']))
+                                    @if ($canViewAll && $canManageTarget)
                                         <a href="{{ route('alumni.edit', $item) }}"
                                             class="rf-btn-secondary p-2"
                                             title="Edit {{ $item->name }}" aria-label="Edit {{ $item->name }}">
@@ -216,9 +219,9 @@
                                         </a>
                                     @endif
 
-                                    @if ($canDeleteAlumniAccounts && !$item->is(auth()->user()) && $item->hasAnyRole(['alumni', 'koorda']) && !$item->hasAnyRole(['super_admin', 'admin']))
+                                    @if ($canViewAll && !$item->is(auth()->user()) && $canManageTarget)
                                         <form method="POST" action="{{ route('alumni.destroy', $item) }}"
-                                            onsubmit="return confirm('Hapus akun {{ $item->name }}? Tindakan ini tidak dapat dibatalkan.');">
+                                            onsubmit="return confirm('Hapus akun ini? Tindakan ini tidak dapat dibatalkan.');">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit"
@@ -260,31 +263,32 @@
         </div>
 
         {{-- Modal --}}
-        <div id="modal-register-alumni"
-            class="{{ $errors->any() ? '' : 'hidden' }} fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50">
+        <div id="modal-register-alumni" role="dialog" aria-modal="true" aria-labelledby="alumni-modal-heading" aria-hidden="{{ $showCreateModal ? 'false' : 'true' }}" tabindex="-1"
+            class="{{ $showCreateModal ? '' : 'hidden' }} fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
 
-            <div class="bg-white rounded-xl w-full max-w-md p-6 shadow-lg relative">
-                <button onclick="document.getElementById('modal-register-alumni').classList.add('hidden')"
-                    class="absolute right-3 top-3 text-slate-500 hover:text-slate-700">
-                    <i class="fas fa-times text-xl"></i>
+            <div class="bg-white rounded-xl w-full max-w-md max-h-full overflow-y-auto p-6 shadow-lg relative">
+                <button type="button" id="close-alumni-modal" aria-label="Tutup formulir tambah alumni"
+                    class="absolute right-3 top-3 text-slate-500 hover:text-slate-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand">
+                    <i class="fas fa-times text-xl" aria-hidden="true"></i>
                 </button>
 
-                <h2 class="text-xl font-semibold mb-4">Tambah Alumni Baru</h2>
+                <h2 id="alumni-modal-heading" class="text-xl font-semibold mb-4">Tambah Alumni Baru</h2>
 
                 <form method="POST" action="{{ route('alumni.store') }}" class="space-y-3">
                     @csrf
+                    <input type="hidden" name="_form" value="alumni-create">
 
                     <div>
-                        <label class="block text-sm mb-1">Nama</label>
-                        <input type="text" name="name" value="{{ old('name') }}" required class="w-full rounded-lg border-slate-300">
+                        <label for="new-alumni-name" class="block text-sm mb-1">Nama</label>
+                        <input id="new-alumni-name" type="text" name="name" value="{{ old('name') }}" autocomplete="name" required @error('name') aria-invalid="true" @enderror class="w-full rounded-lg border-slate-300">
                         @error('name')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
                     </div>
 
                     <div>
-                        <label class="block text-sm mb-1">Email</label>
-                        <input type="email" name="email" value="{{ old('email') }}" required class="w-full rounded-lg border-slate-300">
+                        <label for="new-alumni-email" class="block text-sm mb-1">Email</label>
+                        <input id="new-alumni-email" type="email" name="email" value="{{ old('email') }}" autocomplete="email" required @error('email') aria-invalid="true" @enderror class="w-full rounded-lg border-slate-300">
                         @error('email')
                             <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                         @enderror
@@ -292,7 +296,7 @@
 
                     <div>
                         <label for="new-alumni-wilayah" class="block text-sm mb-1">Wilayah</label>
-                        <select id="new-alumni-wilayah" name="wilayah_id" required class="w-full rounded-lg border-slate-300">
+                        <select id="new-alumni-wilayah" name="wilayah_id" required @error('wilayah_id') aria-invalid="true" @enderror class="w-full rounded-lg border-slate-300">
                             <option value="">Pilih wilayah</option>
                             @foreach ($wilayah as $region)
                                 <option value="{{ $region->id }}" @selected(old('wilayah_id', auth()->user()->wilayah_id) == $region->id)>{{ $region->name }}</option>
@@ -305,15 +309,15 @@
 
                     <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-sm mb-1">Password</label>
-                            <input type="password" name="password" required class="w-full rounded-lg border-slate-300">
+                            <label for="new-alumni-password" class="block text-sm mb-1">Password</label>
+                            <input id="new-alumni-password" type="password" name="password" autocomplete="new-password" required @error('password') aria-invalid="true" @enderror class="w-full rounded-lg border-slate-300">
                             @error('password')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
                         <div>
-                            <label class="block text-sm mb-1">Ulangi Password</label>
-                            <input type="password" name="password_confirmation" required
+                            <label for="new-alumni-password-confirmation" class="block text-sm mb-1">Ulangi Password</label>
+                            <input id="new-alumni-password-confirmation" type="password" name="password_confirmation" autocomplete="new-password" required
                                 class="w-full rounded-lg border-slate-300">
                         </div>
                     </div>

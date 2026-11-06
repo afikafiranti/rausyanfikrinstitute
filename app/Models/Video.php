@@ -16,5 +16,4 @@ class Video extends Model
     protected $casts = ['tags' => 'array'];
 
     public function playlist() { return $this->belongsTo(Playlist::class); }
-    public function progresses() { return $this->hasMany(VideoProgress::class); }
 }

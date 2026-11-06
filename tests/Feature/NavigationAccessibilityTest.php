@@ -10,6 +10,29 @@ class NavigationAccessibilityTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function test_only_create_errors_reopen_the_add_alumni_dialog(): void
+    {
+        $admin = User::factory()->create(['status' => 'active']);
+        $admin->roles()->attach(Role::firstOrCreate(['name' => 'admin']));
+        $this->actingAs($admin)->from('/alumni')->post('/alumni', [
+            '_form' => 'alumni-create', 'name' => 'Input lama',
+        ])->assertSessionHasErrors('email');
+
+        $page = $this->get('/alumni')->assertOk();
+        $dom = new \DOMDocument;
+        @$dom->loadHTML('<?xml encoding="UTF-8">'.$page->getContent());
+        $xpath = new \DOMXPath($dom);
+        $this->assertSame('false', $xpath->query('//*[@id="modal-register-alumni"]')->item(0)->getAttribute('aria-hidden'));
+
+        $this->flushSession();
+        $this->actingAs($admin)->from('/alumni')->delete(route('alumni.destroy', $admin))
+            ->assertSessionHasErrors('delete');
+        $page = $this->get('/alumni')->assertOk();
+        @$dom->loadHTML('<?xml encoding="UTF-8">'.$page->getContent());
+        $xpath = new \DOMXPath($dom);
+        $this->assertSame('true', $xpath->query('//*[@id="modal-register-alumni"]')->item(0)->getAttribute('aria-hidden'));
+    }
+
     public function test_internal_navigation_exposes_named_controls_dialog_and_skip_link_without_dummy_search(): void
     {
         $user = User::factory()->create(['status' => 'active', 'wilayah_id' => Wilayah::create(['name' => 'Wilayah'])->id]);

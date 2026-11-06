@@ -31,9 +31,11 @@ APP_KEY="$(php -r 'echo "base64:".base64_encode(random_bytes(32));')"
 composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
 composer validate --strict
 composer check-platform-reqs
+composer audit --locked
 php scripts/assert-test-database.php
 npm ci
+npm audit --audit-level=high
 npm run build
 php artisan route:list
 # RefreshDatabase handles migrations in the isolated database; no account seeding.
-php artisan test --env=testing
+php vendor/bin/phpunit --display-warnings --display-deprecations --display-notices

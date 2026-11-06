@@ -48,21 +48,6 @@
                     </a>
                 </li>
 
-                @if (auth()->user()->hasAnyRole(['alumni', 'koorda', 'admin', 'super_admin']))
-                    <li class="items-center">
-                        <a href="{{ route('reflections.index') }}" class="{{ $link(request()->routeIs('reflections.*') && ! request()->routeIs('reflections.review.*')) }}">
-                            <i class="fas fa-pen mr-2 text-sm opacity-75" aria-hidden="true"></i> Refleksi saya
-                        </a>
-                    </li>
-                @endif
-                @can('review-report')
-                    <li class="items-center">
-                        <a href="{{ route('reflections.review.index') }}" class="{{ $link(request()->routeIs('reflections.review.*')) }}">
-                            <i class="fas fa-comment mr-2 text-sm opacity-75" aria-hidden="true"></i> Tinjau refleksi
-                        </a>
-                    </li>
-                @endcan
-
                 {{-- Laporan --}}
                 @can('review-report')
                 <li class="items-center">
@@ -119,7 +104,7 @@
                     <li class="items-center">
                         <a href="{{ route('management.post.index') }}"
                             class="{{ $link(request()->routeIs('management.post.*')) }}">
-                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Artikel &amp; Refleksi
+                            <i class="fas fa-newspaper mr-2 text-sm text-blueGray-300"></i> Artikel
                         </a>
                     </li>
 

@@ -60,14 +60,6 @@
             </section>
         </div>
 
-        <section class="rf-card flex min-w-0 flex-col gap-4 border-l-4 border-l-accent sm:flex-row sm:items-center sm:justify-between" aria-labelledby="refleksi-pribadi">
-            <div>
-                <h2 id="refleksi-pribadi" class="text-lg font-semibold">Refleksi saya</h2>
-                <p class="mt-1 max-w-2xl text-sm leading-6 text-muted">Catat pelajaran dari materi atau kajian. Simpan untuk diri sendiri, atau kirim saat ingin mendapat tanggapan pengelola.</p>
-            </div>
-            <a href="{{ route('reflections.index') }}" class="rf-btn shrink-0 self-start sm:self-auto">Buka refleksi</a>
-        </section>
-
         <section class="rf-card flex min-w-0 flex-col gap-4 sm:flex-row sm:items-center sm:justify-between" aria-labelledby="notifikasi-akun">
             <div>
                 <h2 id="notifikasi-akun" class="text-lg font-semibold">Notifikasi</h2>

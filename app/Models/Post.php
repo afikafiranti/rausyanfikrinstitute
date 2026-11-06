@@ -24,7 +24,7 @@ class Post extends Model
     protected static function booted()
     {
         static::saving(function (Post $post) {
-            if (filled($post->slug) && (! $post->exists || ! $post->isDirty('title'))) {
+            if (filled($post->slug)) {
                 return;
             }
 

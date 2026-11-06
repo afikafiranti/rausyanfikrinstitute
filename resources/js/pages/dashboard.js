@@ -1,41 +1,114 @@
-import Chart from 'chart.js/auto';
+const status = (id, message) => {
+  document.getElementById(id + '-status').textContent = message;
+};
 
-const charts = {};
-const destroy = (id) => { if (charts[id]) { charts[id].destroy(); delete charts[id]; } };
-const mount = (id, type, h, labels, data) => {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.height = h;
-  destroy(id);
-  charts[id] = new Chart(el.getContext('2d'), {
+const series = (labels, values) => {
+  if (!Array.isArray(labels) || !Array.isArray(values) || labels.length !== values.length ||
+      labels.some(label => typeof label !== 'string') ||
+      values.some(value => !Number.isFinite(Number(value)) || Number(value) < 0)) {
+    throw new Error('Invalid chart data');
+  }
+  return { labels: labels.map(label => label || 'Tidak diisi'), values: values.map(Number) };
+};
+
+const mount = (Chart, id, type, labels, values, dark = false) => {
+  const color = dark ? '#E2E8F0' : '#334155';
+  const pie = type === 'pie';
+  new Chart(document.getElementById(id), {
     type,
-    data: { labels, datasets: [{ label: 'Alumni', data, borderWidth: 2, fill: type === 'line' ? false : undefined }] },
+    data: {
+      labels,
+      datasets: [{
+        label: 'Jumlah anggota',
+        data: values,
+        borderColor: pie ? '#FFFFFF' : '#A5B4FC',
+        backgroundColor: pie ? ['#4F46E5', '#0F766E', '#B45309', '#9F1239'] : '#A5B4FC',
+        borderWidth: pie ? 2 : 3,
+        tension: pie ? undefined : 0.25,
+      }],
+    },
     options: {
-      responsive: true, maintainAspectRatio: false, animation: false,
-      plugins: { legend: { display: false }, tooltip: { enabled: true } },
-      scales: { y: { beginAtZero: true } }
-    }
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: pie, position: 'bottom', labels: { color } },
+        tooltip: { enabled: true },
+      },
+      ...(pie ? {} : {
+        scales: {
+          x: { ticks: { color }, grid: { color: '#334155' } },
+          y: { beginAtZero: true, ticks: { color, precision: 0 }, grid: { color: '#334155' } },
+        },
+      }),
+    },
   });
 };
 
-async function getJSON(url) {
+const showValues = (id, labels, values) => {
+  const details = document.getElementById(id + '-data');
+  const rows = labels.map((label, index) => {
+    const row = document.createElement('tr');
+    const heading = document.createElement('th');
+    heading.scope = 'row';
+    heading.className = 'py-1 font-normal';
+    heading.textContent = label;
+    const count = document.createElement('td');
+    count.className = 'py-1';
+    count.textContent = new Intl.NumberFormat('id-ID').format(values[index]);
+    row.append(heading, count);
+    return row;
+  });
+  details.querySelector('tbody').replaceChildren(...rows);
+  details.classList.remove('hidden');
+};
+
+async function loadPie(Chart, id, url) {
   try {
-    const r = await fetch(url, { headers: { 'Accept': 'application/json' }, credentials: 'same-origin' });
-    if (!r.ok) throw new Error('HTTP '+r.status);
-    return await r.json();
-  } catch (_) { return null; }
+    const response = await fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
+    if (!response.ok) throw new Error('HTTP ' + response.status);
+    const data = await response.json();
+    const { labels, values } = series(data.labels, data.values);
+    if (values.reduce((sum, value) => sum + value, 0) === 0) {
+      status(id, 'Belum ada data untuk grafik ini.');
+      return;
+    }
+    mount(Chart, id, 'pie', labels, values);
+    showValues(id, labels, values);
+    status(id, 'Grafik tersedia. Angka tiap kategori dapat dibaca pada tabel.');
+  } catch {
+    status(id, 'Data grafik gagal dimuat. Muat ulang halaman untuk mencoba lagi.');
+  }
 }
 
 export async function initDashboardCharts() {
-  const year = new Date().getFullYear();
-  const monthly = await getJSON(`/charts/alumni/monthly?year=${year}`);
-  if (!monthly) return;
+  if (!document.getElementById('chart-alumni')) return;
 
-  // Desktop: line 12 bulan
-  mount('chartKajianDesktop', 'line', 400, monthly.labels, monthly.values);
+  let Chart;
+  try {
+    ({ default: Chart } = await import('chart.js/auto'));
+  } catch {
+    for (const id of ['chart-alumni', 'chartStatusPernikahan', 'chartAb']) {
+      status(id, 'Grafik tidak dapat dimuat. Muat ulang halaman untuk mencoba lagi.');
+    }
+    return;
+  }
 
-  // Mobile: bar ambil 6 bulan terakhir
-  const last6Labels = monthly.labels.slice(-6);
-  const last6Values = monthly.values.slice(-6);
-  mount('chartKajianMobile', 'bar', 300, last6Labels, last6Values);
+  try {
+    const data = JSON.parse(document.getElementById('chart-alumni-data').textContent);
+    const { labels, values } = series(data.labels, data.series);
+    if (values.reduce((sum, value) => sum + value, 0) === 0) {
+      status('chart-alumni', 'Belum ada anggota baru pada tahun ini.');
+    } else {
+      mount(Chart, 'chart-alumni', 'line', labels, values, true);
+      status('chart-alumni', 'Grafik tersedia. Angka per bulan dapat dibaca pada tabel.');
+    }
+  } catch {
+    status('chart-alumni', 'Grafik gagal ditampilkan. Angka per bulan tetap tersedia pada tabel.');
+  }
+
+  const urls = document.getElementById('chart-data-urls').dataset;
+  await Promise.all([
+    loadPie(Chart, 'chartStatusPernikahan', urls.marriageUrl),
+    loadPie(Chart, 'chartAb', urls.abUrl),
+  ]);
 }

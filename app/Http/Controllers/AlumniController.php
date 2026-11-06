@@ -9,10 +9,12 @@ use App\Models\User;
 use App\Models\Wilayah;
 use App\Models\Level;
 use App\Models\Role;
+use App\Support\AccountIntegrity;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 use Illuminate\Validation\Rules;
+use Illuminate\Validation\ValidationException;
 
 class AlumniController extends Controller
 {
@@ -74,7 +76,7 @@ class AlumniController extends Controller
         return view('alumni.index', compact(
             'alumni', 'wilayah', 'level', 'angkatanList',
             'q', 'angkatan', 'wilayahId', 'levelId', 'perPage', 'sort', 'dir', 'ab',
-            'hasFilters', 'activeFilters', 'totalAlumni'
+            'hasFilters', 'activeFilters', 'totalAlumni', 'canViewAll'
         ));
     }
 
@@ -176,13 +178,20 @@ class AlumniController extends Controller
             'status_pernikahan', 'ab', 'email_verified_at', 'status',
         ];
         $criticalChanged = DB::transaction(function () use ($user, $actor, $validated, $fields) {
+            $user = AccountIntegrity::lockUser($user);
+            if (!$this->canManageAlumniProfile($actor, $user)) {
+                throw ValidationException::withMessages(['edit' => 'Hanya super admin dan admin yang dapat mengedit data alumni atau koorda.']);
+            }
             $before = $user->only($fields);
             $user->fill($validated);
             if ($user->isDirty('email')) {
                 $user->email_verified_at = null;
             }
             $criticalChanged = $user->isDirty('wilayah_id') || $user->isDirty('angkatan');
-            if ($criticalChanged) {
+            if ($criticalChanged && $user->status !== User::STATUS_SUSPENDED) {
+                if ($reason = AccountIntegrity::deactivationError($user)) {
+                    throw ValidationException::withMessages(['status' => $reason]);
+                }
                 $user->status = User::STATUS_PENDING;
             }
             $user->save();
@@ -207,11 +216,12 @@ class AlumniController extends Controller
                 ]);
             }
 
-            if ($criticalChanged) {
+            $needsVerification = $criticalChanged && $user->status === User::STATUS_PENDING;
+            if ($needsVerification) {
                 $user->notify(new \App\Notifications\AccountStatusNotification('pending', ['by' => $actor->name]));
             }
 
-            return $criticalChanged;
+            return $needsVerification;
         });
 
         return redirect()
@@ -279,9 +289,15 @@ class AlumniController extends Controller
             return back()->withErrors(['delete' => 'Hanya akun alumni dan koorda yang dapat dihapus dari halaman ini.']);
         }
 
-        $name = $user->name;
+        [$name, $avatarUrl] = DB::transaction(function () use ($user, $actor) {
+            $user = AccountIntegrity::lockUser($user);
+            if (!$this->canManageAlumniProfile($actor, $user)) {
+                throw ValidationException::withMessages(['delete' => 'Hanya akun alumni dan koorda yang dapat dihapus dari halaman ini.']);
+            }
+            if ($reason = AccountIntegrity::deletionError($user)) {
+                throw ValidationException::withMessages(['delete' => $reason]);
+            }
 
-        DB::transaction(function () use ($user, $actor) {
             AuditLog::create([
                 'actor_id' => $actor->id,
                 'action' => 'alumni.delete',
@@ -292,7 +308,10 @@ class AlumniController extends Controller
             ]);
             $user->roles()->detach();
             $user->delete();
+            return [$user->name, $user->photo_url];
         });
+
+        AccountIntegrity::removeOwnedAvatar($avatarUrl);
 
         return redirect()
             ->route('alumni.index')

@@ -67,11 +67,13 @@ php -r echo "base64:".base64_encode(random_bytes(32));
 composer install --no-interaction --prefer-dist --no-progress --optimize-autoloader
 composer validate --strict
 composer check-platform-reqs
+composer audit --locked
 php scripts/assert-test-database.php
 npm ci
+npm audit --audit-level=high
 npm run build
 php artisan route:list
-php artisan test --env=testing
+php vendor/bin/phpunit --display-warnings --display-deprecations --display-notices
 EXPECTED
 diff -u "$test_root/expected.log" "$COMMAND_LOG"
 cmp "$test_root/env.before" "$test_root/.env"
@@ -89,4 +91,17 @@ if grep -q '^npm\|^php artisan' "$COMMAND_LOG"; then
 fi
 cmp "$test_root/env.before" "$test_root/.env"
 cmp "$test_root/testing.before" "$test_root/.env.testing"
+
+for audit_command in 'composer audit --locked' 'npm audit --audit-level=high'; do
+    export FAIL_COMMAND="$audit_command"
+    : > "$COMMAND_LOG"
+    if bash "$test_root/run-ci.sh" > "$test_root/output.log" 2>&1; then
+        printf 'FAIL: runner ignored failed dependency audit\n' >&2
+        exit 1
+    fi
+    if grep -q '^npm run build\|^php vendor/bin/phpunit' "$COMMAND_LOG"; then
+        printf 'FAIL: runner continued after failed dependency audit\n' >&2
+        exit 1
+    fi
+done
 printf 'PASS: runner rejects unsafe config, preserves env, orders commands and stops on preflight failure\n'

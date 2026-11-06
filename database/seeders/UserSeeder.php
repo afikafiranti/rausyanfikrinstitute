@@ -25,7 +25,7 @@ class UserSeeder extends Seeder
 
         // 1) SUPER ADMIN
         $super = User::query()->firstOrCreate(
-            ['email' => 'afika@rausyanfikr.com'],
+            ['email' => 'afika@rausyanfikr.test'],
             [
                 'name' => 'Nur Afika Firanti',
                 'password' => Hash::make('password123'),
@@ -40,7 +40,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1990-01-01',
                 'pendidikan_terakhir' => 'S1 Informatika',
                 'kampus' => 'Universitas Cokroaminoto Palopo',
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -52,7 +52,7 @@ class UserSeeder extends Seeder
 
         // 2) ADMIN
         $admin = User::query()->firstOrCreate(
-            ['email' => 'arif@rausyanfikr.com'],
+            ['email' => 'arif@rausyanfikr.test'],
             [
                 'name' => 'Arif Husain',
                 'password' => Hash::make('password123'),
@@ -67,7 +67,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1992-05-15',
                 'pendidikan_terakhir' => 'S1 Teknik Informatika',
                 'kampus' => 'Universitas Islam Makassar',
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -94,7 +94,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1993-09-09',
                 'pendidikan_terakhir' => 'S1 Manajemen',
                 'kampus' => 'Universitas Negeri Makassar',
-                'status_pernikahan' => 'Menikah',
+                'status_pernikahan' => 'menikah',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -111,7 +111,7 @@ class UserSeeder extends Seeder
                 'name' => 'Nadia Waris',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => $now,
-                'phone' => '081200000004',
+                'phone' => '081200000005',
                 'angkatan' => 2023,
                 'pekerjaan' => 'Mahasiswa',
                 'wilayah_id' => 2,
@@ -121,7 +121,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1998-12-20',
                 'pendidikan_terakhir' => 'SMA',
                 'kampus' => null,
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -138,7 +138,7 @@ class UserSeeder extends Seeder
                 'name' => 'Wawan',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => $now,
-                'phone' => '081200000004',
+                'phone' => '081200000006',
                 'angkatan' => 2023,
                 'pekerjaan' => 'Mahasiswa',
                 'wilayah_id' => 2,
@@ -148,7 +148,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1998-12-20',
                 'pendidikan_terakhir' => 'SMA',
                 'kampus' => null,
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -165,7 +165,7 @@ class UserSeeder extends Seeder
                 'name' => 'Fatryan',
                 'password' => Hash::make('password123'),
                 'email_verified_at' => $now,
-                'phone' => '081200000004',
+                'phone' => '081200000007',
                 'angkatan' => 2023,
                 'pekerjaan' => 'Mahasiswa',
                 'wilayah_id' => 2,
@@ -175,7 +175,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1998-12-20',
                 'pendidikan_terakhir' => 'S1',
                 'kampus' => null,
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -187,7 +187,7 @@ class UserSeeder extends Seeder
 
         // 7) ALUMNI
         $alumni = User::query()->firstOrCreate(
-            ['email' => 'Paslan@rausyanfikr.com'],
+            ['email' => 'paslan@rausyanfikr.test'],
             [
                 'name' => 'Paslan',
                 'password' => Hash::make('password123'),
@@ -202,7 +202,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1998-08-20',
                 'pendidikan_terakhir' => 'S1',
                 'kampus' => null,
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,
@@ -214,7 +214,7 @@ class UserSeeder extends Seeder
 
         // 8) ALUMNI
         $alumni = User::query()->firstOrCreate(
-            ['email' => 'Bambang@rausyanfikr.com'],
+            ['email' => 'bambang@rausyanfikr.test'],
             [
                 'name' => 'Bambang',
                 'password' => Hash::make('password123'),
@@ -229,7 +229,7 @@ class UserSeeder extends Seeder
                 'tanggal_lahir' => '1997-05-20',
                 'pendidikan_terakhir' => 'S1',
                 'kampus' => null,
-                'status_pernikahan' => 'Lajang',
+                'status_pernikahan' => 'lajang',
                 'consent_at' => $now,
                 'created_at' => $now,
                 'updated_at' => $now,

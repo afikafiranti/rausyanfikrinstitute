@@ -59,7 +59,10 @@
 
     <section class="rounded-xl bg-white p-5 shadow">
         <h2 class="text-lg font-semibold">Ekspor Excel</h2>
-        <p class="mt-2 text-sm text-slate-700">Unduh semua hasil sesuai wilayah dan filter dari daftar alumni, tanpa batas halaman. Kolom wilayah berisi nama wilayah. Telepon dan nilai lainnya disimpan sebagai teks.</p>
+        <p class="mt-2 text-sm text-slate-700">Unduh hasil sesuai wilayah dan filter dari daftar alumni, tanpa batas halaman. Excel dibatasi 5.000 baris; gunakan CSV untuk hasil yang lebih besar. Kolom wilayah berisi nama wilayah. Telepon dan nilai lainnya disimpan sebagai teks.</p>
+        @error('export')
+            <p class="mt-2 text-sm text-red-700" role="alert">{{ $message }}</p>
+        @enderror
         <div class="mt-4 flex flex-wrap items-center gap-4">
             <a href="{{ route('alumni.excel.export', request()->query()) }}" class="rf-btn inline-block bg-brand px-4 py-2 text-white hover:bg-brand-dark">Unduh Excel (.xlsx)</a>
             <a href="{{ route('alumni.csv.export', request()->query()) }}" class="text-sm text-indigo-700 underline">Unduh CSV</a>

@@ -1,10 +1,11 @@
-@extends('layouts.app')
+﻿@extends('layouts.app')
 
 @section('page-header')
 @endsection
 
 @section('page-content')
     <div>
+        <p class="mb-3 text-sm text-muted">Statistik mencakup seluruh akun dalam cakupan Anda, termasuk akun pengelola.</p>
         <div class="grid grid-cols-1 gap-4 pb-4 sm:grid-cols-2 lg:grid-cols-12">
             {{-- STATISTIK UTAMA --}}
             <div class="rf-card lg:col-span-3">
@@ -45,16 +46,30 @@
                 </div>
             @endcan
 
-            {{-- GRAFIK TREN (ApexCharts) --}}
+            {{-- Grafik tren --}}
             <div class="min-w-0 rounded-xl bg-[#14213D] p-4 shadow sm:col-span-2 lg:col-span-8">
                 <div class="flex items-center justify-between">
                     <h3 class="font-semibold text-white">Pertumbuhan Anggota per Bulan ({{ $year }})</h3>
                 </div>
                 <div class="min-w-0 flex-auto pt-4">
                     <!-- Chart -->
-                    <div class="relative min-w-0 text-slate-300">
-                        <div id="chart-alumni" class="h-80 w-full min-w-0 text-white"></div>
+                    <div class="relative h-80 min-w-0 text-slate-300">
+                        <canvas id="chart-alumni" class="h-full w-full min-w-0" role="img" aria-label="Grafik pertumbuhan anggota per bulan"></canvas>
                     </div>
+                    <p id="chart-alumni-status" class="mt-2 text-sm text-slate-200" role="status">Memuat grafik anggota.</p>
+                    <details class="mt-2 text-sm text-white">
+                        <summary class="cursor-pointer font-medium">Lihat angka per bulan</summary>
+                        <div class="mt-2 max-h-56 overflow-auto">
+                            <table class="w-full text-left">
+                                <thead><tr><th scope="col" class="py-1 !text-white">Bulan</th><th scope="col" class="py-1 !text-white">Anggota baru</th></tr></thead>
+                                <tbody>
+                                    @foreach ($chartAlumni['labels'] as $index => $month)
+                                        <tr><th scope="row" class="py-1 font-normal !text-white">{{ $month }}</th><td class="py-1">{{ number_format($chartAlumni['series'][$index]) }}</td></tr>
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </details>
                 </div>
             </div>
 
@@ -66,16 +81,26 @@
             {{-- ========================= 2 CHART DALAM 1 BARIS ========================= --}}
             <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-6">
                 <h3 class="font-semibold mb-3">Status Pernikahan Alumni</h3>
-                <div class="relative min-w-0">
-                    <div id="chartStatusPernikahan" class="h-80 w-full min-w-0"></div>
+                <div class="relative h-80 min-w-0">
+                    <canvas id="chartStatusPernikahan" class="h-full w-full min-w-0" role="img" aria-label="Grafik status pernikahan"></canvas>
                 </div>
+                <p id="chartStatusPernikahan-status" class="mt-2 text-sm text-slate-600" role="status">Memuat data status pernikahan.</p>
+                <details id="chartStatusPernikahan-data" class="mt-2 hidden text-sm">
+                    <summary class="cursor-pointer font-medium">Lihat angka status pernikahan</summary>
+                    <table class="mt-2 w-full text-left"><thead><tr><th scope="col">Status</th><th scope="col">Jumlah</th></tr></thead><tbody></tbody></table>
+                </details>
             </div>
 
             <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-6">
                 <h3 class="font-semibold mb-3">Status AB Alumni</h3>
-                <div class="relative min-w-0">
-                    <div id="chartAb" class="h-72 w-full min-w-0"></div>
+                <div class="relative h-72 min-w-0">
+                    <canvas id="chartAb" class="h-full w-full min-w-0" role="img" aria-label="Grafik status AB"></canvas>
                 </div>
+                <p id="chartAb-status" class="mt-2 text-sm text-slate-600" role="status">Memuat data status AB.</p>
+                <details id="chartAb-data" class="mt-2 hidden text-sm">
+                    <summary class="cursor-pointer font-medium">Lihat angka status AB</summary>
+                    <table class="mt-2 w-full text-left"><thead><tr><th scope="col">Status</th><th scope="col">Jumlah</th></tr></thead><tbody></tbody></table>
+                </details>
             </div>
 
 
@@ -212,162 +237,6 @@
 
         </div>
     </div>
-
-
-    {{-- SCRIPTS APEXCHARTS --}}
-    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
-
-    <script>
-        /* ============================== Grafik: Pertumbuhan Alumni (Line) ============================== */
-        (function() {
-            const labels = @json($chartAlumni['labels']);
-            const seriesData = @json($chartAlumni['series']);
-
-            const options = {
-                chart: {
-                    type: 'line',
-                    height: 300,
-                    toolbar: {
-                        show: false
-                    },
-                    foreColor: '#CBD5E1',
-                    animations: {
-                        enabled: true,
-                        easing: 'easeinout',
-                        speed: 800
-                    }
-                },
-                series: [{
-                    name: 'Alumni Baru',
-                    data: seriesData
-                }],
-                stroke: {
-                    curve: 'smooth',
-                    width: 3
-                },
-                colors: ['#6366F1'],
-                grid: {
-                    borderColor: '#334155',
-                    strokeDashArray: 3
-                },
-                xaxis: {
-                    categories: labels,
-                    labels: {
-                        style: {
-                            colors: '#CBD5E1'
-                        }
-                    },
-                    axisBorder: {
-                        color: '#475569'
-                    },
-                    axisTicks: {
-                        color: '#475569'
-                    }
-                },
-                yaxis: {
-                    labels: {
-                        style: {
-                            colors: '#CBD5E1'
-                        },
-                        formatter: val => parseInt(val)
-                    },
-                    title: {
-                        text: 'Jumlah Alumni',
-                        style: {
-                            color: '#CBD5E1'
-                        }
-                    }
-                },
-                tooltip: {
-                    theme: 'dark'
-                }
-            };
-
-            new ApexCharts(document.querySelector("#chart-alumni"), options).render();
-        })();
-    </script>
-
-
-
-    {{-- ========================= PIE CHART STATUS PERNIKAHAN ========================= --}}
-
-    <script>
-        window.addEventListener('load', function() {
-
-            fetch('/charts/alumni/status-pernikahan')
-                .then(response => response.json())
-                .then(data => {
-
-                    const el = document.querySelector("#chartStatusPernikahan");
-
-                    const chart = new ApexCharts(el, {
-                        chart: {
-                            type: 'pie',
-                            height: 300
-                        },
-                        labels: data.labels,
-                        series: data.values,
-                        legend: {
-                            show: true,
-                            position: 'bottom'
-                        }
-                    });
-
-                    chart.render();
-                });
-
-        });
-    </script>
-
-    {{-- <script>
-        window.addEventListener('load', function() {
-
-            const options = {
-                chart: {
-                    type: 'pie',
-                    height: 300
-                },
-                labels: ['Duda', 'Janda', 'Lajang', 'Menikah'],
-                series: [1, 1, 5, 1],
-                legend: {
-                    show: true,
-                    position: 'bottom'
-                }
-            };
-
-            new ApexCharts(
-                document.querySelector("#chartStatusPernikahan"),
-                options
-            ).render();
-
-        });
-    </script> --}}
-
-
-    {{-- ========================= PIE CHART STATUS AB ========================= --}}
-    <script>
-        window.addEventListener('load', function() {
-            fetch('/charts/alumni/ab')
-                .then(res => res.json())
-                .then(data => {
-
-                    const chart = new ApexCharts(
-                        document.querySelector("#chartAb"), {
-                            chart: {
-                                type: 'pie',
-                                height: 300
-                            },
-                            labels: data.labels,
-                            series: data.values,
-                            legend: {
-                                show: true,
-                                position: 'bottom'
-                            }
-                        }
-                    );
-
-                    chart.render();
-                });
-        });
-    </script>
+    <script id="chart-alumni-data" type="application/json">@json($chartAlumni)</script>
+    <div id="chart-data-urls" class="hidden" data-marriage-url="{{ route('charts.alumni.status_pernikahan') }}" data-ab-url="{{ route('charts.alumni.ab') }}"></div>
 @endsection

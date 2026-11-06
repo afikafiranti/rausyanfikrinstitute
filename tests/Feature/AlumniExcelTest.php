@@ -7,6 +7,7 @@ use App\Models\User;
 use App\Models\Wilayah;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
@@ -186,6 +187,57 @@ class AlumniExcelTest extends TestCase
         $emails = array_column($this->downloadSheet($all->streamedContent())->toArray(), 1);
         $this->assertContains('own@example.test', $emails);
         $this->assertNotContains('outside@example.test', $emails);
+    }
+
+    public function test_excel_export_rejects_more_than_5000_matching_rows_but_allows_small_scoped_and_filtered_results(): void
+    {
+        $own = Wilayah::create(['name' => 'Jakarta']);
+        $other = Wilayah::create(['name' => 'Bandung']);
+        $admin = $this->account('admin');
+        $koorda = $this->account('koorda', $own->id);
+        User::factory()->create(['name' => '=2+2', 'email' => 'own@example.test', 'wilayah_id' => $own->id, 'phone' => '08123']);
+
+        $now = now();
+        for ($start = 1; $start <= 5001; $start += 500) {
+            $batch = [];
+            for ($i = $start; $i < min($start + 500, 5002); $i++) {
+                $batch[] = [
+                    'name' => $i <= 5000 ? 'Exportable '.$i : 'Excluded',
+                    'email' => 'outside'.$i.'@example.test',
+                    'password' => 'test-only',
+                    'wilayah_id' => $other->id,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+            DB::table('users')->insert($batch);
+        }
+
+        $this->actingAs($admin)->from(route('alumni.csv.index'))
+            ->get(route('alumni.excel.export'))
+            ->assertRedirect(route('alumni.csv.index'))
+            ->assertSessionHasErrors('export');
+
+        $atLimit = $this->actingAs($admin)->get(route('alumni.excel.export', ['q' => 'Exportable']));
+        $atLimit->assertOk();
+        $this->assertSame(5001, $this->downloadSheet($atLimit->streamedContent())->getHighestDataRow());
+
+        $scoped = $this->actingAs($koorda)->get(route('alumni.excel.export'));
+        $scoped->assertOk();
+        $sheet = $this->downloadSheet($scoped->streamedContent());
+        $this->assertSame(3, $sheet->getHighestDataRow());
+        $scopedRows = $sheet->toArray();
+        $this->assertContains('own@example.test', array_column($scopedRows, 1));
+        $this->assertNotContains('outside1@example.test', array_column($scopedRows, 1));
+        $ownRow = array_values(array_filter($scopedRows, fn (array $row) => $row[1] === 'own@example.test'))[0];
+        $this->assertSame('08123', $ownRow[3]);
+
+        $filtered = $this->actingAs($admin)->get(route('alumni.excel.export', ['q' => 'own@example.test']));
+        $filtered->assertOk();
+        $this->assertSame(2, $this->downloadSheet($filtered->streamedContent())->getHighestDataRow());
+
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+        \App\Support\AlumniExcel::export(User::query()->orderBy('id'));
     }
 
     private function account(string $role, ?int $region = null): User

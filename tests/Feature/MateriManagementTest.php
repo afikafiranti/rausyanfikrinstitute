@@ -7,7 +7,6 @@ use App\Models\Playlist;
 use App\Models\Role;
 use App\Models\User;
 use App\Models\Video;
-use App\Models\VideoProgress;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -66,7 +65,6 @@ class MateriManagementTest extends TestCase
         ])->assertRedirect();
         $video = Video::where('youtube_video_id', 'abcdefghijk')->firstOrFail();
         $this->assertSame($first->id, $video->playlist_id);
-        $progress = VideoProgress::create(['user_id' => auth()->id(), 'video_id' => $video->id]);
 
         $this->patch(route('materi.videos.update', [$second, $video]), [
             'title' => 'Bajak', 'youtube_video_id' => 'abcdefghijk',
@@ -82,7 +80,6 @@ class MateriManagementTest extends TestCase
         $this->assertDatabaseHas('videos', ['id' => $video->id]);
         $this->delete(route('materi.videos.destroy', [$first, $video]), ['confirm_delete' => '1'])->assertRedirect();
         $this->assertDatabaseMissing('videos', ['id' => $video->id]);
-        $this->assertDatabaseMissing('video_progress', ['id' => $progress->id]);
     }
 
     public function test_other_roles_and_inactive_admin_cannot_use_management(): void
@@ -126,14 +123,12 @@ class MateriManagementTest extends TestCase
         $playlist = $this->playlist($level);
         $video = Video::create(['playlist_id' => $playlist->id, 'title' => 'Ada', 'youtube_video_id' => 'abcdefghijk']);
         $this->actingAs($this->account());
-        $progress = VideoProgress::create(['user_id' => auth()->id(), 'video_id' => $video->id]);
 
         $this->delete(route('materi.playlists.destroy', $playlist))->assertSessionHasErrors('confirm_delete');
         $this->assertDatabaseHas('playlists', ['id' => $playlist->id]);
         $this->delete(route('materi.playlists.destroy', $playlist), ['confirm_delete' => '1'])->assertRedirect(route('materi.manage'));
         $this->assertDatabaseMissing('playlists', ['id' => $playlist->id]);
         $this->assertDatabaseMissing('videos', ['id' => $video->id]);
-        $this->assertDatabaseMissing('video_progress', ['id' => $progress->id]);
     }
 
     public function test_failed_video_form_restores_only_its_own_values(): void

@@ -11,6 +11,8 @@ use ZipArchive;
 
 class AlumniExcel
 {
+    public const MAX_EXPORT_ROWS = 5000;
+    public const EXPORT_LIMIT_MESSAGE = 'Ekspor Excel maksimal 5.000 baris sesuai wilayah dan filter. Persempit filter atau unduh CSV untuk seluruh hasil.';
     public const COLUMNS = ['name', 'email', 'wilayah', 'phone', 'angkatan', 'pekerjaan'];
     public const LEGACY_COLUMNS = ['name', 'email', 'wilayah_id', 'phone', 'angkatan', 'pekerjaan'];
 
@@ -105,11 +107,14 @@ class AlumniExcel
 
     public static function export(Builder $query): Spreadsheet
     {
-        // shortcut: workbook stays in memory; use a streaming XLSX writer when export volume exceeds PHP memory.
         $book = self::template();
         $sheet = $book->getActiveSheet();
         $line = 2;
         foreach ($query->with('wilayah:id,name')->lazy(500) as $user) {
+            if ($line > self::MAX_EXPORT_ROWS + 1) {
+                $book->disconnectWorksheets();
+                throw ValidationException::withMessages(['export' => self::EXPORT_LIMIT_MESSAGE]);
+            }
             foreach (self::COLUMNS as $index => $column) {
                 $value = $column === 'wilayah' ? $user->wilayah?->name : $user->{$column};
                 $sheet->setCellValueExplicit([$index + 1, $line], (string) ($value ?? ''), DataType::TYPE_STRING);
