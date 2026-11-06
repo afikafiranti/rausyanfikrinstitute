@@ -37,7 +37,7 @@ class PostController extends Controller
             unset($data['publication_status']);
             DB::transaction(function () use ($data) {
                 if (! (new Post($data))->save()) {
-                    throw new RuntimeException('Tulisan gagal disimpan.');
+                    throw new RuntimeException('Artikel gagal disimpan.');
                 }
             });
         } catch (Throwable $exception) {
@@ -45,7 +45,7 @@ class PostController extends Controller
             throw $exception;
         }
 
-        return redirect()->route('management.post.index')->with('success', 'Tulisan berhasil ditambahkan.');
+        return redirect()->route('management.post.index')->with('success', 'Artikel berhasil ditambahkan.');
     }
 
     public function update(Request $request, Post $post)
@@ -70,7 +70,7 @@ class PostController extends Controller
             }
             DB::transaction(function () use ($post, $data) {
                 if (! $post->fill($data)->save()) {
-                    throw new RuntimeException('Tulisan gagal diperbarui.');
+                    throw new RuntimeException('Artikel gagal diperbarui.');
                 }
             });
         } catch (Throwable $exception) {
@@ -81,7 +81,7 @@ class PostController extends Controller
             $this->deleteImage($oldPath);
         }
 
-        return redirect()->route('management.post.index')->with('success', 'Tulisan berhasil diperbarui.');
+        return redirect()->route('management.post.index')->with('success', 'Artikel berhasil diperbarui.');
     }
 
     public function destroy(Post $post)
@@ -89,12 +89,12 @@ class PostController extends Controller
         $path = $post->cover_url;
         DB::transaction(function () use ($post) {
             if (! $post->delete()) {
-                throw new RuntimeException('Tulisan gagal dihapus.');
+                throw new RuntimeException('Artikel gagal dihapus.');
             }
         });
         $this->deleteImage($path);
 
-        return redirect()->route('management.post.index')->with('success', 'Tulisan berhasil dihapus.');
+        return redirect()->route('management.post.index')->with('success', 'Artikel berhasil dihapus.');
     }
 
     private function validatedData(Request $request): array

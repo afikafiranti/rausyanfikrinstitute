@@ -30,7 +30,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
-| RFIX-21 | Nama menu Artikel | P2 | B | DONE | Navigasi diselaraskan, Refleksi publik tetap tersedia |
+| RFIX-21 | Nama menu Artikel | P2 | B | DONE | Koreksi UI 7 November mencakup seluruh copy pengelolaan; bukti terpisah di bawah |
 | RFIX-22 | Rebuild, integrasi dan pemulihan | P1 | Integrasi | PARTIAL | Lokal lulus; bukti staging/rilis belum tersedia |
 | RFIX-23 | Seeder/factory develop | P1 | A+B | DONE | Fixture domain aktif idempoten; akun existing terjaga |
 | RFIX-24 | Hapus Refleksi saya | P1 | A+B | DONE | Kode/tabel/data develop dihapus; dampak dan endpoint lama diuji |
@@ -77,6 +77,12 @@ Artefak browser: `storage/app/qa-rfix-browser/report.json` (diabaikan Git). Pros
 Cakupan: peta sumber tunggal, pemisahan isi PRD/keputusan/progres/risiko/prosedur, penyelarasan runbook, serta penanda arsip tanpa memindahkan path historis. Pedoman visual dan changelog template diberi kedudukan yang jelas; checklist spesifikasi menjadi butir biasa agar tidak membentuk register progres kedua.
 
 Verifikasi dokumentasi 7 November: pemeriksaan Python atas 18 dokumen/109 tautan lokal menemukan nol berkas/anchor putus; ID ARAH-01–11, KEP-01–10 dan RFIX-01–24 lengkap tanpa duplikasi. Pemeriksaan konsistensi independen dan git diff --check lulus. Hash 66 path non-dokumentasi yang telah berubah sebelum penataan tetap sama, termasuk status berkas terhapus; DOCX pengguna juga tetap identik. Suite aplikasi tidak dijalankan ulang, dan bukti aplikasi 6 November di atas tidak dianggap pengujian baru. Bagian penataan selesai; sisa RFIX-20 mengikuti register.
+
+## Koreksi penamaan UI Artikel 7 November — RFIX-21
+
+Baseline `e525afa`, branch `develop`. Judul form/daftar/modal, label, placeholder, tombol termasuk toggle mobile, penghitung, kondisi kosong, konfirmasi hapus serta pesan controller diselaraskan memakai Artikel. PRD memperjelas cakupan penamaan; tipe konten, route, izin dan schema tetap mengikuti kontrak existing.
+
+Verifikasi: PHP 8.3.30/MySQL pada DB terpisah `127.0.0.1/rf_ui_labels_testing`, config cache terisolasi dan kunci sintetis. `php -d extension=zip vendor/bin/phpunit --filter 'ContentManagementTest|ArticlePublishingTest|RemovedMemberReflectionTest' --display-warnings --display-deprecations --display-notices`: **31 tests, 350 assertions**, tanpa failure/error/warning/deprecation. Pemeriksaan HTTP/render Blade halaman pengelolaan dengan daftar kosong dan berisi Artikel/Refleksi lulus; memeriksa judul, label, serta markup desktop/mobile dan modal edit. Lint controller dan git diff --check lulus; tidak ada istilah lama di view/controller pengelolaan. Log: `storage/logs/phpunit-article-labels-2026-11-07.txt` (diabaikan Git). Browser visual dan suite penuh tidak diulang untuk koreksi teks ini.
 
 ## Riwayat sebelum rencana RFIX
 

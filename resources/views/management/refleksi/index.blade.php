@@ -8,12 +8,12 @@
 
 <div>
     <button type="button" id="toggleCreatePost" aria-controls="createPostPanel" aria-expanded="{{ $errors->any() && ! old('_editing_id') ? 'true' : 'false' }}"
-        class="rf-btn mb-4 lg:hidden">{{ $errors->any() && ! old('_editing_id') ? 'Tutup formulir' : 'Tambah tulisan' }}</button>
+        class="rf-btn mb-4 lg:hidden">{{ $errors->any() && ! old('_editing_id') ? 'Tutup formulir' : 'Tambah artikel' }}</button>
     <div class="grid gap-4 lg:grid-cols-12">
         {{-- ================= FORM INPUT BERITA ================= --}}
         <section id="createPostPanel" class="rf-card min-w-0 order-2 {{ $errors->any() && ! old('_editing_id') ? '' : 'hidden' }} lg:order-1 lg:col-span-4 lg:block">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-lg font-semibold">Tambah artikel atau refleksi</h2>
+                <h2 class="text-lg font-semibold">Tambah artikel</h2>
             </div>
 
             <form action="{{ route('management.post.store') }}" method="POST" enctype="multipart/form-data" class="space-y-3">
@@ -22,11 +22,11 @@
                     <label for="createTitle" class="block text-sm mb-1">Judul</label>
                     <input type="text" name="title" id="createTitle" required value="{{ old('_editing_id') ? '' : old('title') }}"
                         class="w-full min-h-11 rounded-lg border border-slate-300 px-3 py-2"
-                        placeholder="Judul tulisan">
+                        placeholder="Judul artikel">
                 </div>
 
                 <div>
-                    <label for="createType" class="block text-sm mb-1">Jenis tulisan</label>
+                    <label for="createType" class="block text-sm mb-1">Jenis artikel</label>
                     <select name="type" id="createType" class="w-full min-h-11 rounded-lg border border-slate-300 px-3 py-2">
                         <option value="reflection" @selected(old('_editing_id') ? false : old('type', 'reflection') === 'reflection')>Refleksi</option>
                         <option value="article" @selected(! old('_editing_id') && old('type') === 'article')>Artikel</option>
@@ -45,14 +45,14 @@
                     <label for="createExcerpt" class="block text-sm mb-1">Ringkasan</label>
                     <textarea name="excerpt" id="createExcerpt" rows="3"
                         class="w-full rounded-lg border border-slate-300 px-3 py-2"
-                        placeholder="Isi singkat tulisan">{{ old('_editing_id') ? '' : old('excerpt') }}</textarea>
+                        placeholder="Ringkasan artikel">{{ old('_editing_id') ? '' : old('excerpt') }}</textarea>
                 </div>
 
                 <div>
                     <label for="createContent" class="block text-sm mb-1">Isi lengkap</label>
                     <textarea name="content" id="createContent" rows="6"
                         class="w-full rounded-lg border border-slate-300 px-3 py-2"
-                        placeholder="Tulis isi lengkap di sini...">{{ old('_editing_id') ? '' : old('content') }}</textarea>
+                        placeholder="Tulis isi artikel di sini...">{{ old('_editing_id') ? '' : old('content') }}</textarea>
                 </div>
 
                 <div>
@@ -63,7 +63,7 @@
 
                 <button type="submit"
                     class="rf-btn w-full justify-center">
-                    Simpan tulisan
+                    Simpan artikel
                 </button>
             </form>
         </section>
@@ -71,8 +71,8 @@
         {{-- ================= DAFTAR BERITA ================= --}}
         <section class="rf-card min-w-0 order-1 lg:order-2 lg:col-span-8">
             <div class="flex items-center justify-between mb-3">
-                <h2 class="text-lg font-semibold">Daftar tulisan</h2>
-                <div class="text-sm text-slate-500">{{ $totalRows }} item</div>
+                <h2 class="text-lg font-semibold">Daftar artikel</h2>
+                <div class="text-sm text-slate-500">{{ $totalRows }} artikel</div>
             </div>
 
             <div class="space-y-3 lg:hidden">
@@ -95,7 +95,7 @@
                                 data-title="{{ $post->title }}" data-excerpt="{{ $post->excerpt }}" data-content="{{ $post->content }}"
                                 data-type="{{ $post->type }}" data-update-url="{{ route('management.post.update', $post) }}">Edit</button>
                             <form action="{{ route('management.post.destroy', $post->id) }}" method="POST"
-                                onsubmit="return confirm('Yakin ingin menghapus tulisan ini?')">
+                                onsubmit="return confirm('Yakin ingin menghapus artikel ini?')">
                                 @csrf
                                 @method('DELETE')
                                 <button type="submit" class="rf-btn-danger">Hapus</button>
@@ -103,7 +103,7 @@
                         </div>
                     </article>
                 @empty
-                    <p class="py-6 text-center text-[#536173]">Belum ada artikel atau refleksi.</p>
+                    <p class="py-6 text-center text-[#536173]">Belum ada artikel.</p>
                 @endforelse
             </div>
             <div class="hidden overflow-x-auto lg:block">
@@ -144,7 +144,7 @@
                                         </button>
 
                                         <form action="{{ route('management.post.destroy', $post->id) }}" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus tulisan ini?')">
+                                            onsubmit="return confirm('Yakin ingin menghapus artikel ini?')">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="rf-text-action text-[#C5282F]">Hapus</button>
@@ -154,7 +154,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="py-4 text-center text-slate-500">Belum ada artikel atau refleksi.</td>
+                                <td colspan="6" class="py-4 text-center text-slate-500">Belum ada artikel.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -170,7 +170,7 @@
 {{-- ===================== MODAL EDIT ===================== --}}
 <div id="editModal" role="dialog" aria-modal="true" aria-labelledby="editPostHeading" aria-hidden="true" class="fixed inset-0 hidden bg-black bg-opacity-50 items-center justify-center z-50 p-4">
     <div class="bg-white p-6 rounded-lg shadow-lg w-full max-w-lg max-h-full overflow-y-auto">
-        <h2 id="editPostHeading" class="text-lg font-semibold mb-3">Edit tulisan</h2>
+        <h2 id="editPostHeading" class="text-lg font-semibold mb-3">Edit artikel</h2>
         @if ($errors->any() && old('_editing_id'))
             @include('management.feedback')
         @endif
@@ -187,7 +187,7 @@
             </div>
 
             <div>
-                <label for="editType" class="block text-sm mb-1">Jenis tulisan</label>
+                <label for="editType" class="block text-sm mb-1">Jenis artikel</label>
                 <select name="type" id="editType" class="w-full min-h-11 rounded-lg border border-slate-300 px-3 py-2">
                     <option value="reflection" @selected(old('_editing_id') && old('type', 'reflection') === 'reflection')>Refleksi</option>
                     <option value="article" @selected(old('_editing_id') && old('type') === 'article')>Artikel</option>
@@ -223,7 +223,7 @@
 
             <div class="flex justify-end gap-3">
                 <button type="button" onclick="closeEditModal()" class="rf-btn-secondary">Batal</button>
-                <button type="submit" class="rf-btn">Simpan</button>
+                <button type="submit" class="rf-btn">Simpan artikel</button>
             </div>
         </form>
     </div>
@@ -238,7 +238,7 @@
         const willOpen = createPostPanel.classList.contains('hidden');
         createPostPanel.classList.toggle('hidden', !willOpen);
         createPostToggle.setAttribute('aria-expanded', String(willOpen));
-        createPostToggle.textContent = willOpen ? 'Tutup formulir' : 'Tambah tulisan';
+        createPostToggle.textContent = willOpen ? 'Tutup formulir' : 'Tambah artikel';
         if (willOpen) {
             createPostPanel.scrollIntoView({ behavior: 'instant', block: 'start' });
             document.getElementById('createTitle').focus({ preventScroll: true });
