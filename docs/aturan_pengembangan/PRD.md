@@ -103,7 +103,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 - Status laporan adalah draft, submitted, approved, rejected. Penulis mengubah/menghapus draf sendiri; identitas, wilayah dan total disahkan server saat menyimpan/mengirim.
 - Review mengecualikan laporan sendiri, mematuhi scope, membutuhkan alasan penolakan, dan menolak keputusan berulang. Isi laporan submitted/approved/rejected terkunci.
 - Rekap/ekspor CSV mencakup laporan yang sudah dikirim dalam filter wilayah/status/tanggal, bukan draf. Jumlah peserta adalah kehadiran, bukan jumlah orang unik; total harus konsisten dengan peserta laki-laki/perempuan.
-- Foto berada pada storage privat dan hanya disajikan melalui endpoint berizin.
+- Daftar laporan memakai toolbar ringkas dengan Buat draf laporan sebagai aksi utama, diikuti antrean review dan rekap/ekspor. Setiap baris menampilkan thumbnail dokumentasi atau keterangan ketika foto belum ada/tidak tersedia.
+- Foto berada pada storage privat; thumbnail dan foto detail hanya disajikan melalui endpoint berizin.
 
 ## 5. Prinsip UX
 

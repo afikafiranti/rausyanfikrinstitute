@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Profil tunggal, keyboard/modal dan layar kecil diuji |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Profil/modal teruji; tambahan toolbar laporan dan thumbnail 7 November diverifikasi di bawah |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -83,6 +83,20 @@ Verifikasi dokumentasi 7 November: pemeriksaan Python atas 18 dokumen/109 tautan
 Baseline `e525afa`, branch `develop`. Judul form/daftar/modal, label, placeholder, tombol termasuk toggle mobile, penghitung, kondisi kosong, konfirmasi hapus serta pesan controller diselaraskan memakai Artikel. PRD memperjelas cakupan penamaan; tipe konten, route, izin dan schema tetap mengikuti kontrak existing.
 
 Verifikasi: PHP 8.3.30/MySQL pada DB terpisah `127.0.0.1/rf_ui_labels_testing`, config cache terisolasi dan kunci sintetis. `php -d extension=zip vendor/bin/phpunit --filter 'ContentManagementTest|ArticlePublishingTest|RemovedMemberReflectionTest' --display-warnings --display-deprecations --display-notices`: **31 tests, 350 assertions**, tanpa failure/error/warning/deprecation. Pemeriksaan HTTP/render Blade halaman pengelolaan dengan daftar kosong dan berisi Artikel/Refleksi lulus; memeriksa judul, label, serta markup desktop/mobile dan modal edit. Lint controller dan git diff --check lulus; tidak ada istilah lama di view/controller pengelolaan. Log: `storage/logs/phpunit-article-labels-2026-11-07.txt` (diabaikan Git). Browser visual dan suite penuh tidak diulang untuk koreksi teks ini.
+
+## Toolbar laporan dan thumbnail dokumentasi 7 November — RFIX-17
+
+Branch `develop`, baseline `0d500fc`. Ketiga aksi memakai komponen tombol proyek dengan teks lebih kecil, jarak seragam dan Buat draf laporan sebagai aksi utama. Baris laporan menampilkan thumbnail, judul, metadata, status dan peserta. Foto kosong/hilang mempunyai fallback; nama link dan ketersediaan foto dapat dibaca pembaca layar. Query listing menambahkan kolom `foto_url`; gambar tetap memakai endpoint privat `laporan.photo` dan scope existing. Kontrak produk diperbarui pada PRD.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi thumbnail | Dua tes baru mereproduksi foto tidak tampil ketika kolom belum dipilih; setelah perbaikan, tes listing terakhir lulus **2 tests, 18 assertions** |
+| Integrasi laporan | PHP 8.3.30/MySQL 8.4.3, DB `127.0.0.1/rf_report_ui_testing`, config cache terisolasi dan kunci sintetis; `php -d extension=zip vendor/bin/phpunit --filter 'KajianReport\|ReportAvailabilityTest' --display-warnings --display-deprecations --display-notices`: **46 tests, 491 assertions**, tanpa failure/error/warning/deprecation |
+| Aset dan source | `npm run build` Vite 7.3.7 lulus, 176 modul; lint controller/tes dan git diff --check lulus. Review independen menutup temuan label foto untuk pembaca layar |
+| Chrome headless lokal | Data sintetis pada `rf_report_browser_testing`; enam kelompok pemeriksaan PASS: foto privat/akses anonim, fallback dan label aksesibel, responsivitas, navigasi/fokus keyboard, scope koorda, penolakan alumni. Tidak ada page error atau HTTP error yang tak diharapkan |
+| Pengukuran UI | Lebar 320/390/768/1280/1920 px tidak overflow; tombol tinggi 44 px, teks 14 px, jarak minimal 8 px. Kontras teks tombol utama 6,75:1; metadata minimal 5,76:1 pada latarnya |
+
+Log di `storage/logs/phpunit-report-ui-2026-11-07.txt` dan `phpunit-report-listing-final-2026-11-07.txt`. Artefak browser, `report.json`, `desktop-1280.png` dan `mobile-390.png` berada pada `storage/app/qa-report-ui-2026-11-07/`, diabaikan Git. Screenshot desktop/mobile telah diperiksa; server QA sementara port 8768 sudah dihentikan. Bukti ini mencakup perubahan laporan, bukan pengulangan suite aplikasi penuh atau deployment server.
 
 ## Riwayat sebelum rencana RFIX
 

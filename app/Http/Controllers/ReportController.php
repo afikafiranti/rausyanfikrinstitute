@@ -19,7 +19,7 @@ class ReportController extends Controller
     public function listing(Request $request)
     {
         $reports = $this->visibleReports($request)
-            ->select(['id', 'user_id', 'wilayah_id', 'tanggal', 'judul', 'status', 'total_peserta'])
+            ->select(['id', 'user_id', 'wilayah_id', 'tanggal', 'judul', 'status', 'total_peserta', 'foto_url'])
             ->with(['user:id,name', 'wilayah:id,name'])
             ->orderByDesc('tanggal')->orderByDesc('id')->paginate(12);
 
