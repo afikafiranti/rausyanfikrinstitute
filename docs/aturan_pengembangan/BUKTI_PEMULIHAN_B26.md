@@ -1,5 +1,7 @@
 # Bukti latihan pemulihan B2.6
 
+> **Bukti latihan historis — snapshot lokal 17 Oktober 2026.** Hasil sintetis ini bukan bukti pemulihan atau kesiapan lingkungan terkini. Lihat [README pengembangan](README.md), [TASK](TASK.md#register-rfix) untuk progres, dan [AUDIT](AUDIT.md) untuk risiko terkini.
+
 Tanggal: 2026-10-17. Lingkungan: lokal, Windows/Laragon. Data: sintetis seluruhnya.
 
 Perintah:

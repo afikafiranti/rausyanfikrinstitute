@@ -1,5 +1,7 @@
 # Catatan Jalur A
 
+> **Arsip historis.** Catatan bertanggal di bawah merekam pekerjaan Jalur A pada snapshot masing-masing; status, prioritas, dan batas lama bukan instruksi aktif. Untuk konteks proyek gunakan [README pengembangan](README.md), progres aktual [TASK](TASK.md#register-rfix), dan risiko terkini [AUDIT](AUDIT.md).
+
 ## A35-INTEGRATE — DONE lokal (2026-10-17)
 
 - Pengiriman integrasi: merge ecee5b4 dan sinkronisasi dokumen 13da2b5 sudah tersedia pada origin/develop dan origin/dev-A. [CI develop 39041927907](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39041927907) pada snapshot 13da2b5 **completed/success**, memakai PHP 8.3 dan MariaDB 11.4 (server 11.4.13). Tahap pengaman runner, install/Composer/platform/build/route/test semuanya lulus. Bukti CI ini menutup pemeriksaan remote batch A3–A5, tanpa menutup advisory/kunci/staging atau menyetujui rilis.

@@ -1,59 +1,51 @@
 # Audit dan Risiko Aktif
 
-Pembaruan 4 November 2026. Source yang diperiksa: bd9cdc1bc728916060e50d4566eccc64a172df9b; perubahan dokumentasi ini tidak mengubah aplikasi atau schema. Temuan aplikasi di bawah masih terbuka.
+Penilaian per 6 November 2026. [TASK](TASK.md#register-rfix) menjadi satu-satunya register penyelesaian dan [bukti eksekusi](TASK.md#verifikasi-aplikasi-terakhir). Dokumen ini mempertahankan asal temuan, triase, serta batas kesimpulan; keberhasilan lokal tidak membuktikan kondisi server.
 
-Rincian bukti bertanggal ada di [snapshot audit 3 November](AUDIT_REPOSITORI_2026-11-03.md). Keputusan/prioritas terbaru ada pada [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md); progres implementasi hanya di [TASK](TASK.md).
+## Jenis dan batas bukti
+
+| Kode | Sumber | Batas kesimpulan |
+|---|---|---|
+| B1 | Source dan uji mekanisme terisolasi | Mekanisme tertentu terbukti, belum seluruh alur aplikasi |
+| B2 | Source, migration dan penelusuran alur | Tidak sama dengan reproduksi pada DB/server tujuan |
+| B3 | Output CI/perintah aktual | Berlaku pada commit dan lingkungan yang dicatat |
+| B4 | Pencocokan versi dengan advisory | Keterjangkauan serangan ditriase tersendiri |
+| B5 | Catatan historis | Pemakaian saat ini harus diperiksa sebelum tindakan server |
+| B6 | Perilaku/batas produk terdokumentasi | Tidak otomatis menjadi bug |
+| B7 | Arahan perapian/inventarisasi | Bukan bukti kerusakan data telah terjadi |
+
+## Asal temuan dan pengendalian
+
+Tabel ini memetakan alasan pekerjaan, bukan menyalin statusnya. Detail baseline berada pada [audit repositori 3 November](AUDIT_REPOSITORI_2026-11-03.md); spesifikasi tindakan berada di dokumen induk dan hasilnya di TASK.
+
+| Temuan | Mekanisme atau paparan awal | Bukti awal | Pekerjaan/pengendalian |
+|---|---|---|---|
+| RF-01 | Nama alumni disisipkan ke JavaScript konfirmasi hapus | B1/B2 | RFIX-01: hilangkan interpolasi ke kode |
+| RF-02 | Versi dependency PHP cocok advisory | B4 | RFIX-10: patch sesuai paparan dan audit lockfile |
+| RF-03 | Versi dependency frontend/tooling cocok advisory | B3/B4 | RFIX-11: patch dan triase rantai transitif |
+| RF-04 | Cascade akun menghapus laporan; file dapat tertinggal | B2 | RFIX-03/22: kebijakan retensi, FK dan pemulihan |
+| RF-05 | Perubahan profil/self-delete menghilangkan pengelola terakhir | B2, tergantung susunan role | RFIX-08: guard transaksi dan uji beberapa koneksi |
+| RF-06 | Perubahan profil mengganti suspended menjadi pending | B2 | RFIX-09: pertahankan status dan pesan nyata |
+| RF-07 | CI sukses dengan warning dan gate audit belum eksplisit | B3 | RFIX-12: detail keluaran/gate serta bukti remote |
+| RF-08 | Pemakaian APP_KEY historis belum teridentifikasi | B5 | RFIX-13: inventaris lingkungan dan dampak enkripsi |
+| RF-09 | Grafik CDN tanpa versi terkunci | B2 | RFIX-14: bundle lockfile dan penanganan gagal |
+| RF-10 | Query role berulang walau relasi dimuat | B2, belum benchmark saat audit awal | RFIX-07: gunakan relasi untuk tampilan dan ukur |
+| RF-11 | Index bersusunan sama dibuat berulang | B2, belum inventaris DB saat audit awal | RFIX-04: konsolidasi berdasarkan pemakaian |
+| RF-12 | Edit judul mengganti slug tulisan terbit | B2 | RFIX-15: pertahankan URL yang dibagikan |
+
+Perapian schema/fixture (RFIX-02/05/06/23/24) memerlukan inventaris dan regresi, bukan asumsi data telah rusak. Kontrak laporan yang berbeda antara helper/request dan route (RFIX-18) bukan bukti alumni berhasil menembus endpoint. Batas workbook/UX (RFIX-16/17), operasional (RFIX-19/22) dan dokumentasi/aset (RFIX-20) dinilai sesuai lingkungan dan kebutuhan, bukan hanya jumlah berkas/tabel.
 
 ## Daftar risiko aktif
 
-| ID | Kondisi source yang dikonfirmasi | Jenis bukti dan batas | Prioritas | Tindak lanjut |
-|---|---|---|---|---|
-| RF-01 | Nama alumni berada dalam string JavaScript onsubmit konfirmasi hapus | Source + uji handler terisolasi; belum E2E Laravel/browser | P0 | RFIX-01 |
-| RF-02 | Laravel 12.28.1/Symfony 7.3.x dan paket runtime lain cocok dengan advisory | Pencocokan lockfile/Packagist 3 November; bukan bukti semua jalur dapat dieksploitasi | P1 | RFIX-10 |
-| RF-03 | Audit npm baseline mencatat 19 entri paket terdampak | Bertanggal; dua entri critical terkait rantai dependency | P1 | RFIX-11 |
-| RF-04 | FK kajian_reports.user_id masih cascadeOnDelete; akun dihapus permanen | Source/schema; kebijakan perilaku setelah aplikasi dipakai perlu ditetapkan | P1 | RFIX-03/22 |
-| RF-05 | Edit profil kritis menjadi pending; self-delete tanpa penjaga pengelola terakhir | Source; dampak tergantung susunan pengelola | P1 | RFIX-08 |
-| RF-06 | Edit wilayah/angkatan dapat mengubah suspended menjadi pending | Source pada profil sendiri dan edit admin; bukan aktivasi otomatis | P1 | RFIX-09 |
-| RF-07 | CI baseline success dengan 280 warnings, 7 passed, 2172 assertions | Log CI; penyebab warning belum didiagnosis penuh | P1 | RFIX-12 |
-| RF-08 | Pemakaian APP_KEY historis belum dinilai tuntas | Catatan historis; tidak menyatakan kunci produksi aktif bocor | P1 kondisional | RFIX-13 |
-| RF-09 | ApexCharts dimuat dari CDN tanpa versi; package memasang Chart.js | Source view/config; kegagalan grafik belum diuji ulang pada browser | P2 | RFIX-14 |
-| RF-10 | User::hasRole memakai roles()->exists meski relasi daftar sudah dimuat | Source; estimasi query bukan benchmark | P1, dimajukan untuk DB/kode | RFIX-07 |
-| RF-11 | Index users(wilayah_id,level_id,status) didefinisikan tiga kali; kandidat index berlebih lain ada | Migration source; schema terpasang tidak diperiksa melalui koneksi DB | P1, dimajukan untuk DB | RFIX-04 |
-| RF-12 | Perubahan judul Post dapat membentuk slug baru tanpa pemetaan slug lama | Source model/detail route | P2 | RFIX-15 |
-
-## Pemeriksaan source 4 November
-
-Pemeriksaan statis mengonfirmasi:
-- 55 berkas PHP aplikasi, 26 controller, 24 migration, 21 tabel bernama pada source dan 42 berkas PHP tests.
-- Inline nama di konfirmasi hapus, cascade penulis laporan, transisi pending, CDN grafik, query role dan pembuatan slug masih ada.
-- Route laporan menolak alumni, tetapi StoreKajianReportRequest dan helper visibleReports masih menyebut alumni. Ini ketidaksamaan kontrak internal; bukan bukti endpoint alumni sudah terbuka.
-- VideoProgress belum menjadi fitur pengguna, tetapi dirujuk Video::progresses serta dua tes MateriManagementTest. Penghapusan kandidat tabel harus menyesuaikan referensi itu.
-- Dokumen lama menyebut Chart.js; dashboard aktif memakai ApexCharts CDN. Rencana library akhir belum dipilih.
-
-## Pemaknaan kondisi develop
-
-Data develop lama boleh direset. Tidak diperlukan penyelamatan atau upgrade dataset lama untuk merancang schema. Risiko RF-04 tetap menyangkut aturan hapus/rekap setelah sistem digunakan; ia tidak menjadi larangan reset develop yang sudah diizinkan.
-
-Struktur DB belum final. Baseline 21 tabel dan nama model bukan keputusan desain akhir. Kandidat schema, constraint, index dan seeder diuji menurut kebutuhan fungsi, bukan mengikuti target jumlah tabel semata.
-
-## Bukti pengujian baseline
-
-[CI 39086196915](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39086196915) pada bd9cdc1bc728916060e50d4566eccc64a172df9b completed/success, dengan 280 warnings, 7 passed dan 2172 assertions. Log ringkas memotong sejumlah pesan file_get_contents; jangan menetapkan akar masalah tanpa output lengkap.
-
-Build frontend dan pengaman runner lokal telah diperiksa pada audit awal. PHP/Composer/database/Chromium lokal tidak tersedia pada sesi audit tersebut; suite aplikasi tidak dijalankan ulang saat sinkronisasi dokumentasi. Audit dependency 43 advisory unik/12 paket PHP runtime dan 19 entri npm tetap merupakan hasil 3 November, bukan audit baru 4 November.
-
-## Batas fitur yang tidak dihitung sebagai bug baru
-
-- Homepage ringkas memang tidak memasukkan agenda/tim-kontak.
-- Progres video, metadata otomatis dan CRUD web master belum diimplementasikan.
-- Laporan rejected belum memiliki revisi/kirim ulang.
-- Galeri disimpan langsung publik; verifikasi email belum menjadi syarat umum modul.
-- Statistik alumni memasukkan seluruh akun dalam scope; widget jumlah kajian bulanan masih menyatakan belum tersedia.
-- Refleksi publik tetap dapat dibuka melalui URL; navigasi publik aktif belum menautkannya.
-- Draf Refleksi saya hanya penulis; pengiriman internal tidak mempublikasikannya.
+- **Dependency tooling.** Residu low npm berasal dari satu advisory `GHSA-gcqx-w48m-w2h4` pada rantai `flowbite → flowbite-datepicker → @rollup/plugin-node-resolve → deepmerge 4.3.1`. Paket terakhir digunakan pada tooling build datepicker; aplikasi tidak memasukkan objek unggahan pengguna ke proses merge tersebut. Registry yang diperiksa pada tanggal penilaian masih menawarkan 4.3.1. Penurunan major Flowbite yang disarankan otomatis tidak diterapkan. Temuan tetap terlihat, dengan gate sesuai runner; triase ini bukan klaim seluruh risiko dependency hilang.
+- **CI remote.** Hasil lokal belum membuktikan patch pada runner remote. Akar warning baseline belum dapat ditetapkan dari log ringkas yang memotong pesan file_get_contents; jangan menganggap sudah terdiagnosis.
+- **Kunci server.** Pemeriksaan repository/lokal tidak membuktikan kunci mana yang dipakai server. Sebelum rotasi, identifikasi lingkungan, data terenkripsi dan backup kunci; jangan mencetak rahasia atau merotasi tanpa menilai dampaknya.
+- **Operasional tujuan.** SMTP organisasi, QA staging, backup/restore serta RTO/RPO server membutuhkan bukti lingkungan tujuan. Drill sintetis lokal tidak menggantikannya.
+- **Kapasitas hosting.** Batas XLSX dipilih dari pengukuran lokal pada TASK. Memori/waktu hosting belum diukur; kontrak batas dan alternatif ekspor mengikuti PRD.
+- **Identitas/aset.** Lisensi memerlukan keputusan pemilik. Inventaris/pembersihan seluruh aset dan template lama masih perlu diselesaikan.
 
 ## Perubahan status audit
 
-Temuan ditutup hanya dengan commit implementasi dan bukti penerimaan terkait. Catat kapan temuan hanya didokumentasikan, kapan patch tersedia, dan kapan benar-benar terverifikasi. Jangan mengubah semua prioritas/cakupan berdasarkan snapshot lama.
+Nilai penutupan dari kriteria RFIX dan bukti pada TASK; bedakan dokumentasi, patch yang tersedia, verifikasi lokal, dan penerapan target. Batas fitur mengikuti [PRD](PRD.md#cakupan-dan-status-implementasi), keputusan schema mengikuti dokumen induk, dan pengaman develop/tes mengikuti SOP.
 
-Riwayat sebelum sinkronisasi: [AUDIT baseline](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/AUDIT.md). Guardrail lama tentang pelestarian data develop/migration lama diganti oleh arahan eksplisit terbaru; riwayat tersebut tetap berguna sebagai bukti tanggalnya.
+[Audit baseline](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/AUDIT.md) beserta snapshot bertanggal merupakan riwayat. Larangan reset develop lama tidak menggantikan izin aktif yang dibatasi pada target proyek terverifikasi.

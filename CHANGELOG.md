@@ -1,5 +1,7 @@
 # Release Notes
 
+> **Arsip skeleton Laravel.** Isi di bawah merupakan riwayat template upstream, bukan rilis atau versi aplikasi Rausyan Fikr. Status pekerjaan dan bukti rilis proyek mengikuti [TASK](docs/aturan_pengembangan/TASK.md); pembagian dokumen mengikuti [peta dokumentasi](docs/aturan_pengembangan/README.md).
+
 ## [Unreleased](https://github.com/laravel/laravel/compare/v12.3.1...12.x)
 
 ## [v12.3.1](https://github.com/laravel/laravel/compare/v12.3.0...v12.3.1) - 2025-08-21

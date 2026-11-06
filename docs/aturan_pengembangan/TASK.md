@@ -1,71 +1,83 @@
 # Task Log Pengembangan
 
+Satu register progres aktif. Spesifikasi dan syarat penerimaan ada di [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md#9-rincian-pekerjaan); cara mencatat pekerjaan mengikuti [SOP](SOP.md#5-pencatatan-dan-penutupan).
+
 ## Ringkasan Status Saat Ini
 
-Pembaruan 4 November 2026. Basis kode aplikasi: bd9cdc1bc728916060e50d4566eccc64a172df9b. Dokumen induk dan pencatatan aktif disimpan atas instruksi pengguna. Tidak ada patch aplikasi, schema baru, reset database atau eksekusi seeder pada sinkronisasi dokumentasi ini.
-
-Satu register progres aktif adalah dokumen ini. Rincian langkah dan kriteria setiap pekerjaan ada pada [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md#9-rincian-pekerjaan). [PLAN](PLAN.md#rencana-aktif) menetapkan urutan; [AUDIT](AUDIT.md) menetapkan status bukti.
-
-### DONE — DOK-SYNC-2026-11-04
-
-- Dokumen induk dipindahkan ke repo agar dapat dibaca agent tanpa akses ChatGPT Library.
-- Snapshot audit disertakan sebagai berkas repo; tautan internal diperiksa.
-- AGENTS/README/PRD/PLAN/TASK/AUDIT/SOP diselaraskan dengan arahan terbaru dan source baseline.
-- Penataan schema masih terbuka; izin reset data develop dan kewajiban seeder dicatat.
-- Pemeriksaan source mengonfirmasi temuan belum ditutup; tidak mencatat implementasi yang belum terjadi.
-- Verifikasi dokumentasi: struktur tabel Markdown, referensi RFIX/ARAH/KEP, tautan berkas/anchor, kesesuaian bukti source, dan perubahan hanya dokumentasi.
-- Penyusunan dan verifikasi dokumen selesai; berkas disimpan pada develop dalam dua commit dokumentasi melalui browser GitHub. Verifikasi remote memastikan isi dan cakupan perubahannya.
-- Subtugas pencatatan RFIX-20 selesai; pembersihan aset/template dan penetapan lisensi tetap pekerjaan tersendiri. Status keseluruhan RFIX-20 PARTIAL.
+Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada commit implementasi `660238afa3c7d8cf60aee187a9fcca31d1b87e4d` di `develop`; penataan dokumentasi disimpan pada commit sesudahnya. Pengguna meminta pengiriman ke `origin/develop`. Belum ada deployment baru. Bukti aplikasi di bawah berasal dari verifikasi lokal 6 November, bukan CI remote atau produksi. Kebutuhan produk mengikuti [PRD](PRD.md), termasuk penghapusan fitur pribadi dan penamaan menu.
 
 ### Register RFIX
 
-| ID | Pekerjaan | Prioritas | Domain koordinasi | Status | Catatan kondisi kode |
+| ID | Pekerjaan | Prioritas | Domain | Status | Hasil atau bagian tersisa |
 |---|---|---|---|---|---|
-| RFIX-01 | Amankan konfirmasi hapus alumni | P0 | A+B | TODO | RF-01; nama dalam JavaScript masih ada |
-| RFIX-02 | Petakan kebutuhan dan bandingkan kandidat schema | P1 | Integrasi | TODO | Schema belum final; data develop boleh dibuat ulang |
-| RFIX-03 | Atur hapus akun, laporan dan file | P1 | A+B | TODO | RF-04; kebijakan KEP-01/02 dan kandidat schema |
-| RFIX-04 | Konsolidasikan index yang berlebih | P1 | Integrasi | TODO | RF-11; schema baru boleh disusun dari kosong |
-| RFIX-05 | Selaraskan kolom, constraint dan validasi | P1 | A+B | TODO | Hasil RFIX-02; keputusan kebutuhan data |
-| RFIX-06 | Tinjau schema tertunda dan referensinya | P1 | A+B | TODO | video_progress masih punya relasi dan tes |
-| RFIX-07 | Kurangi query role berulang | P1 | A+B | TODO | RF-10; gunakan pengukuran dan tes izin |
-| RFIX-08 | Lindungi pengelola aktif terakhir | P1 | A | TODO | RF-05; definisi pengelola dan KEP-03 |
-| RFIX-09 | Jaga suspended saat profil berubah | P1 | A | TODO | RF-06; jalur profil sendiri dan edit admin |
-| RFIX-10 | Triase dan perbarui dependency PHP | P1 | B+A | TODO | RF-02; audit bertanggal dan runtime PHP 8.3 |
-| RFIX-11 | Triase dan perbarui dependency frontend | P1 | B | TODO | RF-03; browser/build/development dibedakan |
-| RFIX-12 | Bersihkan warning dan perjelas CI | P1 | B+A | TODO | RF-07; rincian warning belum didiagnosis penuh |
-| RFIX-13 | Nilai pemakaian kunci historis | P1 kondisional | Operator+B | TODO | RF-08; bukan bukti kunci produksi aktif bocor |
-| RFIX-14 | Kunci library grafik dan tangani gagal | P2 | B | TODO | RF-09; KEP-04 |
-| RFIX-15 | Pertahankan URL tulisan saat edit judul | P2 | B | TODO | RF-12; slug masih dapat berubah |
-| RFIX-16 | Ukur dan tetapkan batas ekspor XLSX | P2 | A+B | TODO | Workbook masih memakai memori; KEP-05 |
-| RFIX-17 | Rapikan form dan interaksi responsif | P2 | A+B | TODO | Form profil ganda dan fokus modal |
-| RFIX-18 | Selaraskan kontrak izin laporan | P1 | A+B | TODO | Route menolak alumni; helper/request masih menyebut alumni |
-| RFIX-19 | Buktikan email dan operasional target | P1 rilis | Operator+A+B | TODO | Staging/SMTP eksternal belum ada bukti lulus |
-| RFIX-20 | Selaraskan dokumentasi dan arsip teknis | P2/P3 | Integrasi | PARTIAL | Dokumen aktif sinkron; aset/template dan lisensi belum ditata |
-| RFIX-21 | Perjelas istilah publik dan pribadi | P2 | B | TODO | Kontrak dicatat; perubahan teks/menu aplikasi belum dibuat |
-| RFIX-22 | Buktikan rebuild, integrasi dan pemulihan | P1 | Integrasi | TODO | Tidak mewajibkan upgrade dataset develop lama |
-| RFIX-23 | Lengkapi seeder/factory develop | P1 | A+B | TODO | Seeder baseline belum memenuhi semua fixture rencana |
+| RFIX-01 | Konfirmasi hapus alumni | P0 | A+B | DONE | Pesan statis; regresi endpoint/browser lulus |
+| RFIX-02 | Rancangan schema | P1 | Integrasi | DONE | Kandidat B dipilih dan diuji dari kosong |
+| RFIX-03 | Hapus akun, laporan dan file | P1 | A+B | DONE | Aplikasi/FK melindungi laporan; avatar dibersihkan setelah commit |
+| RFIX-04 | Konsolidasi index | P1 | Integrasi | DONE | Index berlebih dihapus; inventaris DB pada bukti penerapan |
+| RFIX-05 | Kolom, constraint dan validasi | P1 | A+B | DONE | Unique phone dan fixture enum; constraint/regresi lulus |
+| RFIX-06 | Schema tertunda | P1 | A+B | DONE | VideoProgress beserta seluruh pemakai lama dihapus |
+| RFIX-07 | Query role | P1 | A+B | DONE | Hasil pengukuran pada bukti penerapan; izin aktual terjaga |
+| RFIX-08 | Pengelola aktif terakhir | P1 | A | DONE | Regresi multi-role dan dua transaksi lulus |
+| RFIX-09 | Status suspended | P1 | A | DONE | Dua jalur profil, pesan/notifikasi dan audit diuji |
+| RFIX-10 | Dependency PHP | P1 | B+A | DONE | Lockfile, platform, audit dan regresi lulus |
+| RFIX-11 | Dependency frontend | P1 | B | DONE | Instalasi/build/browser lulus; residu ditriase di AUDIT |
+| RFIX-12 | Warning dan gate CI | P1 | B+A | PARTIAL | Gate/keluaran diperbaiki; CI remote patch dan akar warning baseline belum terbukti |
+| RFIX-13 | Kunci historis | P1 kondisional | Operator+B | PARTIAL | Pemeriksaan lokal tercatat; pemakaian kunci server belum diketahui |
+| RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
+| RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
+| RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Profil tunggal, keyboard/modal dan layar kecil diuji |
+| RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
+| RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
+| RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
+| RFIX-21 | Nama menu Artikel | P2 | B | DONE | Navigasi diselaraskan, Refleksi publik tetap tersedia |
+| RFIX-22 | Rebuild, integrasi dan pemulihan | P1 | Integrasi | PARTIAL | Lokal lulus; bukti staging/rilis belum tersedia |
+| RFIX-23 | Seeder/factory develop | P1 | A+B | DONE | Fixture domain aktif idempoten; akun existing terjaga |
+| RFIX-24 | Hapus Refleksi saya | P1 | A+B | DONE | Kode/tabel/data develop dihapus; dampak dan endpoint lama diuji |
 
 ### Arti status
 
-- TODO: pekerjaan yang tersisa belum diimplementasikan.
-- IN_PROGRESS: changeset sedang dikerjakan; catat branch, pelaksana dan commit awal agar tidak tumpang tindih.
-- PARTIAL: ada bagian selesai dengan bukti, tetapi keseluruhan pekerjaan belum memenuhi kriteria; bukan tanda ada pelaksana yang masih memegang lock.
-- REVIEW: implementasi dan tes relevan tersedia, menunggu pemeriksaan hasil.
-- BLOCKED: kebutuhan atau keputusan spesifik menghalangi langkah terkait; sebutkan tepatnya.
-- DONE: kriteria penerimaan terpenuhi dan bukti commit/perintah/lingkungan dicatat.
+- TODO: bagian tersisa belum diimplementasikan.
+- IN_PROGRESS: sedang dikerjakan; catat branch, pelaksana dan titik awal untuk koordinasi.
+- PARTIAL: sebagian terbukti selesai; keseluruhan kriteria belum terpenuhi dan bukan lock pelaksana.
+- REVIEW: implementasi/tes relevan tersedia, menunggu pemeriksaan hasil.
+- BLOCKED: kebutuhan spesifik menghalangi langkah terkait; sebutkan penyebabnya.
+- DONE: kriteria penerimaan terpenuhi dan bukti eksekusi/lingkungan tersedia.
 
-Persetujuan rilis/penerapan tidak disimpulkan dari DONE sebuah perubahan kode. TASK, audit dan catatan jalur tidak boleh menyebut test berhasil bila belum dijalankan.
+DONE suatu perubahan kode tidak menyatakan persetujuan deployment.
 
-## Kondisi implementasi baseline
+## Bukti penerapan lokal 6 November
 
-Fitur akun/alumni/materi, laporan, homepage ringkas, dashboard alumni, Refleksi saya dan pembatasan Post/Galeri sudah tersedia pada develop hasil integrasi 18 Oktober. Tidak mengulang A0–A5/PUB-03/PUB-04/UIUX-02 sebagai pembangunan fitur baru.
+| Pemeriksaan | Hasil aktual |
+|---|---|
+| Target rebuild | Environment `local`, host `127.0.0.1`, database `rausyan_fikr`, config cache tidak aktif; `migrate:fresh --seed`, lalu `db:seed` ulang |
+| Schema dan fixture | 13 akun contoh, 19 tabel bernama di luar `migrations`, 8 index users; tanpa duplikasi telepon atau tabel fitur yang dihapus |
+| Snapshot sebelum reset | Storage privat yang diabaikan Git: `storage/app/private/rfix-local-before-2026-11-06.sql` |
+| Query role pada daftar 5/15 baris | Sebelum 35/75, sesudah 17/17 query; pemeriksaan endpoint tetap membaca role aktual |
+| Pengukuran workbook XLSX | PHP 8.3/ZIP/512M: 1.000 baris 0,387 detik/54 MiB; 5.000 1,778 detik/80 MiB; 10.000 3,898 detik/114 MiB. Bukan jaminan hosting |
+| Kunci historis | Dua kunci berbeda ditemukan tanpa mencetak nilainya; kunci lokal saat ini tidak cocok dengan keduanya. Pemakaian server belum terbukti |
+| Bahan diskusi pengguna | `docs/diskusi/` dipertahankan; SHA256 DOCX `94fa62f788ba4fda78f16da3334838e333313a03c4572740484afdc3c1e7698d` tetap sama |
 
-Bukti CI yang diperiksa pada source baseline: [run 39086196915](https://github.com/afikafiranti/rausyanfikrinstitute/actions/runs/39086196915) completed/success; ringkasan 280 warnings, 7 passed, 2172 assertions. Ini bukti baseline, bukan tes patch RFIX.
+## Verifikasi aplikasi terakhir
 
-## Pembaruan progres berikutnya
+| Verifikasi akhir lokal | Hasil dan batas |
+|---|---|
+| PHP 8.3.30, MySQL 8.4.3, `rf_integration_testing`; `php -d extension=zip vendor/bin/phpunit --display-warnings --display-deprecations --display-notices` | **298 tests, 2.322 assertions**, tanpa failure/error/warning/deprecation/skip; PHPUnit 11.5.57. Log di `storage/logs/phpunit-final.txt` dan XML pendamping |
+| Composer validate/platform/audit locked | Validasi dan platform lulus; **0 advisory**. Laravel 12.71.0 dan dependency sesuai `composer.lock`; ZIP 8.3 diaktifkan pada proses CLI melalui `-d extension=zip` |
+| `npm ci`, `npm run build`, audit npm | Build Vite 7.3.7 lulus, 176 modul; **4 low, 0 moderate/high/critical**. Rantai Flowbite/deepmerge ditriase pada AUDIT |
+| Chrome headless lokal, database `rf_browser_testing`, aset hasil build | Delapan pemeriksaan lulus: tiga grafik/AB null; HTTP 403/500; data kosong; fokus/trap/Escape modal; validasi; konfirmasi batal/lanjut dengan nama apostrof/ekspresi; profil 320/390/1280px; endpoint privat 404 dan publik 200. Tidak ada page error JavaScript |
+| Dua proses PHP/koneksi MySQL pada database uji tersendiri | Dua admin: proses kedua menunggu 702 ms lalu ditolak, satu admin aktif tersisa. Dua super admin + satu admin: proses kedua menunggu 765 ms lalu ditolak, satu super admin dan satu admin aktif tersisa. Membuktikan mekanisme lock DB; tes endpoint berurutan terpisah |
+| `scripts/rehearse-recovery.php --run-local-drill` | SQL + tiga file + kunci sintetis dipulihkan, checksum/dekripsi dan deteksi korupsi lulus; restore 1,980 detik, total 8,036 detik. Database dan berkas drill dibersihkan; bukan bukti RTO/RPO staging |
+| Tooling CI, PHP lint, route dan review | Pengaman runner lulus; 36 berkas PHP baru/berubah lolos lint PHP 8.3; 83 route, 0 route refleksi pribadi. Review independen selesai; temuan fokus modal, batas iterasi XLSX dan pesan gagal sudah diperbaiki dan diuji |
 
-Setiap perubahan RFIX mengisi: branch/commit, target develop/test/staging, keputusan KEP, file/schema berubah, seeder yang dipakai, perilaku sebelum/sesudah, perintah uji dan hasil/warning/skip. Gunakan [format dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md#14-catatan-perubahan-per-pekerjaan). Catatan A/B menyimpan detail pelaksanaan; status aktif tetap satu pada register di atas.
+Artefak browser: `storage/app/qa-rfix-browser/report.json` (diabaikan Git). Proses QA milik pekerjaan sudah dihentikan; target drill/koneksi sementara dibersihkan. Batas bukti dan risiko rilis dinilai pada [AUDIT](AUDIT.md#daftar-risiko-aktif).
+
+## Penataan dokumentasi 7 November — RFIX-20
+
+Cakupan: peta sumber tunggal, pemisahan isi PRD/keputusan/progres/risiko/prosedur, penyelarasan runbook, serta penanda arsip tanpa memindahkan path historis. Pedoman visual dan changelog template diberi kedudukan yang jelas; checklist spesifikasi menjadi butir biasa agar tidak membentuk register progres kedua.
+
+Verifikasi dokumentasi 7 November: pemeriksaan Python atas 18 dokumen/109 tautan lokal menemukan nol berkas/anchor putus; ID ARAH-01–11, KEP-01–10 dan RFIX-01–24 lengkap tanpa duplikasi. Pemeriksaan konsistensi independen dan git diff --check lulus. Hash 66 path non-dokumentasi yang telah berubah sebelum penataan tetap sama, termasuk status berkas terhapus; DOCX pengguna juga tetap identik. Suite aplikasi tidak dijalankan ulang, dan bukti aplikasi 6 November di atas tidak dianggap pengujian baru. Bagian penataan selesai; sisa RFIX-20 mengikuti register.
 
 ## Riwayat sebelum rencana RFIX
 
-[Versi TASK pada baseline 18 Oktober](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/TASK.md) mempertahankan seluruh task A/B/PUB dan bukti historis. [Catatan A](CATATAN_JALUR_A.md) dan [Catatan B](CATATAN_JALUR_B.md) tetap tersedia. Label lama “belum merge”, “CI belum”, larangan reset develop, dan urutan agenda/tim tidak menggantikan arahan aktif.
+[Catatan A](CATATAN_JALUR_A.md), [Catatan B](CATATAN_JALUR_B.md), dan [TASK baseline](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/TASK.md) mempertahankan kronologi A/B/PUB serta bukti tanggalnya. Ikuti [peta dokumentasi](README.md#arsip-dan-bukti-historis) untuk kedudukan arsip.

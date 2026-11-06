@@ -1,22 +1,21 @@
-# Runbook staging, backup dan pemulihan — Jalur B
+# Runbook staging, backup dan pemulihan
 
-Tanggal: 2026-10-17. Status: persiapan lokal; **belum izin rilis**.
+Prosedur operator untuk lingkungan server yang telah diidentifikasi. Status pekerjaan dan bukti pelaksanaan terbaru berada di [TASK](TASK.md#register-rfix), risiko dan batas buktinya di [AUDIT](AUDIT.md#daftar-risiko-aktif). Persyaratan produk mengikuti [PRD](PRD.md); runtime, instalasi develop dan pengujian lokal mengikuti [SOP](SOP.md).
 
 ## Batas dan syarat masuk
 
-Belum ada target/akses staging yang diverifikasi pada sesi ini. Semua perintah server di bawah adalah prosedur untuk operator pada lingkungan yang telah ditentukan, bukan catatan eksekusi staging. Jangan menyalin kredensial staging/produksi ke Git, terminal history, issue atau hasil CI.
+Perintah server di bawah adalah prosedur, bukan bukti bahwa deployment atau pemulihan telah dijalankan. Jangan menyalin kredensial staging/produksi ke Git, terminal history, issue atau hasil CI.
 
 Sebelum deployment:
 
-1. Integrasikan batch B0–B2 dengan A. Tutup P0 A0 (scope, gate konten, materi, seeder aman) dan B0; uji endpoint pada hasil merge. Catatan aksesibilitas form login A pada QA_JALUR_B_B25.md juga perlu ditangani.
-2. Tinjau advisory dependency yang telah dicatat B0. Jangan menganggap build/test lulus sebagai bukti advisory tertutup.
-3. Pastikan commit rilis sudah tersimpan/direview, CI remote PHP 8.3 + MariaDB/MySQL lulus dan lockfile disetujui. Workspace dev-B saat runbook dibuat masih memiliki perubahan belum di-commit; jangan deploy langsung dari workspace ini.
-4. Tetapkan URL, operator, akses SSH/panel, path release/shared, database terpisah, lokasi backup terenkripsi, pengelola kunci, retensi, batas kehilangan data (RPO) dan batas waktu pulih (RTO). Jangan menyebut target terpenuhi sebelum drill staging diukur.
-5. Pastikan mesin server memakai PHP 8.3 beserta ekstensi lockfile, client dump/import yang kompatibel dengan server MySQL/MariaDB, HTTPS, storage cukup, dan akses baca/tulis direktori Laravel sesuai user service. Document root harus menuju public/.
+1. Pilih commit rilis yang sudah disimpan dan direview. Cocokkan perubahan serta risiko yang belum selesai pada TASK/AUDIT; selesaikan syarat rilis yang relevan sebelum promosi. Jangan deploy dari working tree yang masih berubah.
+2. Pastikan CI remote pada commit rilis lulus dengan runtime target dan lockfile yang disetujui. Triase advisory dependency menurut AUDIT; build/test lulus sendiri tidak menutup advisory.
+3. Tetapkan URL, operator, akses SSH/panel, path release/shared, database terpisah, lokasi backup terenkripsi, pengelola kunci, retensi, batas kehilangan data (RPO) dan batas waktu pulih (RTO). Ukur pencapaian RPO/RTO melalui drill pada lingkungan tujuan.
+4. Pastikan mesin server memenuhi runtime/ekstensi menurut SOP dan lockfile, client dump/import yang kompatibel dengan MySQL/MariaDB tujuan, HTTPS, ruang penyimpanan, serta izin direktori Laravel menurut user service. Document root harus menuju `public/`.
 
 ## Konfigurasi staging
 
-- Gunakan .env.staging.example sebagai daftar variabel, lalu provision environment **di luar repo/release**. APP_ENV=staging, APP_DEBUG=false, APP_URL memakai URL HTTPS staging, SESSION_SECURE_COOKIE=true. Database/user staging harus berbeda dari lokal/test/produksi.
+- Gunakan `.env.staging.example` sebagai daftar variabel, lalu sediakan environment **di luar repo/release**. `APP_ENV=staging`, `APP_DEBUG=false`, `APP_URL` memakai HTTPS staging, dan `SESSION_SECURE_COOKIE=true`. Database/user staging harus berbeda dari lokal/test/produksi.
 - APP_KEY dibuat sekali untuk instalasi staging baru dan disimpan pada secret manager. Pada deployment berikutnya gunakan kunci existing; jangan menjalankan key:generate atau mengganti APP_KEY sebagai langkah deploy rutin. Pemulihan memerlukan kunci lama yang sesuai data terenkripsi. Rotasi kunci yang pernah terlacak harus didahului inventarisasi pemakaian/data terenkripsi.
 - Template mail log hanya cocok untuk staging dengan data sintetis; log harus privat. Email nyata memerlukan konfigurasi transport yang diverifikasi dan aturan pengiriman staging. Queue database memerlukan worker terkelola dan monitoring failed jobs; jangan menganggap queue sudah diproses hanya karena halaman berhasil dibuka.
 - Shared storage mencakup storage/app/public, storage/app/private, log dan cache runtime yang diperlukan. Foto laporan berada pada storage/app/private/report-photos dan hanya disajikan lewat endpoint berizin. Symlink public/storage hanya menuju storage/app/public, tidak pernah storage/app/private.
@@ -87,15 +86,15 @@ php artisan view:cache
 php artisan queue:restart
 ```
 
-Tidak menjalankan migrate:fresh, migrate:refresh atau seed akun pada database existing. Seeder domain A yang belum dinyatakan aman tidak menjadi langkah deploy. Promosikan release secara atomik melalui mekanisme hosting yang dipilih, reload PHP-FPM bila diperlukan, lalu jalankan smoke test. Aktifkan kembali worker/scheduler dengan versi release yang sama.
+Pada database server existing, jangan menjalankan `migrate:fresh`, `migrate:refresh` atau seeder contoh. Migration rilis harus ditinjau untuk data dan versi schema pada target; izin reset develop di SOP tidak berlaku di sini. Promosikan release secara atomik melalui mekanisme hosting yang dipilih, reload PHP-FPM bila diperlukan, lalu jalankan smoke test. Aktifkan kembali worker/scheduler dengan versi release yang sama.
 
-Smoke test staging: homepage/refleksi/galeri, login setiap role sintetis, guest ditolak dari laporan, koorda lintas wilayah ditolak, draf privat, create/edit/submit, approve/reject beralasan, rekap/CSV sesuai filter, foto privat berizin, upload konten, mobile/keyboard, HTTPS/cookie dan pemrosesan queue. Periksa log serta error HTTP/JS tanpa menyalin data pribadi. Jika lulus:
+Smoke test staging mengikuti kontrak PRD yang berubah pada rilis tersebut: halaman publik dan konten terbit, autentikasi tiap role, scope wilayah dan penolakan akses, alur laporan, file privat, unggahan, interaksi mobile/keyboard, HTTPS/cookie dan pemrosesan queue. Periksa log serta error HTTP/JS tanpa menyalin data pribadi. Jika lulus:
 
 ```sh
 php artisan up
 ```
 
-Catat commit, hasil CI/smoke, waktu maintenance, migration, bukti backup dan operator. Jangan membuka akses produksi bila P0 atau smoke wajib masih gagal.
+Catat commit, hasil CI/smoke, waktu maintenance, migration, bukti backup dan operator pada TASK. Jangan membuka akses produksi bila syarat rilis atau smoke wajib masih gagal.
 
 ## Restore atau rollback
 
@@ -123,4 +122,4 @@ php scripts/rehearse-recovery.php --run-local-drill --mysql-bin=C:/laragon/bin/m
 
 Script membaca konfigurasi MySQL lokal dari phpunit.xml, membatasi host ke 127.0.0.1, membuat dua database baru dengan nama acak berakhiran _testing, memakai environment/kunci sintetis dan tidak membaca .env nyata. Ia menjalankan migration tanpa seeder, menulis fixture, membuat dump+arsip, memeriksa checksum/corruption, import ke database kosong, memverifikasi data/relasi/file/dekripsi, lalu menghapus kedua database dan direktori sementara miliknya. Jalankan dari workspace ini pada mesin lokal yang mengizinkan pembuatan database uji. Tidak menerima target database existing atau arsip eksternal.
 
-Arsip drill hanya berisi data sintetis dan tidak disimpan setelah sukses. Angka durasi drill kecil bukan janji RTO produksi. Script ini **bukan utilitas backup produksi** dan tidak melakukan upload backup, restore staging, pergantian release atau rotasi kunci.
+Arsip drill hanya berisi data sintetis dan tidak disimpan setelah sukses. Hasil aktualnya dicatat pada TASK; durasi lokal bukan janji RTO server. Script ini **bukan utilitas backup produksi** dan tidak melakukan upload backup, restore staging, pergantian release atau rotasi kunci.

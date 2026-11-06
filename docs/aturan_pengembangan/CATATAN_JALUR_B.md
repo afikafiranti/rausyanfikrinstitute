@@ -1,5 +1,7 @@
 # Catatan Jalur B
 
+> **Arsip historis.** Catatan bertanggal di bawah mempertahankan bukti pelaksanaan Jalur B pada snapshot masing-masing; status dan arahan lama bukan instruksi aktif. Untuk konteks proyek gunakan [README pengembangan](README.md), progres aktual [TASK](TASK.md#register-rfix), dan risiko terkini [AUDIT](AUDIT.md).
+
 ## DOK-SYNC-2026-11-04 — dokumentasi tersinkron dengan source
 
 - Pengguna meminta dokumen perbaikan masuk GitHub agar agent dapat langsung memahami konteks.

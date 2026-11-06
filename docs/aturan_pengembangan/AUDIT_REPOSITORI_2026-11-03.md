@@ -1,6 +1,6 @@
 # Analisis Repositori Rausyan Fikr
 
-> Snapshot audit 3 November 2026. Prioritas dan izin develop yang berlaku sekarang mengikuti [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md) dan [TASK](TASK.md). Bukti source tetap terikat pada commit yang disebut; dokumen ini tidak menyatakan perbaikan telah diterapkan.
+> **Arsip snapshot 3 November 2026.** Temuan dan hitungan di sini terikat pada commit yang disebut dan bukan penilaian terkini. Prioritas/progres aktif ada di [TASK](TASK.md#register-rfix), risiko terkini di [AUDIT](AUDIT.md), dan peta dokumentasi di [README pengembangan](README.md). Catatan ini tidak menyatakan perbaikan telah diterapkan.
 
 Tanggal analisis: 3 November 2026.
 Repositori: https://github.com/afikafiranti/rausyanfikrinstitute

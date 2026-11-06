@@ -1,32 +1,48 @@
 # SOP Pengembangan dan Sinkronisasi
 
-Pembaruan 4 November 2026. Berlaku untuk rencana RFIX dan menggantikan aturan historis yang bertentangan tentang pelestarian dataset develop, perubahan migration lama dan kewajiban bekerja paralel.
+Prosedur ini digunakan saat menjalankan pekerjaan. Ambil tugas menurut AGENTS/PLAN, kontrak menurut PRD, dan syarat khusus menurut RFIX. Hasil eksekusi hanya dicatat di TASK.
 
-## 1. Masuk sesi dan pilih pekerjaan
+## 1. Lingkungan dan dependensi
 
-1. Baca AGENTS, [dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md), [TASK](TASK.md), [PLAN](PLAN.md), [PRD](PRD.md), [AUDIT](AUDIT.md) dan SOP ini.
-2. Periksa branch/status dan baseline source; pertahankan perubahan pengguna/pengembang lain.
-3. Pilih ID RFIX, peta berkas/domain dan kriteria penerimaannya. Ubah TASK menjadi IN_PROGRESS ketika pelaksanaan dimulai.
-4. Gunakan kondisi kode sebagai bukti. Jika source sudah berubah, perbarui penilaian sebelum mengerjakan temuan lama.
-5. Kerjakan perubahan minimum yang menyelesaikan alur. Jangan mengulang pembangunan fitur yang sudah ada atau menambahkan fitur di luar kebutuhan.
+- Target sintaks dan pengujian bersama adalah **PHP 8.3** dengan MySQL/MariaDB. Lint pada versi PHP lain tidak membuktikan runtime target.
+- Laravel 12, Blade/Tailwind/Vite dan dependency lain mengikuti composer.json/package.json beserta lockfile. Versi Node/CI mengikuti [.github/workflows/tests.yml](../../.github/workflows/tests.yml); jangan memigrasikan framework/Tailwind untuk perapian biasa.
+- Instalasi memakai composer install dan npm ci. Perubahan versi dilakukan pada pekerjaan dependency yang dituju, kemudian lockfile, platform, audit, build dan regresi terkait diverifikasi.
+- Aktifkan ekstensi yang diminta lockfile, termasuk ZIP untuk XLSX; jangan melewati pemeriksaan platform. Jika menggunakan PHP 8.3 lokal yang ZIP-nya belum dimuat otomatis, aktifkan pada proses CLI melalui -d extension=zip.
+- Gunakan database develop dan database tes sendiri. Target tes harus APP_ENV=testing, koneksi mysql/mariadb, dan nama berakhiran _testing.
 
-## 2. Perancangan database develop
+## 2. Instalasi develop baru
 
-- Skema belum final. Bandingkan kandidat menurut kebutuhan web, privasi, integritas, kesederhanaan kode dan pengukuran.
-- Nama/jumlah tabel, kolom, relasi dan migration baseline dapat berubah. Kontrak pengguna tidak boleh melemah akibat perubahan fisik schema.
-- Data develop yang ada boleh dibuang. Tidak perlu jalur upgrade, backfill, atau penyelamatan dataset lama develop.
-- Migration awal boleh ditata/digabung untuk membentuk schema dari kosong. Seeder/factory ikut diperbarui dan menjadi bagian syarat selesai.
-- Tentukan satu sumber aturan data yang jelas; gunakan kemampuan Laravel yang tersedia sebelum menambah lapisan/dependency.
-- Tabel framework dievaluasi bersama driver; tabel fitur tertunda diperiksa seluruh pemakainya sebelum dikeluarkan.
-- Artikel dan Refleksi publik adalah dua jenis tulisan untuk publik. Refleksi saya mempunyai draf pribadi dan pengiriman internal; pilihan tabel tidak boleh mencampurkan pembacanya.
+Contoh berikut untuk Bash/Git Bash pada checkout baru; pilih binary PHP target pada PATH terlebih dahulu.
+
+~~~bash
+git clone https://github.com/afikafiranti/rausyanfikrinstitute.git
+cd rausyanfikrinstitute
+test -f .env || cp .env.example .env
+~~~
+
+Isi koneksi database develop milik sendiri pada .env. Jangan menimpa konfigurasi existing. Setelah database baru tersedia:
+
+~~~bash
+composer install --prefer-dist --no-interaction
+npm ci
+php artisan key:generate
+php artisan migrate --seed
+php artisan storage:link
+~~~
+
+key:generate hanya untuk environment baru, bukan langkah sinkronisasi/deployment rutin. Seeder contoh terbatas local/testing, memakai identitas sintetis dan tidak dianggap konten resmi. Pengulangan seeder harus menjaga profil/password/role akun existing serta tidak menggandakan fixture.
+
+Jalankan php artisan serve dan npm run dev pada terminal terpisah. Untuk memakai aset hasil build, jalankan npm run build; jangan menyertakan penanda public/hot yang menunjuk dev server tidak aktif pada artefak.
+
+Pada checkout existing, periksa diff dan migration yang akan diterapkan. migrate --seed untuk instalasi baru bukan prosedur upgrade database server.
 
 ## 3. Reset develop yang sudah diizinkan
 
-Izin pengguna untuk reset data develop sudah ada dan tidak perlu ditanyakan ulang untuk target proyek yang telah teridentifikasi.
+Data develop proyek ini boleh dibuang dan dibuat ulang. Izin tersebut sudah diberikan; setelah target benar-benar teridentifikasi, jangan meminta izin ulang. Izin ini tidak berlaku pada produksi atau sistem lain.
 
-Sebelum menjalankan perintah destruktif, periksa host, database, environment dan konfigurasi yang benar-benar dimuat, termasuk config cache. Jangan mengubah label environment untuk melewati pemeriksaan target. Izin ini tidak berlaku untuk produksi atau sistem lain.
-
-Pada target develop yang telah benar, prosedur rebuild yang direncanakan:
+1. Periksa konfigurasi yang benar-benar dimuat: environment, driver, host, nama database dan config cache. Jangan mengganti label environment untuk melewati pengaman atau hanya mempercayai nama file .env.
+2. Pastikan target adalah database develop proyek yang dimaksud, bukan database bersama/produksi/tes milik pelaksana lain. Identifikasi dampak migration destruktif; down migration tidak mengembalikan isi tabel yang dihapus.
+3. Pada target yang telah benar, jalankan:
 
 ~~~bash
 php artisan migrate:fresh --seed
@@ -34,45 +50,43 @@ php artisan db:seed
 php artisan route:list
 ~~~
 
-Pembentukan dari kosong dan pengulangan seeder harus berhasil tanpa duplikasi data referensi/fixture. Data contoh terbatas local/testing, memakai identitas sintetis dan tidak dianggap konten resmi.
+Periksa pembentukan dari kosong, keunikan/FK, hasil seeder, dan pengulangannya. Dataset develop lama tidak memerlukan backfill atau jalur upgrade. Schema/migration boleh ditata ulang, tetapi semua model, controller, request, view, navigasi, factory dan tes pemakainya harus ikut selaras. Perbandingan rancangan dan pilihan acuan dicatat sebagai KEP di dokumen induk.
 
-Pengaman pengujian tetap terpisah: database _testing, TestDatabaseSafety dan pemeriksaan sebelum RefreshDatabase. Izin reset develop tidak menjadi alasan menonaktifkan pengaman test atau berbagi database test antar pelaksana.
+## 4. Verifikasi
 
-## 4. Implementasi dan koordinasi
+Reproduksi atau ukur kondisi awal sesuai risiko, lalu uji perubahan melalui antarmuka yang dipakai pengguna/pemanggil. Tambahkan regresi untuk logika berisiko; tidak perlu tes yang hanya menyalin implementasi atau perubahan teks rendah dampak.
 
-1. Reproduksi masalah atau ukur kondisi awal sesuai risiko. Uji regresi dibuat untuk logika berisiko yang diubah.
-2. Selaraskan migration, model, relasi, validasi, query, seeder, factory, view dan tes yang terdampak.
-3. Pertahankan transaksi, row lock, audit, CSRF, scope wilayah, multi-role dan privasi.
-4. Hindari cache izin global yang dapat menyimpan role lama; hindari query berulang di view.
-5. Peta domain A/B dipakai saat ada pekerjaan bersama. Jangan menimpa edit orang lain atau memformat ulang seluruh file lintas domain.
-6. Instruksi ini tidak mewajibkan sub-agent atau paralelisasi. Ikuti penugasan/lingkungan yang sedang berlaku.
-7. Perubahan keputusan fungsi dicatat pada PRD dan dokumen induk; pilihan teknis serta hasilnya dicatat dengan ID KEP/RFIX yang sesuai.
+Untuk suite gabungan, siapkan database uji terpisah dan user-nya. Contoh Bash/Git Bash:
 
-## 5. Verifikasi
+~~~bash
+TEST_DB_DATABASE=proyek_testing TEST_DB_USERNAME=user_uji bash run-ci.sh
+~~~
 
-- Target bersama PHP 8.3 dan MySQL/MariaDB; gunakan lockfile yang sesuai.
-- Jalankan pemeriksaan domain yang relevan, kemudian integrasi yang terdampak. Tidak perlu tes baru untuk perubahan rendah dampak yang hanya menyalin implementasi.
-- Build aset tidak membuktikan perilaku browser/permission. Tes PHP tidak membuktikan handler JavaScript.
-- Uji rebuild schema kosong, seed ulang, keunikan/FK, status, hak akses dan fungsi pengguna sebelum menyebut penataan DB selesai.
-- Audit dependency dilaporkan dengan waktu, versi, ID advisory dan applicability. Angka severity tidak langsung menjadi bukti serangan ke endpoint.
-- Tampilkan rincian warning dan perbaiki penyebabnya; jangan menyembunyikannya agar CI hijau.
-- Catat perintah, commit, runtime, lingkungan, hasil, warning dan skip. Jangan menggunakan angka tes lama untuk patch baru.
-- Bukti staging, SMTP eksternal dan pemulihan sebelum live dipisahkan dari pekerjaan develop. Ketidaktersediaannya tidak menghalangi perancangan schema.
+Variabel opsional TEST_DB_HOST/PORT/CONNECTION/PASSWORD mengikuti [runner](../../run-ci.sh). Jangan menaruh password pada riwayat perintah; provision melalui environment lokal yang aman. Runner menyiapkan kunci sintetis dalam proses, mengabaikan DB_* aplikasi, memeriksa config cache dan koneksi, lalu menjalankan dependency/platform/audit/build/route/tes.
 
-## 6. Pencatatan dan penutupan
+- Pertahankan TestDatabaseSafety sebelum RefreshDatabase. Jangan berbagi DB tes antar pelaksana atau menonaktifkan pengaman agar tes berjalan.
+- Untuk tes domain langsung, terapkan environment uji yang sama sebelum menjalankan PHPUnit; jangan membiarkan .env/config cache aplikasi menentukan target.
+- Gunakan disk/file QA terpisah jika tes paralel memakai Storage::fake; nama DB berbeda tidak memisahkan direktori file palsu.
+- PHP lint, unit/integrasi, build dan uji browser membuktikan hal berbeda. Periksa keyboard/mobile, aksi batal/lanjut serta kondisi kosong/gagal bila interaksi berubah.
+- Perubahan schema memerlukan rebuild, seed ulang dan uji constraint; perubahan transaksi/penguncian memerlukan pengujian independen pada beberapa koneksi bila klaimnya mencakup konkurensi.
+- Audit dependency dilaporkan dengan tanggal, versi, advisory, jalur langsung/transitif dan pemakaian yang relevan. Severity saja tidak membuktikan keterjangkauan serangan.
+- Warning/deprecation harus terlihat dan ditangani. Gate yang dijalankan mengikuti runner dan phpunit.xml; alasan pengecualian/triase tersimpan pada AUDIT, bukan disembunyikan.
+- Klaim keberhasilan harus memakai output, exit code dan runtime yang benar-benar diperiksa. Bukti lokal tidak menggantikan CI remote, SMTP eksternal atau staging.
 
-TASK adalah satu register progres aktif. Dokumen induk menyimpan keputusan dan kriteria. AUDIT menyimpan risiko/bukti; PLAN menyimpan urutan; PRD menyimpan fungsi/cakupan; catatan A/B menyimpan detail pelaksanaan.
+Perubahan dokumentasi saja diperiksa melalui konsistensi sumber, ID/anchor/tautan, aturan keselamatan, serta diff; tidak memerlukan pengulangan suite aplikasi bila source executable tidak berubah.
 
-Status PARTIAL berarti ada subtugas selesai tetapi pekerjaan belum memenuhi seluruh kriteria, bukan tanda pekerjaan sedang dikunci pelaksana. DONE memerlukan bukti kriteria; deployment memerlukan bukti lingkungan tujuan.
+## 5. Pencatatan dan penutupan
 
-Perbarui README jika ringkasan fitur/setup berubah. Saat terjadi perbedaan, periksa source dan instruksi pengguna terbaru, kemudian perbaiki pencatatan yang salah. Jangan menumpuk status aktif yang bertentangan di beberapa dokumen.
+Catat satu kali pada TASK:
 
-## 7. Skill project dan sumber teknis
+~~~text
+Tanggal dan ID pekerjaan; branch/commit awal-akhir atau keadaan working tree;
+target environment/database; keputusan KEP dan berkas/schema/data yang berubah;
+perilaku sebelum-sesudah; migration/seeder yang dijalankan;
+perintah, runtime dan hasil aktual, termasuk warning/deprecation/skip;
+lokasi artefak, batas bukti, risiko dan tindak lanjut yang belum terpenuhi.
+~~~
 
-Baca instruksi project skill pada .agents/skills saat relevan: diagnosing-bugs untuk diagnosis; tdd untuk perubahan berisiko; implement untuk pelaksanaan spesifikasi; code-review untuk review; ui-ux-pro-max/ui-styling untuk UI; qa/browser-use/remote-browser untuk QA browser; research untuk riset teknis sumber primer. Ketersediaan skill tidak mengharuskan perubahan stack atau pemasangan dependency.
+Gunakan [arti status pada TASK](TASK.md#arti-status). Persyaratan produk diperbarui pada PRD, spesifikasi/keputusan pada dokumen induk, urutan pada PLAN, dan penilaian risiko pada AUDIT. Jangan menyalin log/status ke dokumen tersebut. Riwayat A/B tetap arsip bertanggal.
 
-Jangan menjalankan konfigurasi penuh ekosistem skill, integrasi gateway, atau mengirim kredensial/data nyata ke layanan browser/gateway hanya karena tool tersebut tersedia. Ikuti cakupan tugas dan instruksi pengguna.
-
-## 8. Riwayat
-
-[SOP baseline 18 Oktober](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/SOP.md) menyimpan prosedur historis lengkap. Larangan reset dataset develop dan perubahan migration lama di sana telah diganti arahan pengguna 4 November. Prosedur perlindungan lingkungan lain serta pemulihan sebelum penggunaan nyata tetap diperiksa sesuai konteks.
+Implementasi belum selesai sebelum kriteria yang relevan terverifikasi. Persetujuan deployment memerlukan konteks dan bukti lingkungan tujuan; ikuti [runbook](RUNBOOK_STAGING_JALUR_B.md) untuk konfigurasi, backup, promosi release dan restore.

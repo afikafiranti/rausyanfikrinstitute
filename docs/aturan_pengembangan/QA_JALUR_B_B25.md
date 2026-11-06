@@ -1,5 +1,7 @@
 # QA Jalur B — B2.5
 
+> **Bukti QA historis — snapshot 16 Oktober 2026.** Hasil di bawah hanya berlaku untuk build dan lingkungan yang disebut; bukan bukti kualitas rilis terkini. Lihat [README pengembangan](README.md), [TASK](TASK.md#register-rfix) untuk progres, dan [AUDIT](AUDIT.md) untuk risiko terkini.
+
 Tanggal: 2026-10-16. Branch: dev-B. Runtime: PHP 8.3.33.
 
 ## Lingkungan dan cakupan

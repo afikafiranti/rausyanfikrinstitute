@@ -1,5 +1,7 @@
 # Arah UI Rausyan Fikr
 
+Acuan visual dalam [peta dokumentasi](docs/aturan_pengembangan/README.md). Kebutuhan fungsi/interaksi mengikuti PRD; bukti penerapan dan QA mengikuti TASK.
+
 Disepakati melalui preferensi pengguna dan audit UIUX-01, 2026-10-18: modern ekspresif, warna lebih berani, komposisi dinamis. Implementasi tetap memakai konten, logo, route dan alur yang tersedia.
 
 - Identitas: lembaga kajian dan ruang alumni. Publik menonjolkan tulisan dan dokumentasi; area anggota mengutamakan kejelasan data/form.

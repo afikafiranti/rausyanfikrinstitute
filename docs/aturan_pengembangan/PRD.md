@@ -1,283 +1,118 @@
 # PRD Website Alumni dan Kajian Rausyan Fikr
 
-## Acuan Aktif 4 November 2026
-
-[Dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md) mencatat arahan perbaikan terbaru. [TASK](TASK.md) memuat progres aktual; [PLAN](PLAN.md) memuat urutan; [AUDIT](AUDIT.md) memuat kondisi source dan bukti.
-
-Fitur pada matriks di bawah sudah tersedia pada develop hasil integrasi 18 Oktober. Ketersediaan tersebut tidak berarti seluruh bug dan kesiapan rilis selesai. Perbaikan RFIX aplikasi belum diterapkan; subtugas sinkronisasi dokumentasi RFIX-20 sudah dikerjakan.
-
-### Kebutuhan fungsi dan rancangan fisik database
-
-Skema masih dicari dan dikembangkan. Nama/jumlah tabel, kolom, model, relasi dan migration pada source bukan desain final. Kandidat boleh disusun ulang bila memenuhi kebutuhan web dan diuji menurut dokumen induk.
-
-Data develop lama boleh dihapus dan dibuat ulang melalui seeder. Migration develop boleh dikonsolidasikan; tidak diperlukan pelestarian atau jalur upgrade dataset develop lama. Seeder wajib mendukung data dasar dan contoh penggunaan. Testing terpisah dan lingkungan selain develop tetap mengikuti kewenangannya.
-
-Kebutuhan pengguna dipisahkan dari nama tabel. Artikel/Refleksi publik dan Refleksi saya mempunyai tujuan serta pembaca berbeda; setiap rancangan penyimpanan harus menjaga perbedaannya.
-
-### Penjelasan untuk pengguna
-
-- Artikel membagikan penjelasan/pembahasan topik kepada pengunjung.
-- Refleksi publik membagikan pengalaman/renungan yang sengaja diterbitkan untuk umum.
-- Refleksi saya menyimpan catatan belajar masing-masing pengguna; draf hanya penulis. Pengiriman opsional membuka catatan kepada koorda wilayah kiriman serta admin/super admin aktif untuk tanggapan, tanpa penerbitan otomatis.
-
-Super admin aktif mengelola Post/Galeri. Admin tetap mengelola materi dan dapat menanggapi refleksi lintas wilayah, tetapi tidak mendapat izin menerbitkan tulisan publik. Koorda menanggapi kiriman sesuai wilayahnya. Semua role mempunyai catatan sendiri dan tidak menanggapi kirimannya sendiri.
+Acuan kontrak produk per 6 November 2026. Dokumen ini menjelaskan perilaku pengguna dan batas fitur; progres serta hasil uji dicatat pada [TASK](TASK.md#register-rfix).
 
 ## 1. Ringkasan Produk
 
-Riwayat integrasi 2026-10-17: A0–A5 dan B0/B1/B2 digabung pada develop; A3-VERIFY, A4-AUTH dan A5-FIX masuk melalui ecee5b4. Suite saat itu lulus 260 test/1921 assertion dan CI remote snapshot 13da2b5 lulus pada PHP 8.3/MariaDB 11.4. Bukti A3–A5 ada pada CATATAN_JALUR_A.md dan catatan integrasi Jalur B. Tindak lanjut operasional/produksi tetap terpisah. Status source dan arah perbaikan mengikuti acuan aktif 4 November 2026 di atas.
-
-Website Rausyan Fikr adalah aplikasi internal berbasis Laravel untuk mengelola data alumni kajian, proses verifikasi akun, akses materi kajian berdasarkan level, laporan kajian wilayah, serta konten publik seperti landing page, refleksi, dan galeri.
-
-Produk ini harus mengutamakan:
-- Akurasi data alumni.
-- Workflow admin dan koordinator daerah yang jelas.
-- Pengalaman pengguna yang sederhana, cepat, dan tidak membingungkan.
-- Pengembangan bertahap dengan dokumentasi teknis yang selalu sinkron.
+Website komunitas untuk data alumni, verifikasi akun, materi kajian berdasarkan level, laporan wilayah, serta tulisan dan galeri publik. Pengalaman penggunaan harus jelas bagi pengguna nonteknis dan pengolahan data harus akurat.
 
 ### Cakupan dan Status Implementasi
 
-Perubahan cakupan pengguna 2026-10-17: halaman publik aktif disederhanakan menjadi Hero, maksimal empat cuplikan Artikel, maksimal empat foto Galeri dan footer; navbar menghubungkan halaman yang tersedia. Artikel memiliki daftar/detail publik dan draf/terbit melalui pengelolaan Post yang sama dengan Refleksi publik. Seluruh pengelolaan Post dan Galeri hanya untuk super admin aktif. URL Refleksi publik existing tetap tersedia dan berbeda dari Refleksi saya. Agenda, tim/kontak, tentang/statistik serta CTA terpisah tidak masuk homepage. Implementasi PUB-04/PUB-03 telah diuji, migration lokal diterapkan, dan kode masuk hasil penggabungan develop pada 2026-10-18. Persetujuan konten resmi dan rilis tetap terpisah dari integrasi.
+| Area | Cakupan produk |
+|---|---|
+| Akun, alumni, profil dan verifikasi | Tersedia; kontrak pada modul terkait di bawah |
+| Materi, dashboard dan laporan | Tersedia; akses mengikuti role/status/level/wilayah |
+| Tulisan publik dan Galeri | Tersedia; pengelolaan pada menu Artikel dan Galeri |
+| Refleksi saya/Tinjau refleksi | Dihapus; bukan backlog atau sumber publikasi otomatis |
+| Progres menonton dan metadata YouTube otomatis | Ditunda; struktur progres yang tidak digunakan sudah dikeluarkan |
+| Revisi/kirim ulang laporan rejected | Belum tersedia |
+| CRUD web khusus master role/wilayah/level | Direncanakan, belum memiliki spesifikasi pelaksanaan; penetapan level akun sudah tersedia |
+| Agenda, tim/kontak, section tentang/statistik dan CTA tambahan | Di luar cakupan homepage aktif |
 
-Matriks ini menggambarkan fitur pada source bd9cdc1 yang diperiksa 4 November 2026. Tersedia berarti implementasi ada, sebagian berarti baru memenuhi sebagian alur, direncanakan berarti akan dibuat, dan ditunda berarti pengembangan lanjut belum dijalankan. Status task DONE/REVIEW dan persetujuan rilis tetap mengikuti TASK.md serta bukti verifikasi, bukan hanya keberadaan fitur.
-
-| Fitur | Status | Bukti dan batas saat ini |
-|---|---|---|
-| Akun, profil, verifikasi, data alumni dan audit | Tersedia | A0/A1/A3/A4/A5-FIX; registrasi pending, scope wilayah/role verifikasi, transport email gagal tertangani dan label profil aksesibel. SMTP lokal lulus; pengiriman eksternal masih perlu QA |
-| Impor/ekspor alumni CSV dan Excel .xlsx | Tersedia | A2/A35; template/nama wilayah, laporan baris gagal, unggah XLSX nyata/duplikat/filter/ekspor lulus QA browser lokal. Staging belum diuji |
-| Dashboard dan grafik pengelola | Tersedia | Data database dan scope wilayah; hitungan mencakup seluruh akun dalam scope |
-| Dashboard pribadi alumni | Tersedia | Status akun, level/wilayah, profil dasar, akses materi sesuai kelayakan, Refleksi saya dan notifikasi sendiri |
-| Refleksi saya semua role | Tersedia | Draf privat; kiriman opsional dan tanggapan pengelola sesuai wilayah, terpisah dari konten publik |
-| Playlist/video, pencarian dan akses materi berdasarkan status/level | Tersedia | A2; pengelolaan admin dan tautan YouTube, metadata judul/durasi manual |
-| Pengambilan/cache metadata YouTube otomatis | Ditunda | Belum ada integrasi otomatis; PLAN A2 menundanya |
-| Progres menonton, opsional | Ditunda | Model/tabel video_progress tersedia; endpoint dan UI pengguna belum tersedia |
-| Draf/edit/kirim/review/rekap/ekspor laporan | Tersedia | B2 REVIEW; foto privat dan CSV; rejected terkunci tanpa revisi/kirim ulang |
-| Homepage Hero/Artikel/Galeri/Footer | Tersedia pada hasil gabungan | Maksimal empat artikel terbit dan empat foto Galeri; konten resmi tetap menunggu pengelola |
-| Artikel publik | Tersedia pada hasil gabungan | Daftar/detail dan draf/terbit melalui Post; pengelolaan hanya super admin. Refleksi publik existing tetap tersedia |
-| Agenda kajian publik | Di luar cakupan aktif | PUB-01 tidak dilanjutkan dalam homepage ringkas atas keputusan pengguna |
-| Profil tim dan informasi kontak resmi | Di luar cakupan aktif | PUB-02 tidak dilanjutkan dalam homepage ringkas atas keputusan pengguna |
-| Navigasi publik | Tersedia pada develop | Menu Artikel/Galeri dan Masuk/Area anggota; URL Refleksi publik tetap ada tetapi belum ditautkan di menu utama/footer. Penambahan tautan merupakan pilihan UX RFIX-21 |
-| CRUD web khusus master role/wilayah/level | Direncanakan | Tujuan pengelolaan super admin; rincian task/acceptance criteria belum ditetapkan. Penetapan level akun sudah tersedia |
+Keputusan perubahan kebutuhan ada pada [ARAH/KEP di dokumen induk](DOKUMEN_INDUK_PERBAIKAN_2026-11-04.md#1-keputusan-yang-menjadi-dasar-pekerjaan). Ketersediaan fitur tidak menyatakan kesiapan rilis.
 
 ## 2. Tujuan Produk
 
-1. Menjadi pusat data alumni Rausyan Fikr yang dapat dicari, difilter, diverifikasi, dan dirawat.
-2. Menyediakan akses materi kajian sesuai level alumni.
-3. Menyediakan laporan kajian wilayah yang dapat direkap dan ditinjau.
-4. Menyediakan homepage ringkas, artikel dan galeri publik serta mempertahankan akses Refleksi existing.
-5. Memberikan dasar sistem yang siap dikembangkan secara konsisten oleh tim web profesional.
+Menjaga data alumni yang dapat dirawat, menyediakan materi sesuai kelayakan, memungkinkan pengelola mencatat/meninjau kegiatan wilayah, dan menyediakan konten resmi untuk pengunjung.
 
 ## 3. Pengguna dan Role
 
-### Super Admin
-- Mengakses seluruh data.
-- Mengelola user, role, wilayah, level, konten, dan konfigurasi penting.
-- Mengambil keputusan final jika ada konflik data.
+Satu akun mendukung beberapa role. Role menentukan kewenangan; level menentukan kelayakan materi. Izin pengelolaan membutuhkan status active. Akun pending/suspended tetap dapat menggunakan profilnya sendiri sesuai autentikasi.
 
-Cakupan pengelolaan master melalui CRUD web khusus masih direncanakan sesuai matriks. Role/wilayah/level awal disediakan seeder; keberadaan data master tidak berarti modul pengelolaannya sudah tersedia.
+| Role | Kewenangan utama |
+|---|---|
+| super_admin | Pengelolaan lintas wilayah serta penerbitan Post dan Galeri |
+| admin | Pengelolaan alumni, verifikasi, materi dan laporan lintas wilayah; tidak menerbitkan Post/Galeri |
+| koorda | Pengelolaan dan verifikasi anggota serta laporan sesuai wilayahnya |
+| alumni | Profil sendiri, dashboard pribadi, notifikasi sendiri dan materi sesuai kelayakan; tidak mengakses laporan |
+| Pengunjung tanpa akun | Membaca konten publik yang tersedia |
 
-### Admin
-- Mengelola data alumni lintas wilayah sesuai kebijakan.
-- Mengelola materi sesuai gate existing; pengelolaan Post/Artikel/Refleksi dan Galeri hanya untuk super admin.
-- Melakukan verifikasi akun.
-- Melihat dashboard dan laporan.
-
-### Koorda
-- Melihat dan meninjau data alumni di wilayahnya.
-- Melakukan verifikasi akun untuk wilayahnya.
-- Meninjau laporan kajian wilayah.
-
-### Alumni
-- Registrasi dan login.
-- Melengkapi serta memperbarui profil.
-- Mengakses materi kajian sesuai level.
-- Menerima notifikasi status akun.
-
-### Pengunjung Publik
-- Mengakses homepage Hero/Artikel/Galeri/Footer, daftar/detail artikel, Refleksi existing dan Galeri.
+Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahankan pending dengan alasan tercatat. Ketentuan khusus setiap tindakan ada pada modul berikut; role ganda tidak boleh menjadi jalan melewati pembatasan target atau self-review.
 
 ## 4. Modul Produk
 
 ### Modul Landing Page
-Status: PUB-04/PUB-03 tersedia pada hasil penggabungan develop 2026-10-18. Migration lokal Post sudah diterapkan; persetujuan konten resmi dan rilis tetap terpisah dari integrasi kode.
 
-Fitur tersedia:
-- Hero, Galeri, footer serta daftar/detail Refleksi existing menjadi dasar yang dipakai ulang.
-- Artikel dan Galeri diambil dari database; homepage menampilkan maksimal empat item masing-masing, bukan data contoh.
-
-Fitur batch PUB-04/PUB-03:
-- PUB-04: jenis Artikel pada Post, draf/terbit, daftar/detail publik serta empat cuplikan di homepage; seluruh pengelolaan Post dan Galeri dibatasi pada super admin aktif.
-- PUB-03 terkait: navigasi Artikel/Galeri, tautan membaca artikel dari Hero, serta tautan Masuk/Area anggota existing menuju halaman yang tersedia.
-- PUB-01/PUB-02 agenda dan tim/kontak berada di luar cakupan aktif saat ini, bukan bagian batch homepage.
-
-Batas cakupan: homepage hanya Hero/Artikel/Galeri/Footer. Tidak menambahkan kalender, agenda, tim/kontak, statistik/tentang atau CTA terpisah. Registrasi existing tetap tersedia tanpa perubahan kebijakan auth pada batch B ini.
-
-Kriteria UX:
-- Informasi utama langsung jelas.
-- Tautan Artikel/Galeri dan Masuk/Area anggota mudah ditemukan.
-- Layout responsif dan tidak terlalu padat di mobile.
+- Homepage berurutan Hero, maksimal empat cuplikan Artikel terbit, maksimal empat foto Galeri, lalu Footer; seluruh daftar berasal dari database dan mempunyai kondisi kosong.
+- Navigasi publik menghubungkan Artikel/Galeri dan Masuk/Area anggota. URL daftar/detail Refleksi publik tetap tersedia walau belum menjadi tautan menu utama/footer.
+- Artikel membahas suatu topik; Refleksi publik membagikan pengalaman/renungan untuk umum. Perbedaan keduanya editorial, tanpa kriteria isi otomatis yang berbeda.
 
 ### Modul Autentikasi
-Status: tersedia.
 
-Fitur:
-- Login.
-- Register.
-- Reset password.
-- Verifikasi email.
-- Logout.
-
-Kriteria:
-- Error validasi harus tampil jelas.
-- Setelah register publik, user masuk status pending.
-- Setelah tambah alumni oleh admin, admin tidak boleh otomatis berubah login menjadi akun baru.
+- Registrasi, login/logout, reset password dan verifikasi email tersedia. Verifikasi email belum menjadi syarat umum seluruh modul.
+- Registrasi publik membuat akun pending dengan role alumni; role, status dan level tidak dapat ditentukan melalui payload publik.
+- Menambah alumni melalui pengelola tidak mengganti sesi pengelola menjadi akun baru.
+- Kegagalan pengiriman email ditangani tanpa menyatakan pesan terkirim; bukti transport lingkungan tujuan mengikuti TASK.
 
 ### Modul Data Alumni
-Status: tersedia; A0/A1/A2 DONE pada hasil integrasi.
 
-Fitur:
-- Daftar alumni.
-- Detail alumni.
-- Filter dan pencarian.
-- Sorting dan pagination.
-- Tambah alumni oleh admin/role yang diizinkan.
-- Edit/hapus data dan ubah level sesuai izin, serta impor/ekspor CSV dan Excel .xlsx.
-- Relasi role, wilayah, dan level.
-
-Kriteria:
-- Alumni baru tersimpan ke database.
-- Alumni baru mendapat role alumni.
-- Data baru terlihat di daftar sesuai filter aktif.
-- Error validasi terlihat jelas.
-- Admin tetap berada pada sesi admin setelah menambah alumni.
+- Daftar/detail, pencarian, filter, sorting, pagination, tambah/edit/hapus akun dan penetapan level mengikuti izin serta wilayah aktor.
+- Impor CSV UTF-8 dan XLSX menerima header terdefinisi, maksimal 200 baris data dan berkas 1 MB. XLS lama dan rumus Excel tidak didukung; nomor telepon harus tetap menjadi teks.
+- Nama wilayah dicocokkan dengan data terdaftar. Nama ambigu/tidak dikenal atau wilayah di luar izin dilaporkan gagal. Template legacy dengan wilayah_id tetap diterima.
+- Impor hanya menambah akun pending dengan role alumni, tanpa level/verifikasi email; password awal tidak dibagikan dan akun menyetelnya melalui lupa password. Email/telepon unik serta kegagalan per baris dijelaskan.
+- Ekspor mengikuti seluruh filter dan scope, bukan halaman pagination. XLSX maksimal 5.000 hasil; kelebihan data ditolak dengan pilihan mempersempit filter atau memakai CSV streaming. Nilai teks, Unicode, nol telepon di depan dan perlindungan formula dipertahankan.
 
 ### Modul Profil Alumni
-Status: tersedia.
 
-Fitur:
-- View profil.
-- Edit profil.
-- Update password.
-- Upload foto profil.
-- Perubahan wilayah/angkatan mengubah status menjadi pending.
-
-Kriteria:
-- Field penting tervalidasi.
-- Perubahan kritikal tercatat di audit log.
-- User mendapat notifikasi jika status kembali pending.
+- Pengguna membaca/mengubah profil, foto dan password sendiri; validasi menjaga panjang/format/keunikan data.
+- Perubahan wilayah/angkatan memerlukan verifikasi kembali dan mengubah akun yang memenuhi syarat menjadi pending; suspended tetap suspended.
+- Tindakan yang menghilangkan pengelola global aktif terakhir ditolak. Bila sudah ada super admin aktif, sekurangnya satu tetap tersedia; multi-role dihitung per akun.
+- Akun penulis atau penanggap laporan kajian tidak dapat dihapus agar laporan dan atribusinya tetap utuh. Penghapusan akun lain tetap mencatat audit dan membersihkan avatar lokal milik aplikasi setelah berhasil.
+- Perubahan kritis dicatat di audit; pesan dan notifikasi mengikuti status nyata.
 
 ### Modul Verifikasi Akun
-Status: tersedia.
 
-Fitur:
-- Daftar user pending.
-- Approve user.
-- Reject user.
-- Set level awal.
-- Tambah role alumni saat approve.
-- Notifikasi status akun.
-- Audit log approve/reject.
-
-Kriteria:
-- User tidak boleh memverifikasi akun sendiri.
-- Koorda hanya boleh memverifikasi target non-pengelola di wilayahnya. Target dengan role koorda/admin/super_admin, termasuk role ganda, tidak muncul di antrean dan ditolak pada approve/reject.
-- Admin dan super admin dapat memverifikasi akun lain lintas wilayah, termasuk akun super_admin pending agar pemulihan tetap tersedia; diri sendiri dan target non-pending tetap ditolak. Akun legacy tanpa role tetap dapat disetujui dan mendapat role alumni.
+- Pengelola melihat akun pending, menyetujui/menolak, dan menetapkan level awal yang sah. Hasil tindakan dicatat serta diberitahukan kepada akun terkait.
+- Aktor tidak dapat memverifikasi dirinya atau akun non-pending.
+- Koorda hanya meninjau target non-pengelola dalam wilayahnya. Target dengan role koorda/admin/super_admin, termasuk role ganda, disembunyikan dari antrean koorda dan ditolak pada endpoint.
+- Admin/super admin dapat meninjau akun lain lintas wilayah, termasuk super admin pending. Akun legacy tanpa role dapat disetujui dan memperoleh role alumni.
 
 ### Modul Dashboard
-Status: tersedia pada hasil integrasi; B1 REVIEW untuk tindak lanjut rilis.
 
-Dashboard statistik di bawah khusus admin/super admin/koorda aktif. Alumni mendapat dashboard pribadi: sapaan, status akun, level/wilayah, data profil dasar, akses materi sesuai status/level existing, Refleksi saya dan notifikasi miliknya sendiri. Akun tanpa role tetap diarahkan ke profil.
-
-Fitur:
-- Total alumni.
-- Alumni aktif.
-- Alumni baru bulan berjalan.
-- Persentase verifikasi.
-- Grafik pertumbuhan alumni.
-- Sebaran angkatan.
-- Sebaran wilayah.
-- Pending verification count.
-
-Kriteria:
-- Angka dashboard konsisten dengan data tabel.
-- Grafik tidak memakai dummy data untuk fitur produksi.
-
-Definisi hitungan saat ini adalah seluruh akun dalam scope, termasuk pengelola; perubahan definisi menjadi role alumni saja memerlukan keputusan produk dan pembaruan test.
+- Pengelola aktif mendapat statistik dalam scope-nya: total/aktif/baru, persentase verifikasi, pending, pertumbuhan bulanan, serta sebaran angkatan/wilayah dan kategori yang ditampilkan.
+- Istilah hitungan alumni saat ini mencakup seluruh akun dalam scope, termasuk pengelola; jumlah kajian bulanan masih diberi keterangan belum tersedia.
+- Alumni mempunyai dashboard pribadi berisi status, level/wilayah, data profil, akses materi yang memenuhi syarat dan notifikasi sendiri. Akun tanpa role diarahkan ke profil.
+- Angka/grafik memakai data nyata, menyediakan tabel angka, serta penjelasan ketika data kosong atau gagal dimuat.
 
 ### Modul Manajemen Konten
-Status: CRUD, pembeda jenis, draf/terbit dan pembatasan pengelola super admin tersedia melalui PUB-04.
 
-Fitur:
-- CRUD Artikel/Refleksi pada Post dan Galeri oleh super admin aktif saja.
-- Pilihan draf/terbit memakai published_at; admin biasa, koorda dan alumni tidak dapat mengakses endpoint pengelolaan Post/Galeri.
-- Upload gambar.
-
-Kriteria:
-- File lama terhapus saat diganti.
-- Validasi gambar aman.
-- Pesan sukses dan error tampil jelas.
-
-Batas: Galeri tidak memiliki status publikasi terpisah; item yang disimpan pengelola ditampilkan publik. Form Post mendukung draf/terbit, tanpa fitur penjadwalan baru. Request legacy tanpa jenis/status tetap kompatibel; konten lama berjenis Refleksi.
+- Menu pengelolaan bernama **Artikel**. Artikel dan Refleksi publik tetap dua jenis Post; daftar/detail publik membatasi jenis serta hanya menampilkan konten yang sudah terbit.
+- Draf/terbit menggunakan published_at. Request legacy tanpa jenis/status tetap kompatibel dan konten lama berjenis Refleksi; penjadwalan publikasi baru tidak ditambahkan.
+- Hanya super admin aktif mengelola Post dan Galeri. Galeri langsung publik setelah disimpan dan tidak mempunyai status draf.
+- Unggah gambar divalidasi; penggantian/penghapusan konten membersihkan file lokal terkait dengan aman. Mengganti judul tulisan terbit mempertahankan URL yang sudah dibagikan.
 
 ### Modul Materi Kajian
-Status: fitur inti tersedia; A2 DONE. Pengambilan metadata otomatis dan progres menonton ditunda.
 
-Fitur tersedia:
-- CRUD playlist/video oleh admin, pencarian dan detail playlist berisi daftar video.
-- Akses materi bagi akun aktif berdasarkan level; level kosong ditolak.
-- Judul/durasi video diisi manual; tautan playlist/video dibuka di YouTube.
-
-Pekerjaan yang ditunda:
-- Pengambilan/cache metadata YouTube otomatis.
-- Progres menonton opsional; model/tabel belum terhubung endpoint/UI pengguna.
-
-Inkonsistensi schema/controller pada baseline awal sudah ditangani dalam A0–A2. Pembatasan level aplikasi tidak mencegah tautan YouTube yang sudah diketahui dibagikan.
+- Pengelola yang berwenang mengelola playlist/video; pengguna dapat mencari dan membuka detail materi.
+- Akses memerlukan akun active dengan level yang memenuhi syarat; level kosong ditolak. Level berbeda dari role akun.
+- Judul/durasi diisi manual, sedangkan menonton membuka tautan YouTube. Pembatasan aplikasi tidak mencegah pembagian tautan YouTube yang sudah diketahui.
 
 ### Modul Laporan Kajian
-Status: implementasi lokal tersedia; B2 REVIEW untuk tindak lanjut rilis.
 
-Akses hanya untuk admin, super admin dan koorda aktif dengan scope wilayah existing. Alumni biasa menggunakan Refleksi saya dan tidak dapat mengakses endpoint Laporan; laporan historis tetap tersimpan.
-
-Fitur tersedia:
-- Draf, edit dan kirim laporan kajian.
-- Data judul, pemateri, peserta, catatan, wilayah, tanggal, foto.
-- Review koorda/admin.
-- Approve/reject.
-- Rekap sesuai filter wilayah/status/tanggal.
-- Ekspor CSV dan penyajian foto privat melalui endpoint berizin.
-
-Batas saat ini: laporan berstatus submitted/approved/rejected tidak dapat diedit atau dikirim ulang; alur revisi rejected belum tersedia. Rekap memuat laporan yang sudah dikirim, bukan draf; jumlah peserta adalah total kehadiran, bukan jumlah orang unik.
-
-Kriteria:
-- Laporan mengikuti scope wilayah.
-- Status laporan terlihat jelas.
-- Catatan reject wajib diisi.
+- Hanya pengelola aktif sesuai kewenangan/wilayah dapat mengakses endpoint laporan; alumni ditolak, termasuk bila mempunyai laporan historis.
+- Status laporan adalah draft, submitted, approved, rejected. Penulis mengubah/menghapus draf sendiri; identitas, wilayah dan total disahkan server saat menyimpan/mengirim.
+- Review mengecualikan laporan sendiri, mematuhi scope, membutuhkan alasan penolakan, dan menolak keputusan berulang. Isi laporan submitted/approved/rejected terkunci.
+- Rekap/ekspor CSV mencakup laporan yang sudah dikirim dalam filter wilayah/status/tanggal, bukan draf. Jumlah peserta adalah kehadiran, bukan jumlah orang unik; total harus konsisten dengan peserta laki-laki/perempuan.
+- Foto berada pada storage privat dan hanya disajikan melalui endpoint berizin.
 
 ## 5. Prinsip UX
 
-1. Setiap aksi simpan harus menghasilkan feedback jelas: sukses, gagal validasi, atau error.
-2. Filter aktif harus terlihat dan mudah di-reset.
-3. Tabel data harus mudah discan: kolom utama, status badge, dan aksi jelas.
-4. Form harus mempertahankan input lama saat validasi gagal.
-5. Role dan permission tidak boleh membuat user terjebak tanpa penjelasan.
-6. Halaman admin harus mengutamakan efisiensi, bukan tampilan marketing.
-7. Landing page publik boleh lebih ekspresif, tetapi tetap cepat dan informatif.
+Setiap tindakan memberi hasil yang jelas. Filter dapat dikenali dan di-reset, input lama dipertahankan ketika validasi gagal, label/fokus/keyboard berfungsi, dan formulir tetap terbaca di layar kecil. Halaman pengelola mengutamakan efisiensi.
 
 ## 6. Kebutuhan Non-Fungsional
 
-- Framework: Laravel 12.
-- Frontend: Blade, Tailwind, Vite.
-- Database: MySQL/MariaDB.
-- Auth: Laravel auth/Breeze style.
-- Auditability: perubahan kritikal dicatat di audit log.
-- Maintainability: perubahan fitur wajib memperbarui dokumen di `docs/aturan_pengembangan`.
-- Security: validasi input, CSRF, authorization gate, scope wilayah.
+Validasi input, CSRF, autentikasi/gate, scope wilayah, audit dan integritas transaksi wajib dipertahankan. Pilih kode dan struktur yang mudah dirawat. Runtime, dependensi serta prosedur verifikasi mengikuti [SOP](SOP.md#1-lingkungan-dan-dependensi); keputusan penyimpanan mengikuti dokumen induk.
 
 ## 7. Definisi Done
 
-Sebuah fitur dianggap selesai jika:
-- Route, controller, model, migration, dan view konsisten.
-- Validasi sukses dan gagal diuji manual atau otomatis.
-- Permission/role diuji minimal untuk admin dan non-admin terkait.
-- UX error/success terlihat jelas.
-- Dokumen PRD, PLAN, TASK, dan AUDIT diperbarui jika scope berubah.
-- Tidak ada error baru di log Laravel untuk workflow yang disentuh.
+Fitur memenuhi kontrak di atas serta kriteria RFIX terkait dan diverifikasi menurut [SOP](SOP.md#4-verifikasi). Hasil dicatat di TASK; kesiapan rilis membutuhkan bukti lingkungan tujuan.
