@@ -50,7 +50,6 @@ Route::middleware(['auth', 'can:review-user'])->prefix('verifikasi')->name('veri
 });
 
 // MATERI & LAPORAN INDEX
-// Route::prefix('materi')->name('materi.')->group(fn() => Route::view('/', 'materi/index')->name('index'));
 Route::middleware(['auth'])
     ->prefix('materi')
     ->name('materi.')
@@ -58,15 +57,20 @@ Route::middleware(['auth'])
         Route::get('/', [MateriController::class, 'index'])->name('index');
         Route::middleware('can:manage-content')->group(function () {
             Route::get('/kelola', [\App\Http\Controllers\MateriManagementController::class, 'index'])->name('manage');
+            Route::get('/buat', [\App\Http\Controllers\MateriManagementController::class, 'createPlaylist'])->name('playlists.create');
             Route::post('/playlists', [\App\Http\Controllers\MateriManagementController::class, 'storePlaylist'])->name('playlists.store');
-            Route::get('/playlists/{playlist}/edit', [\App\Http\Controllers\MateriManagementController::class, 'editPlaylist'])->name('playlists.edit');
-            Route::patch('/playlists/{playlist}', [\App\Http\Controllers\MateriManagementController::class, 'updatePlaylist'])->name('playlists.update');
-            Route::delete('/playlists/{playlist}', [\App\Http\Controllers\MateriManagementController::class, 'destroyPlaylist'])->name('playlists.destroy');
-            Route::post('/playlists/{playlist}/videos', [\App\Http\Controllers\MateriManagementController::class, 'storeVideo'])->name('videos.store');
-            Route::patch('/playlists/{playlist}/videos/{video}', [\App\Http\Controllers\MateriManagementController::class, 'updateVideo'])->name('videos.update');
-            Route::delete('/playlists/{playlist}/videos/{video}', [\App\Http\Controllers\MateriManagementController::class, 'destroyVideo'])->name('videos.destroy');
+            Route::get('/playlists/{playlist}/edit', [\App\Http\Controllers\MateriManagementController::class, 'editPlaylist'])->whereNumber('playlist')->name('playlists.edit');
+            Route::get('/playlists/{playlist}/hapus', [\App\Http\Controllers\MateriManagementController::class, 'confirmDeletePlaylist'])->whereNumber('playlist')->name('playlists.confirm-delete');
+            Route::patch('/playlists/{playlist}', [\App\Http\Controllers\MateriManagementController::class, 'updatePlaylist'])->whereNumber('playlist')->name('playlists.update');
+            Route::delete('/playlists/{playlist}', [\App\Http\Controllers\MateriManagementController::class, 'destroyPlaylist'])->whereNumber('playlist')->name('playlists.destroy');
+            Route::get('/playlists/{playlist}/videos/buat', [\App\Http\Controllers\MateriManagementController::class, 'createVideo'])->whereNumber('playlist')->name('videos.create');
+            Route::post('/playlists/{playlist}/videos', [\App\Http\Controllers\MateriManagementController::class, 'storeVideo'])->whereNumber('playlist')->name('videos.store');
+            Route::get('/playlists/{playlist}/videos/{video}/edit', [\App\Http\Controllers\MateriManagementController::class, 'editVideo'])->whereNumber('playlist')->whereNumber('video')->name('videos.edit');
+            Route::get('/playlists/{playlist}/videos/{video}/hapus', [\App\Http\Controllers\MateriManagementController::class, 'confirmDeleteVideo'])->whereNumber('playlist')->whereNumber('video')->name('videos.confirm-delete');
+            Route::patch('/playlists/{playlist}/videos/{video}', [\App\Http\Controllers\MateriManagementController::class, 'updateVideo'])->whereNumber('playlist')->whereNumber('video')->name('videos.update');
+            Route::delete('/playlists/{playlist}/videos/{video}', [\App\Http\Controllers\MateriManagementController::class, 'destroyVideo'])->whereNumber('playlist')->whereNumber('video')->name('videos.destroy');
         });
-        Route::get('/{id}', [MateriController::class, 'show'])->name('show');
+        Route::get('/{id}', [MateriController::class, 'show'])->whereNumber('id')->name('show');
     });
 Route::middleware(['auth', 'can:review-report', \App\Http\Middleware\ScopeWilayah::class])->prefix('laporan')->name('laporan.')->group(function () {
     Route::get('/', [\App\Http\Controllers\ReportController::class, 'listing'])->name('index');

@@ -37,6 +37,8 @@ Perapian schema/fixture (RFIX-02/05/06/23/24) memerlukan inventaris dan regresi,
 
 Penyatuan halaman Laporan (RFIX-17) memakai scope/filter bersama untuk daftar dan ekspor; mutasi tetap memeriksa izin pada server. Penghapusan dibatasi pada draf sendiri dengan lock transaksi dan pembersihan foto setelah commit. Ekspor Excel mengikuti batas volume KEP-05 dan teks sel harus diperlakukan sebagai data, bukan rumus. Bukti regresi dan alur browser tercatat pada [TASK](TASK.md); bukti lokal ini tidak mengubah risiko lingkungan tujuan di bawah.
 
+Penyatuan Materi (RFIX-17) membedakan akses pengelola aktif dan akses belajar anggota pada server. Modal tidak menggantikan pemeriksaan role, level, status terbit atau relasi video–playlist. Penghapusan playlist tetap meminta konfirmasi eksplisit dan menghapus video terkait melalui relasi database; schema dan kelayakan anggota tidak diubah. Hasil regresi serta batas bukti mengikuti [TASK](TASK.md).
+
 ## Daftar risiko aktif
 
 - **Dependency tooling.** Residu low npm berasal dari satu advisory `GHSA-gcqx-w48m-w2h4` pada rantai `flowbite → flowbite-datepicker → @rollup/plugin-node-resolve → deepmerge 4.3.1`. Paket terakhir digunakan pada tooling build datepicker; aplikasi tidak memasukkan objek unggahan pengguna ke proses merge tersebut. Registry yang diperiksa pada tanggal penilaian masih menawarkan 4.3.1. Penurunan major Flowbite yang disarankan otomatis tidak diterapkan. Temuan tetap terlihat, dengan gate sesuai runner; triase ini bukan klaim seluruh risiko dependency hilang.

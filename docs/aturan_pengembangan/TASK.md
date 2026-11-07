@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | IN_PROGRESS | develop baseline 47fe0a2: setelah koreksi publik, satukan daftar/pengelolaan Materi dengan modal; bukti Laporan tetap tersimpan di bawah |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Materi terpadu dengan modal dan thumbnail; regresi serta alur browser lulus dari baseline c1f0c4b. Bukti Laporan tetap di bawah |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -154,6 +154,22 @@ Efek hover kartu dari baseline `8418f66`: latar biru muda dan garis tepi cobalt 
 Branch `develop`, baseline `47fe0a2`. Hero tidak lagi menampilkan tombol Masuk area anggota. Navigasi, judul bagian/daftar/detail, tautan, kondisi kosong, deskripsi dan metadata publik memakai Catatan Pemikiran; menu pengelolaan Artikel, jenis `article`, URL `/artikel`, Refleksi publik dan batas empat cuplikan homepage tetap mengikuti kontrak. Partial CTA historis yang tidak dirender tidak diaktifkan atau diubah.
 
 PHP 8.3.30/MySQL 8.4.3 pada database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi: `php -d extension=zip vendor/bin/phpunit --filter 'PublicContentTest\|ArticlePublishingTest\|RemovedMemberReflectionTest' --display-warnings --display-deprecations --display-notices` lulus **16 tests, 245 assertions**, tanpa failure/error/warning/deprecation/notice/skip. Pemeriksaan view ter-render mencakup label publik, CTA hero, konten terbit/privat dan nama menu pengelola. Lint view/tes dan `git diff --check` lulus. Log: `storage/logs/phpunit-public-thought-notes-2026-11-07.txt` dan `phpunit-public-thought-notes.xml`. Suite aplikasi penuh tidak diulang; perbaikan Materi masih mengikuti status RFIX-17.
+
+## Materi terpadu dan modal 7 November — RFIX-17
+
+Branch `develop`, baseline publik `c1f0c4b`. Daftar belajar/pengelolaan disatukan pada `/materi`; `/materi/kelola` mengarahkan ke daftar ini. Pengelola aktif dapat mengelola seluruh playlist tanpa level belajar pada akunnya, sedangkan akses anggota tetap dibatasi level, status akun dan playlist aktif. Tambah/edit/detail serta konfirmasi hapus playlist/video memakai satu dialog dengan fragmen privat, validasi JSON, isian tetap saat gagal dan fallback HTML. Daftar playlist serta video dibatasi masing-masing 10 per halaman, termasuk pengalihan ke halaman valid setelah hapus. Partial lama yang tidak digunakan dihapus; metadata YouTube dan progres menonton tidak ditambahkan.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi Materi, navigasi dan publik | PHP 8.3.30 dengan ZIP, MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi. `php -d extension=zip vendor/bin/phpunit --filter 'Materi\|NavigationAccessibilityTest\|PublicContentTest\|ArticlePublishingTest\|RemovedMemberReflectionTest' --display-warnings --display-deprecations --display-notices`: **46 tests, 559 assertions**, tanpa failure/error/warning/deprecation/notice/skip; PHPUnit 11.5.57 |
+| Cakupan server | Akun pengelola tanpa level, batas akses anggota/draf/level tinggi, pencarian/pagination, fragmen/cache, JSON CRUD dan 422, relasi video–playlist, konfirmasi hapus/cascade, isian gagal per entitas serta halaman terakhir playlist/video lulus |
+| Thumbnail | Arahan lanjutan memakai thumbnail YouTube pada video dan kartu playlist. Query memilih ID video pertama menurut urutan/id tanpa memuat seluruh koleksi; regresi urutan, playlist kosong dan scope materi terbatas lulus. ID gambar divalidasi, URL penyedia tetap, pemuatan lazy dan fallback gambar gagal tersedia |
+| Review independen | Backend, UI/JS dan thumbnail diperiksa; halaman video yang berlebih kini diarahkan ke halaman valid. Penghapusan playlist dari URL langsung menampilkan hasil sebelum kembali ke daftar. Tidak ada temuan konkret tersisa |
+| Source dan aset | Lint 15 berkas PHP/Blade, `node --check resources/js/pages/materi.js`, `node --check resources/js/app.js`, `git diff --check` dan `npm.cmd run build` lulus. Vite 7.3.7, 178 modul; build akhir sudah memuat thumbnail serta hasil hapus dari URL langsung |
+| Chrome headless | Data sintetis pada `rf_report_browser_testing`: **9 kelompok uji utama dan 5 kelompok tambahan PASS**, tanpa page error. Termasuk Cari/Reset, 10 item per halaman, gagal memuat/ulangi, dirty Escape, 422/isian tetap, pencegahan kiriman ganda, CRUD modal, detail/pagination video, scope anggota dan pending/suspended. Tambahan mencakup thumbnail sukses/gagal/kosong, konfirmasi hapus URL langsung serta label publik/hero |
+| Tampilan | Kartu, modal dan pencarian pada 320/390/768/1280 px tanpa overflow. Screenshot publik serta Materi desktop/ponsel diperiksa. Thumbnail diuji dengan respons gambar sintetis dan kegagalan jaringan yang dikendalikan, bukan jaminan ketersediaan gambar YouTube |
+
+Log: `storage/logs/phpunit-materi-final-2026-11-07.txt` dan `phpunit-materi-final.xml`. Artefak browser: `storage/app/qa-materi-ui-2026-11-07/report.json`, `final-report.json`, `materi-final-1280.png`, `materi-final-390.png`, `public-1280.png` dan `public-390.png`; seluruhnya diabaikan Git. Server QA sementara port 8768 sudah dihentikan. Pemeriksaan 18 dokumen/114 tautan lokal lulus tanpa berkas/anchor putus. Tidak ada migration atau reset develop; suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini.
 
 ## Riwayat sebelum rencana RFIX
 

@@ -12,45 +12,86 @@ class MateriManagementController extends Controller
 {
     public function index()
     {
-        return view('materi.manage', [
-            'playlists' => Playlist::with('level')->withCount('videos')->orderBy('order_index')->orderBy('id')->paginate(10),
+        return redirect()->route('materi.index');
+    }
+
+    public function createPlaylist(Request $request)
+    {
+        return $this->formView($request, 'materi.partials.playlist-form', [
+            'playlist' => new Playlist,
             'levels' => Level::where('is_active', true)->orderBy('id')->get(),
+            'formKey' => 'playlist-new',
         ]);
     }
 
     public function storePlaylist(Request $request)
     {
-        Playlist::create($this->playlistData($request));
-        return redirect()->route('materi.manage')->with('success', 'Playlist ditambahkan.');
+        $request->session()->flash('materi_form', 'playlist-new');
+        $playlist = Playlist::create($this->playlistData($request));
+
+        return $this->saved($request, $playlist, 'Playlist ditambahkan.');
     }
 
-    public function editPlaylist(Playlist $playlist)
+    public function editPlaylist(Request $request, Playlist $playlist)
     {
-        return view('materi.edit', [
-            'playlist' => $playlist->load(['videos' => fn ($query) => $query->orderBy('order_index')->orderBy('id')]),
+        return $this->formView($request, 'materi.partials.playlist-form', [
+            'playlist' => $playlist,
             'levels' => Level::where('is_active', true)->orWhere('id', $playlist->level_id)->orderBy('id')->get(),
+            'formKey' => 'playlist-'.$playlist->id,
         ]);
+    }
+
+    public function confirmDeletePlaylist(Request $request, Playlist $playlist)
+    {
+        return $this->formView($request, 'materi.partials.delete-form', compact('playlist') + ['video' => null]);
     }
 
     public function updatePlaylist(Request $request, Playlist $playlist)
     {
-        $request->session()->flash('materi_form', 'playlist');
+        $request->session()->flash('materi_form', 'playlist-'.$playlist->id);
         $playlist->update($this->playlistData($request));
-        return redirect()->route('materi.playlists.edit', $playlist)->with('success', 'Playlist disimpan.');
+
+        return $this->saved($request, $playlist, 'Playlist disimpan.');
     }
 
     public function destroyPlaylist(Request $request, Playlist $playlist)
     {
         $request->validate(['confirm_delete' => ['required', 'accepted']]);
         $playlist->delete();
-        return redirect()->route('materi.manage')->with('success', 'Playlist dan videonya dihapus.');
+        $message = 'Playlist dan videonya dihapus.';
+
+        return $request->expectsJson()
+            ? response()->json(['message' => $message, 'deleted' => true])->header('Cache-Control', 'private, no-store')
+            : redirect()->route('materi.index')->with('success', $message);
+    }
+
+    public function createVideo(Request $request, Playlist $playlist)
+    {
+        return $this->formView($request, 'materi.partials.video-form', compact('playlist') + [
+            'video' => new Video, 'formKey' => 'video-new-'.$playlist->id,
+        ]);
     }
 
     public function storeVideo(Request $request, Playlist $playlist)
     {
-        $request->session()->flash('materi_form', 'video-new');
+        $request->session()->flash('materi_form', 'video-new-'.$playlist->id);
         $playlist->videos()->create($this->videoData($request));
-        return redirect()->route('materi.playlists.edit', $playlist)->with('success', 'Video ditambahkan.');
+
+        return $this->saved($request, $playlist, 'Video ditambahkan.');
+    }
+
+    public function editVideo(Request $request, Playlist $playlist, int $video)
+    {
+        $video = $playlist->videos()->findOrFail($video);
+
+        return $this->formView($request, 'materi.partials.video-form', compact('playlist', 'video') + ['formKey' => 'video-'.$video->id]);
+    }
+
+    public function confirmDeleteVideo(Request $request, Playlist $playlist, int $video)
+    {
+        $video = $playlist->videos()->findOrFail($video);
+
+        return $this->formView($request, 'materi.partials.delete-form', compact('playlist', 'video'));
     }
 
     public function updateVideo(Request $request, Playlist $playlist, int $video)
@@ -58,7 +99,8 @@ class MateriManagementController extends Controller
         $item = $playlist->videos()->findOrFail($video);
         $request->session()->flash('materi_form', 'video-'.$video);
         $item->update($this->videoData($request, $item));
-        return redirect()->route('materi.playlists.edit', $playlist)->with('success', 'Video disimpan.');
+
+        return $this->saved($request, $playlist, 'Video disimpan.');
     }
 
     public function destroyVideo(Request $request, Playlist $playlist, int $video)
@@ -66,7 +108,31 @@ class MateriManagementController extends Controller
         $item = $playlist->videos()->findOrFail($video);
         $request->validate(['confirm_delete' => ['required', 'accepted']]);
         $item->delete();
-        return redirect()->route('materi.playlists.edit', $playlist)->with('success', 'Video dihapus.');
+
+        return $this->saved($request, $playlist, 'Video dihapus.');
+    }
+
+    private function formView(Request $request, string $partial, array $data)
+    {
+        $fragment = view($partial, $data)->render();
+        $response = $request->header('X-Materi-Modal') === '1'
+            ? response($fragment)
+            : response()->view('materi.page', $data + ['fragment' => $fragment]);
+
+        $response->headers->set('Cache-Control', 'private, no-store');
+        $response->headers->set('Vary', 'X-Materi-Modal');
+        if ($request->header('X-Materi-Modal') === '1') {
+            $response->headers->set('X-Materi-Modal', '1');
+        }
+
+        return $response;
+    }
+
+    private function saved(Request $request, Playlist $playlist, string $message)
+    {
+        return $request->expectsJson()
+            ? response()->json(['message' => $message, 'modal_url' => route('materi.show', $playlist)])->header('Cache-Control', 'private, no-store')
+            : redirect()->route('materi.show', $playlist)->with('success', $message);
     }
 
     private function playlistData(Request $request): array

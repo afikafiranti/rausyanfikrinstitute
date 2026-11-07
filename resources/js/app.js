@@ -3,6 +3,7 @@ import 'flowbite';
 import './notus';
 import { initDashboardCharts } from './pages/dashboard';
 import { initReportModals } from './pages/reports';
+import { initMateriModals } from './pages/materi';
 import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 
@@ -65,6 +66,7 @@ function initializePage() {
   initDashboardCharts();
   initAlumniDialog();
   initReportModals();
+  initMateriModals();
 }
 
 if (document.readyState === 'loading') {

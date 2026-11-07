@@ -94,9 +94,10 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 ### Modul Materi Kajian
 
 - Pengelola yang berwenang mengelola playlist/video; pengguna dapat mencari dan membuka detail materi.
-- Materi memakai satu daftar berhalaman: pengelola aktif melihat semua playlist yang dapat dikelolanya, sedangkan alumni hanya melihat playlist aktif sesuai level. Tambah/edit playlist, tambah/edit video, detail dan konfirmasi hapus dibuka dalam modal dari daftar yang sama; URL kelola lama mengarah ke daftar Materi.
+- Materi memakai satu daftar berhalaman: pengelola aktif melihat semua playlist yang dapat dikelolanya, sedangkan anggota tanpa kewenangan pengelolaan hanya melihat playlist aktif sesuai level. Tambah/edit playlist, tambah/edit video, detail dan konfirmasi hapus dibuka dalam modal dari daftar yang sama; URL kelola lama mengarah ke daftar Materi.
+- Kartu playlist memakai thumbnail YouTube dari video pertama menurut urutan/id; setiap video menampilkan thumbnail sendiri. Playlist kosong atau gambar yang tidak tersedia memakai placeholder. Thumbnail dimuat saat diperlukan; tidak ada pengambilan metadata atau sinkronisasi playlist otomatis.
 - Penyimpanan mempertahankan isian ketika validasi gagal, mencegah kiriman ganda, dan memperbarui daftar tanpa menghilangkan pencarian/posisi halaman. Modal mendukung fokus keyboard, Escape, kembali ke pemicu serta konfirmasi perubahan yang belum disimpan. Penghapusan playlist tetap meminta persetujuan eksplisit karena turut menghapus video terkait.
-- Akses memerlukan akun active dengan level yang memenuhi syarat; level kosong ditolak. Level berbeda dari role akun.
+- Akses belajar memerlukan akun active dengan level yang memenuhi syarat; level kosong ditolak untuk anggota. Pengelolaan admin/super admin aktif mengikuti kewenangan pengelola tanpa mensyaratkan level belajar. Level berbeda dari role akun.
 - Judul/durasi diisi manual, sedangkan menonton membuka tautan YouTube. Pembatasan aplikasi tidak mencegah pembagian tautan YouTube yang sudah diketahui.
 
 ### Modul Laporan Kajian

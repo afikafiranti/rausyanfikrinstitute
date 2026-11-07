@@ -41,7 +41,8 @@ class MateriManagementTest extends TestCase
         ])->assertRedirect();
         $playlist = Playlist::where('title', 'Materi Tinggi')->firstOrFail();
         $this->assertFalse($playlist->is_active);
-        $this->get(route('materi.manage'))->assertOk()->assertSee('Materi Tinggi')->assertSee('Draft');
+        $this->get(route('materi.manage'))->assertRedirect(route('materi.index'));
+        $this->get(route('materi.index'))->assertOk()->assertSee('Materi Tinggi')->assertSee('Draf');
         $this->get(route('materi.playlists.edit', $playlist))->assertOk()->assertSee('Materi Tinggi');
 
         $this->patch(route('materi.playlists.update', $playlist), [
@@ -126,12 +127,12 @@ class MateriManagementTest extends TestCase
 
         $this->delete(route('materi.playlists.destroy', $playlist))->assertSessionHasErrors('confirm_delete');
         $this->assertDatabaseHas('playlists', ['id' => $playlist->id]);
-        $this->delete(route('materi.playlists.destroy', $playlist), ['confirm_delete' => '1'])->assertRedirect(route('materi.manage'));
+        $this->delete(route('materi.playlists.destroy', $playlist), ['confirm_delete' => '1'])->assertRedirect(route('materi.index'));
         $this->assertDatabaseMissing('playlists', ['id' => $playlist->id]);
         $this->assertDatabaseMissing('videos', ['id' => $video->id]);
     }
 
-    public function test_failed_video_form_restores_only_its_own_values(): void
+    public function test_failed_video_form_restores_submitted_values_in_its_modal(): void
     {
         $level = Level::create(['name' => 'Level 1', 'is_active' => true]);
         $playlist = $this->playlist($level);
@@ -141,18 +142,22 @@ class MateriManagementTest extends TestCase
         $this->post(route('materi.videos.store', $playlist), [
             'title' => 'Belum Valid', 'youtube_video_id' => 'salah', 'order_index' => 8,
         ])->assertSessionHasErrors('youtube_video_id');
-        $html = $this->get(route('materi.playlists.edit', $playlist))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/id="title"[^>]*value="Kajian Dasar"/', $html);
-        $this->assertMatchesRegularExpression('/id="new_title"[^>]*value="Belum Valid"/', $html);
-        $this->assertMatchesRegularExpression('/id="video_title_'.$video->id.'"[^>]*value="Asli"/', $html);
+        $html = $this->get(route('materi.videos.create', $playlist))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/id="video_title"[^>]*value="Belum Valid"/', $html);
+
+        $other = $this->playlist($level, ['title' => 'Playlist Lain', 'youtube_playlist_id' => 'PLOTHER']);
+        $this->post(route('materi.videos.store', $playlist), [
+            'title' => 'Belum Valid', 'youtube_video_id' => 'salah',
+        ])->assertSessionHasErrors('youtube_video_id');
+        $otherHtml = $this->get(route('materi.videos.create', $other))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/id="video_title"[^>]*value=""/', $otherHtml);
+        $this->assertStringNotContainsString('Belum Valid', $otherHtml);
 
         $this->patch(route('materi.videos.update', [$playlist, $video]), [
             'title' => 'Edit Gagal', 'youtube_video_id' => 'salah',
         ])->assertSessionHasErrors('youtube_video_id');
-        $html = $this->get(route('materi.playlists.edit', $playlist))->assertOk()->getContent();
-        $this->assertMatchesRegularExpression('/id="title"[^>]*value="Kajian Dasar"/', $html);
-        $this->assertMatchesRegularExpression('/id="new_title"[^>]*value=""/', $html);
-        $this->assertMatchesRegularExpression('/id="video_title_'.$video->id.'"[^>]*value="Edit Gagal"/', $html);
+        $html = $this->get(route('materi.videos.edit', [$playlist, $video]))->assertOk()->getContent();
+        $this->assertMatchesRegularExpression('/id="video_title"[^>]*value="Edit Gagal"/', $html);
     }
 
     public function test_inactive_current_level_is_visible_but_cannot_be_selected_for_update(): void
@@ -164,7 +169,7 @@ class MateriManagementTest extends TestCase
 
         $this->get(route('materi.playlists.edit', $playlist))->assertOk()
             ->assertSee('Level Lama (nonaktif)')
-            ->assertSee('Pilih level aktif untuk menyimpan playlist.');
+            ->assertSee('Pilih level aktif untuk menyimpan.');
         $this->patch(route('materi.playlists.update', $playlist), [
             'title' => 'Kajian Dasar', 'youtube_playlist_id' => 'PL123456',
             'level_id' => $inactive->id,
