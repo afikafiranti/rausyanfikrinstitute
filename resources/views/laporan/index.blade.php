@@ -5,7 +5,7 @@
         <header class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
             <div class="min-w-0">
                 <h1 id="laporan-heading" class="text-2xl font-semibold text-ink">Laporan Kajian</h1>
-                <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Catat kegiatan, pantau status, dan tindak lanjuti laporan dari satu daftar.</p>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Kelola laporan kajian dari draf hingga hasil peninjauan.</p>
             </div>
             <div class="flex flex-wrap gap-2" aria-label="Aksi laporan">
                 <a href="{{ route('laporan.create') }}" data-report-modal class="rf-btn px-3">Buat</a>

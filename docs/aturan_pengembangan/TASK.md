@@ -145,6 +145,8 @@ Penyesuaian posisi tombol dari baseline `b047c1e`: tombol Filter/Reset menjadi k
 
 Koreksi teks lanjutan dari baseline `69b310d`: paragraf keterangan ekspor dihapus sesuai permintaan pengguna dan label ringkasan Kehadiran menjadi Peserta. Penjelasan aksesibel tombol Ekspor nonaktif tidak lagi merujuk ID paragraf yang dihapus. Lint Blade, pencarian teks/rujukan lama dan `git diff --check` lulus. Tidak ada perubahan perhitungan, endpoint atau JavaScript; build dan tes aplikasi tidak diulang untuk perubahan teks ini.
 
+Penyempurnaan copy dari baseline `e231991`: subjudul halaman Laporan menjadi “Kelola laporan kajian dari draf hingga hasil peninjauan.” Lint Blade, pemeriksaan diff dan pencarian kalimat lama lulus; tidak ada perubahan fungsi. Build dan tes aplikasi tidak diulang untuk koreksi satu kalimat ini.
+
 ## Riwayat sebelum rencana RFIX
 
 [Catatan A](CATATAN_JALUR_A.md), [Catatan B](CATATAN_JALUR_B.md), dan [TASK baseline](https://github.com/afikafiranti/rausyanfikrinstitute/blob/bd9cdc1bc728916060e50d4566eccc64a172df9b/docs/aturan_pengembangan/TASK.md) mempertahankan kronologi A/B/PUB serta bukti tanggalnya. Ikuti [peta dokumentasi](README.md#arsip-dan-bukti-historis) untuk kedudukan arsip.
