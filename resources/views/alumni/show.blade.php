@@ -153,4 +153,10 @@
             </a>
         </div>
     </div>
+    @if ($canVerify)
+        <section id="verifikasi" class="rf-card mx-auto mt-6 max-w-3xl" aria-labelledby="verification-detail-heading">
+            <h2 id="verification-detail-heading" class="text-xl font-semibold">Verifikasi {{ $alumni->name }}</h2>
+            @include('verification.forms', ['target' => $alumni])
+        </section>
+    @endif
 @endsection

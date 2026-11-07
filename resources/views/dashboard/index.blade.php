@@ -92,14 +92,14 @@
             </div>
 
             <div class="rf-card min-w-0 sm:col-span-2 lg:col-span-6">
-                <h3 class="font-semibold mb-3">Status AB Alumni</h3>
+                <h3 class="font-semibold mb-3">Pekerjaan Alumni</h3>
                 <div class="relative h-72 min-w-0">
-                    <canvas id="chartAb" class="h-full w-full min-w-0" role="img" aria-label="Grafik status AB"></canvas>
+                    <canvas id="chartJobs" class="h-full w-full min-w-0" role="img" aria-label="Grafik pekerjaan alumni"></canvas>
                 </div>
-                <p id="chartAb-status" class="mt-2 text-sm text-slate-600" role="status">Memuat data status AB.</p>
-                <details id="chartAb-data" class="mt-2 hidden text-sm">
-                    <summary class="cursor-pointer font-medium">Lihat angka status AB</summary>
-                    <table class="mt-2 w-full text-left"><thead><tr><th scope="col">Status</th><th scope="col">Jumlah</th></tr></thead><tbody></tbody></table>
+                <p id="chartJobs-status" class="mt-2 text-sm text-slate-600" role="status">Memuat data pekerjaan.</p>
+                <details id="chartJobs-data" class="mt-2 hidden text-sm">
+                    <summary class="cursor-pointer font-medium">Lihat angka pekerjaan</summary>
+                    <table class="mt-2 w-full text-left"><thead><tr><th scope="col">Pekerjaan</th><th scope="col">Jumlah</th></tr></thead><tbody></tbody></table>
                 </details>
             </div>
 
@@ -238,5 +238,5 @@
         </div>
     </div>
     <script id="chart-alumni-data" type="application/json">@json($chartAlumni)</script>
-    <div id="chart-data-urls" class="hidden" data-marriage-url="{{ route('charts.alumni.status_pernikahan') }}" data-ab-url="{{ route('charts.alumni.ab') }}"></div>
+    <div id="chart-data-urls" class="hidden" data-marriage-url="{{ route('charts.alumni.status_pernikahan') }}" data-jobs-url="{{ route('charts.alumni.jobs') }}"></div>
 @endsection

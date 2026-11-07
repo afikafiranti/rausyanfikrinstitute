@@ -28,13 +28,9 @@
                 <i class="fas fa-file-lines w-5 text-center"></i><span>Laporan</span>
             </a>
             @endcan
-            @can('review-user')
-                <a href="{{ route('verification.index') }}" class="{{ $link(request()->routeIs('verification.*')) }}">
-                    <i class="fas fa-user-check w-5 text-center"></i><span>Verifikasi</span>
-                </a>
-            @endcan
+
             @can('view-alumni')
-                <a href="{{ route('alumni.index') }}" class="{{ $link(request()->routeIs('alumni.*')) }}">
+                <a href="{{ route('alumni.index') }}" class="{{ $link(request()->routeIs('alumni.*', 'verification.*')) }}">
                     <i class="fas fa-user-graduate w-5 text-center"></i><span>Alumni</span>
                 </a>
             @endcan

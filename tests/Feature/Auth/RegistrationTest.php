@@ -128,7 +128,7 @@ class RegistrationTest extends TestCase
 
         $this->post('/logout')->assertRedirect();
         $this->post('/login', ['email' => $koorda->email, 'password' => 'password'])->assertSessionHasNoErrors()->assertRedirect();
-        $this->get(route('verification.index'))->assertOk()->assertSee('Alumni Baru');
+        $this->get(route('alumni.index', ['view' => 'verification']))->assertOk()->assertSee('Alumni Baru');
         $this->post(route('verification.approve', $alumni), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();
 

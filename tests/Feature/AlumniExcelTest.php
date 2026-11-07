@@ -174,7 +174,7 @@ class AlumniExcelTest extends TestCase
         User::factory()->create(['name' => '=2+2', 'email' => 'own@example.test', 'wilayah_id' => $own->id, 'phone' => '08123']);
         User::factory()->create(['name' => 'Outside', 'email' => 'outside@example.test', 'wilayah_id' => $other->id]);
 
-        $response = $this->actingAs($koorda)->get(route('alumni.excel.export', ['q' => 'own@example.test']));
+        $response = $this->actingAs($koorda)->get(route('alumni.excel.export', ['q' => '=2+2']));
         $response->assertOk();
         $sheet = $this->downloadSheet($response->streamedContent());
         $this->assertSame('=2+2', $sheet->getCell('A2')->getValue());
@@ -232,7 +232,7 @@ class AlumniExcelTest extends TestCase
         $ownRow = array_values(array_filter($scopedRows, fn (array $row) => $row[1] === 'own@example.test'))[0];
         $this->assertSame('08123', $ownRow[3]);
 
-        $filtered = $this->actingAs($admin)->get(route('alumni.excel.export', ['q' => 'own@example.test']));
+        $filtered = $this->actingAs($admin)->get(route('alumni.excel.export', ['q' => '=2+2']));
         $filtered->assertOk();
         $this->assertSame(2, $this->downloadSheet($filtered->streamedContent())->getHighestDataRow());
 

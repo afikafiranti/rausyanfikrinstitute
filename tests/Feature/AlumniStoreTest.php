@@ -59,7 +59,7 @@ class AlumniStoreTest extends TestCase
         $alumni = User::where('email', 'new@example.test')->firstOrFail();
         $this->assertSame($region->id, $alumni->wilayah_id);
         $this->get(route('alumni.index'))->assertOk()->assertSee('Alumni Koorda');
-        $this->get(route('verification.index'))->assertOk()->assertSee('Alumni Koorda');
+        $this->get(route('alumni.index', ['view' => 'verification']))->assertOk()->assertSee('Alumni Koorda');
     }
 
     public function test_admin_must_select_a_valid_region_when_creating_alumni(): void

@@ -28,10 +28,10 @@ class DashboardStatisticsTest extends TestCase
             ->assertViewHas('alumniBaru', 2)
             ->assertViewHas('pendingCount', 1)
             ->assertViewHas('persenVerifikasi', 50)
-            ->assertViewHas('chartAlumni', fn ($chart) => $chart['series'][9] === 2 && array_sum($chart['series']) === 2)
+            ->assertViewHas('chartAlumni', fn ($chart) => count($chart['labels']) === 10 && count($chart['series']) === 10 && $chart['series'][9] === 2 && array_sum($chart['series']) === 2)
             ->assertViewHas('sebaranAngkatan', fn ($rows) => $rows->pluck('angkatan')->all() === [2020])
             ->assertViewHas('sebaranWilayah', fn ($rows) => $rows->count() === 1 && $rows[0]->id === $local->id && (int) $rows[0]->total === 2)
-            ->assertDontSee('Wilayah Lain');
+            ->assertSee('Pekerjaan Alumni')->assertDontSee('Status AB Alumni')->assertDontSee('Wilayah Lain');
     }
 
     public function test_admin_and_super_admin_can_see_all_regions_and_only_count_new_members_in_current_year(): void

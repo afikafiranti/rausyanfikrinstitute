@@ -192,7 +192,7 @@ class AlumniCsvTest extends TestCase
         User::factory()->create(['name' => '=2+2', 'email' => 'match@example.test', 'wilayah_id' => $region->id]);
         User::factory()->create(['name' => 'Other', 'email' => 'other@example.test', 'wilayah_id' => $region->id]);
 
-        $response = $this->actingAs($admin)->get(route('alumni.csv.export', ['q' => 'match']));
+        $response = $this->actingAs($admin)->get(route('alumni.csv.export', ['q' => '=2+2']));
         $response->assertOk();
         $content = $response->streamedContent();
         $this->assertStringStartsWith("\xEF\xBB\xBFname,email,wilayah,phone,angkatan,pekerjaan", $content);

@@ -35,9 +35,12 @@ class ChartController extends Controller
         $labels = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
         $values = [];
 
-        for ($m = 1; $m <= 12; $m++) {
+        $monthCount = $year === now()->year ? now()->month : 12;
+        for ($m = 1; $m <= $monthCount; $m++) {
             $values[] = (int) ($raw[$m] ?? 0);
         }
+
+        $labels = array_slice($labels, 0, $monthCount);
 
         return response()->json([
             'year'   => $year,
@@ -81,5 +84,49 @@ class ChartController extends Controller
         'values' => $raw->values(),
     ]);
 }
+
+    public function alumniJobs()
+    {
+        $raw = $this->alumniQuery()
+            ->selectRaw('MIN(pekerjaan) as pekerjaan, COUNT(*) as c')
+            ->groupByRaw('BINARY pekerjaan')
+            ->get();
+
+        $jobs = [];
+        $missing = 0;
+        foreach ($raw as $row) {
+            $label = trim(preg_replace('/\s+/u', ' ', $row->pekerjaan ?? ''));
+            if ($label === '') {
+                $missing += (int) $row->c;
+                continue;
+            }
+
+            $key = mb_strtolower($label);
+            if (! isset($jobs[$key])) {
+                $jobs[$key] = ['label' => $label, 'count' => 0];
+            } elseif (strcmp($label, $jobs[$key]['label']) < 0) {
+                $jobs[$key]['label'] = $label;
+            }
+            $jobs[$key]['count'] += (int) $row->c;
+        }
+
+        uasort($jobs, fn ($a, $b) => $b['count'] <=> $a['count'] ?: strcmp($a['label'], $b['label']));
+        $top = array_slice(array_values($jobs), 0, 5);
+        $labels = array_column($top, 'label');
+        $values = array_column($top, 'count');
+        $other = array_sum(array_column(array_slice(array_values($jobs), 5), 'count'));
+        foreach ([['Lainnya', $other, 'gabungan'], ['Belum diisi', $missing, 'profil kosong']] as [$name, $count, $context]) {
+            if ($count === 0) continue;
+            $label = $name;
+            for ($suffix = 1; isset($jobs[mb_strtolower($label)]); $suffix++) {
+                $label = $name.' ('.$context.($suffix > 1 ? ' '.$suffix : '').')';
+            }
+            $labels[] = $label;
+            $values[] = $count;
+        }
+
+        return response()->json(['labels' => $labels, 'values' => $values])
+            ->header('Cache-Control', 'private, no-store');
+    }
 
 }

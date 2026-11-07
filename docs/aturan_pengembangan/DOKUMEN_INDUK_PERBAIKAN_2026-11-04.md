@@ -273,6 +273,8 @@ ID RFIX adalah spesifikasi pekerjaan dan kriteria penerimaan. Status, commit, pe
 
 **Asal:** RF-09. **Prioritas:** P2. **Dependensi:** KEP-04.
 
+Penggantian grafik AB dengan Pekerjaan Alumni dan batas bulan pertumbuhan mengikuti [kontrak Dashboard](PRD.md#modul-dashboard).
+
 **Berkas terkait:** resources/views/dashboard/index.blade.php, resources/js/app.js atau modul grafik existing, package.json/package-lock.json bila perlu, README.
 
 **Langkah:**
@@ -332,6 +334,7 @@ ID RFIX adalah spesifikasi pekerjaan dan kriteria penerimaan. Status, commit, pe
 - Jelaskan definisi hitungan “alumni” sesuai kontrak seluruh akun dalam scope; jangan mengubah angka diam-diam.
 - Ikuti arahan penyatuan alur Laporan pada [PRD](PRD.md#modul-laporan-kajian); jangan mempertahankan daftar/review/rekap sebagai tiga halaman kerja yang berulang.
 - Alur Materi mengikuti [kontrak modal dan pengelolaan terpadu](PRD.md#modul-materi-kajian), dengan batas akses pengelola dan level alumni tetap berlaku.
+- Penyederhanaan Alumni/Verifikasi mengikuti [kontrak daftar Alumni](PRD.md#modul-data-alumni) dan [verifikasi akun](PRD.md#modul-verifikasi-akun); penyatuan antarmuka tidak memperluas kewenangan aktor.
 
 **Syarat selesai:** form yang sama dapat digunakan pada ukuran layar terkait; tidak ada field/aksi penting hilang dan tidak terjadi ID ganda.
 

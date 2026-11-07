@@ -21,6 +21,7 @@ Route::middleware(['auth', 'can:view-alumni', \App\Http\Middleware\ScopeWilayah:
     Route::get('/alumni/status-pernikahan', [ChartController::class, 'alumniStatusPernikahan'])
         ->name('alumni.status_pernikahan');
     Route::get('/alumni/ab', [ChartController::class, 'alumniAb'])->name('alumni.ab');
+    Route::get('/alumni/pekerjaan', [\App\Http\Controllers\ChartController::class, 'alumniJobs'])->name('alumni.jobs');
 });
 
 // LANDING PAGE

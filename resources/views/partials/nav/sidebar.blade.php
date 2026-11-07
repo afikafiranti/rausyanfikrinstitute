@@ -57,20 +57,10 @@
                 </li>
                 @endcan
 
-                {{-- Verifikasi --}}
-                @can('review-user')
-                    <li class="items-center">
-                        <a href="{{ route('verification.index') }}"
-                            class="{{ $link(request()->routeIs('verification.*')) }}">
-                            <i class="fas fa-user-check mr-2 text-sm text-blueGray-300"></i> Verifikasi
-                        </a>
-                    </li>
-                @endcan
-
                 {{-- Alumni --}}
                 @can('view-alumni')
                     <li class="items-center">
-                        <a href="{{ route('alumni.index') }}" class="{{ $link(request()->routeIs('alumni.*')) }}">
+                        <a href="{{ route('alumni.index') }}" class="{{ $link(request()->routeIs('alumni.*', 'verification.*')) }}">
                             <i class="fas fa-user-graduate mr-2 text-sm text-blueGray-300"></i> Alumni
                         </a>
                     </li>

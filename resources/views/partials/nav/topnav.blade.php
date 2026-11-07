@@ -14,7 +14,7 @@
                 $r === 'dashboard' => 'Dashboard',
                 str_starts_with($r, 'materi.') => 'Materi',
                 str_starts_with($r, 'laporan.') => 'Laporan',
-                str_starts_with($r, 'verification.') => 'Verifikasi',
+                str_starts_with($r, 'verification.') => 'Alumni',
                 str_starts_with($r, 'alumni.') => 'Alumni',
                 str_starts_with($r, 'notifications.') => 'Notifikasi',
                 $r === 'profile.edit' => 'Profil',

@@ -23,10 +23,10 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-11 | Dependency frontend | P1 | B | DONE | Instalasi/build/browser lulus; residu ditriase di AUDIT |
 | RFIX-12 | Warning dan gate CI | P1 | B+A | PARTIAL | Gate/keluaran diperbaiki; CI remote patch dan akar warning baseline belum terbukti |
 | RFIX-13 | Kunci historis | P1 kondisional | Operator+B | PARTIAL | Pemeriksaan lokal tercatat; pemakaian kunci server belum diketahui |
-| RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
+| RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Grafik pekerjaan menggantikan AB; batas bulan berjalan, angka/scope serta kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Materi terpadu dengan modal dan thumbnail; regresi serta alur browser lulus dari baseline c1f0c4b. Bukti Laporan tetap di bawah |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Alumni/Verifikasi terpadu, pencarian nama, sort header dan pagination; regresi/browser lulus, bukti per modul di bawah |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -170,6 +170,21 @@ Branch `develop`, baseline publik `c1f0c4b`. Daftar belajar/pengelolaan disatuka
 | Tampilan | Kartu, modal dan pencarian pada 320/390/768/1280 px tanpa overflow. Screenshot publik serta Materi desktop/ponsel diperiksa. Thumbnail diuji dengan respons gambar sintetis dan kegagalan jaringan yang dikendalikan, bukan jaminan ketersediaan gambar YouTube |
 
 Log: `storage/logs/phpunit-materi-final-2026-11-07.txt` dan `phpunit-materi-final.xml`. Artefak browser: `storage/app/qa-materi-ui-2026-11-07/report.json`, `final-report.json`, `materi-final-1280.png`, `materi-final-390.png`, `public-1280.png` dan `public-390.png`; seluruhnya diabaikan Git. Server QA sementara port 8768 sudah dihentikan. Pemeriksaan 18 dokumen/114 tautan lokal lulus tanpa berkas/anchor putus. Tidak ada migration atau reset develop; suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini.
+
+## Alumni terpadu dan grafik pekerjaan 7 November — RFIX-14/17
+
+Branch `develop`, baseline `b27ab20`. Implementasi mengikuti [Data Alumni](PRD.md#modul-data-alumni), [Verifikasi Akun](PRD.md#modul-verifikasi-akun) dan [Dashboard](PRD.md#modul-dashboard). Tidak ada migration/reset develop; data AB serta endpoint lama dipertahankan. Makna AB yang belum terdefinisi dan asal commit dicatat pada AUDIT.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi server | PHP 8.3.30 dengan ZIP, MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi. `php -d extension=zip vendor/bin/phpunit --filter 'Alumni\|Verification\|AccountIntegrityTest\|ProfileTest\|NavigationAccessibilityTest\|DashboardStatisticsTest' --display-warnings --display-deprecations --display-notices`: **160 tests, 1.128 assertions**, tanpa failure/error/warning/deprecation/notice/skip; PHPUnit 11.5.57 |
+| Cakupan server | Pencarian nama saja, enam urutan naik/turun dan whitelist, multi-role tanpa duplikasi, 15 akun per halaman, keselarasan ekspor/tab, gate/wilayah/role target, larangan self-review, 422/403/409, audit/notifikasi, HTML fallback dengan konteks daftar dan penolakan URL kembali eksternal. Grafik diuji untuk normalisasi, lima teratas/sisa/kosong, benturan label bebas, total wilayah serta tahun berjalan/lampau |
+| Review independen | Label kategori dan konteks daftar pada fallback HTML diperbaiki; review ulang dua perbaikan selesai tanpa temuan bermakna tersisa. Verifikasi tambahan terfokus: **11 tests, 93 assertions** lulus; angka ini bagian dari cakupan regresi, bukan tambahan tes unik |
+| Source dan aset | Lint 27 berkas PHP/Blade, `node --check` untuk app/dashboard/verification, `git diff --check` dan `npm.cmd run build` lulus. Vite 7.3.7, 179 modul; grafik langsung dirender tanpa animasi |
+| Chrome headless | Data sintetis terpisah pada `rf_report_browser_testing`: **10 kelompok uji PASS**, tanpa page error. Termasuk pencarian/sort/pagination, redirect lama, nama berapostrof, dirty Escape, 422/isian tetap, freeze saat menyimpan, tolak tetap pending, setujui/refresh daftar, listener modal tambah, unduhan XLSX, scope koorda, fallback tanpa JavaScript, grafik pekerjaan/batas bulan dan HTTP 500/data kosong |
+| Tampilan | Alumni pada 320/390/768/1280 px dan dashboard pada 390/1280 px diperiksa; tabel bergeser di dalam area sendiri. Screenshot viewport/canvas memastikan grafik tergambar serta muat di kartu. Pemeriksaan 18 dokumen dan 121 tautan lokal lulus; ID ARAH/KEP/RFIX tetap lengkap. DOCX diskusi pengguna tetap identik dengan hash sebelumnya |
+
+Log: `storage/logs/phpunit-alumni-final.txt`, `phpunit-alumni-final.xml`, `phpunit-alumni-review.txt` dan `phpunit-alumni-review.xml`. Artefak browser: `storage/app/qa-alumni-ui-2026-11-07/report.json`, `alumni-1280.png`, `alumni-390.png`, `verification-modal-1280.png`, `verification-modal-390.png`, `dashboard-viewport.png`, `jobs-card-1280.png`, `jobs-card-390.png` dan `canvas-bounds.json`; seluruhnya diabaikan Git. Proses QA sementara port 8768 dihentikan setelah pemeriksaan. Suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini.
 
 ## Riwayat sebelum rencana RFIX
 

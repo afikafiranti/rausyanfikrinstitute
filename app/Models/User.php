@@ -38,11 +38,13 @@ class User extends Authenticatable implements MustVerifyEmail
         if (!$canViewAll) {
             $query->where('users.wilayah_id', $actor->wilayah_id);
         }
+        if (($filters['view'] ?? '') === 'verification') {
+            $query->reviewableBy($actor);
+        }
 
         $search = trim($filters['q'] ?? '');
         if ($search !== '') {
-            $query->where(fn ($match) => $match->where('users.name', 'like', "%{$search}%")
-                ->orWhere('users.email', 'like', "%{$search}%"));
+            $query->where('users.name', 'like', "%{$search}%");
         }
         foreach (['angkatan', 'wilayah_id', 'level_id', 'ab'] as $field) {
             if (isset($filters[$field]) && $filters[$field] !== '') {
@@ -54,6 +56,7 @@ class User extends Authenticatable implements MustVerifyEmail
             'name' => 'users.name', 'email' => 'users.email', 'angkatan' => 'users.angkatan',
             'wilayah' => 'wilayah.name', 'level' => 'levels.description',
             'status' => 'users.status', 'created_at' => 'users.created_at',
+            'role' => 'role',
         ];
         $sort = $sortMap[$filters['sort'] ?? 'created_at'] ?? 'users.created_at';
         if ($sort === 'wilayah.name') {
@@ -62,8 +65,29 @@ class User extends Authenticatable implements MustVerifyEmail
             $query->leftJoin('levels', 'levels.id', '=', 'users.level_id');
         }
 
-        return $query->select('users.*')->orderBy($sort, ($filters['dir'] ?? '') === 'asc' ? 'asc' : 'desc')
-            ->orderBy('users.id');
+        $direction = ($filters['dir'] ?? '') === 'asc' ? 'asc' : 'desc';
+        $query->select('users.*');
+        if ($sort === 'role') {
+            $query->orderBy(Role::query()->select('roles.name')
+                ->join('role_user', 'roles.id', '=', 'role_user.role_id')
+                ->whereColumn('role_user.user_id', 'users.id')->orderBy('roles.name')->limit(1), $direction);
+        } else {
+            $query->orderBy($sort, $direction);
+        }
+
+        return $query->orderBy('users.id');
+    }
+
+    public function scopeReviewableBy(Builder $query, User $actor): Builder
+    {
+        $query->where('users.status', self::STATUS_PENDING)->where('users.id', '!=', $actor->id);
+        if (! $actor->hasAnyRole(['super_admin', 'admin'])) {
+            abort_unless($actor->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
+            $query->where('users.wilayah_id', $actor->wilayah_id)
+                ->whereDoesntHave('roles', fn ($roles) => $roles->whereIn('name', ['super_admin', 'admin', 'koorda']));
+        }
+
+        return $query;
     }
 
     // Relations

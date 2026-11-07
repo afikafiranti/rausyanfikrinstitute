@@ -3,265 +3,84 @@
 @section('page-content')
     @php
         $showCreateModal = old('_form') === 'alumni-create' && $errors->any();
+        $statusLabels = ['pending' => 'Menunggu', 'active' => 'Aktif', 'suspended' => 'Ditangguhkan'];
     @endphp
-    <div class="rounded-xl bg-white p-6 shadow max-w-7xl mx-auto">
-        <h2 class="text-2xl font-semibold mb-6">Daftar Alumni</h2>
-
-        <div class="mb-4 flex flex-wrap gap-2">
-            <button type="button" id="open-alumni-modal" aria-controls="modal-register-alumni" aria-expanded="{{ $showCreateModal ? 'true' : 'false' }}" class="rf-btn">
-                <i class="fas fa-plus"></i> Tambah Alumni
-            </button>
-            <a href="{{ route('alumni.csv.index', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Impor Excel</a>
-            <a href="{{ route('alumni.excel.export', request()->except('page')) }}" class="rf-btn border border-slate-300 px-4 py-2 rounded-lg">Ekspor Excel sesuai filter</a>
-        </div>
-
-        @if (session('success'))
-            <div class="mb-4 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-                {{ session('success') }}
+    <section data-alumni-workspace class="rf-card min-w-0 sm:p-6" aria-labelledby="alumni-heading">
+        <header class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
+            <div><h1 id="alumni-heading" class="text-2xl font-semibold text-ink">Alumni</h1><p class="mt-2 text-sm text-muted">Kelola data akun dan tinjau pendaftaran alumni.</p></div>
+            <div class="flex flex-wrap gap-2">
+                <button type="button" id="open-alumni-modal" aria-controls="modal-register-alumni" aria-expanded="{{ $showCreateModal ? 'true' : 'false' }}" class="rf-btn">Buat</button>
+                <a href="{{ route('alumni.csv.index', $filters) }}" class="rf-btn-secondary">Impor</a>
+                <a href="{{ route('alumni.excel.export', $filters) }}" class="rf-btn-secondary" title="Unduh Excel sesuai daftar terpilih">Ekspor</a>
             </div>
-        @endif
-
-        @if ($errors->any())
-            <div class="mb-4 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                <div class="font-semibold">Permintaan belum berhasil.</div>
-                <ul class="mt-2 list-disc pl-5">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
-
-        {{-- Filter Section --}}
-        <form method="GET" action="{{ route('alumni.index') }}" class="mb-4 flex flex-wrap gap-3 items-end">
-            <div>
-                <label class="block text-sm text-slate-600">Cari</label>
-                <input type="text" name="q" value="{{ $q }}" placeholder="Nama atau Email"
-                    class="w-52 rounded-lg border-slate-300" />
-            </div>
-
-            <div>
-                <label class="block text-sm text-slate-600">Angkatan</label>
-                <select name="angkatan" class="rounded-lg border-slate-300">
-                    <option value="">Semua</option>
-                    @foreach ($angkatanList as $item)
-                        <option value="{{ $item }}" @selected($angkatan == $item)>{{ $item }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm text-slate-600">Wilayah</label>
-                <select name="wilayah_id" class="rounded-lg border-slate-300">
-                    <option value="">Semua</option>
-                    @foreach ($wilayah as $w)
-                        <option value="{{ $w->id }}" @selected($wilayahId == $w->id)>{{ $w->name }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            <div>
-                <label class="block text-sm text-slate-600">Level</label>
-                <select name="level_id" class="rounded-lg border-slate-300">
-                    <option value="">Semua</option>
-                    @foreach ($level as $l)
-                        <option value="{{ $l->id }}" @selected($levelId == $l->id)>{{ $l->description }}</option>
-                    @endforeach
-                </select>
-            </div>
-
-            {{-- FILTER AB --}}
-            <div>
-                <label class="block text-sm text-slate-600">AB</label>
-                <select name="ab" class="rounded-lg border-slate-300">
-                    <option value="">Semua</option>
-                    <option value="iya" @selected($ab == 'iya')>Iya</option>
-                    <option value="tidak" @selected($ab == 'tidak')>Tidak</option>
-                </select>
-            </div>
-
-            <button class="rf-btn bg-brand hover:bg-brand-dark text-white px-4 py-2 rounded-lg">
-                <i class="fas fa-search mr-1"></i> Filter
-            </button>
-
-            @if ($hasFilters)
-                <a href="{{ route('alumni.index') }}"
-                    class="rf-btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-50 px-4 py-2 rounded-lg inline-flex items-center gap-2">
-                    <i class="fas fa-rotate-left"></i> Reset
-                </a>
-            @endif
+        </header>
+        @if (session('success'))<p role="status" class="mt-4 rounded-lg bg-green-50 p-3 text-sm text-green-900">{{ session('success') }}</p>@endif
+        @if ($errors->any())<div role="alert" class="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-800"><p>Permintaan belum berhasil.</p><ul class="mt-2 list-disc pl-5">@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+        <form action="{{ route('alumni.index') }}" method="GET" class="mt-5 flex flex-wrap items-end gap-2">
+            <input type="hidden" name="view" value="{{ $view }}"><input type="hidden" name="sort" value="{{ $sort }}"><input type="hidden" name="dir" value="{{ $dir }}">
+            <div class="min-w-0 flex-1"><label for="alumni-search" class="block text-sm font-medium">Cari nama</label><input id="alumni-search" name="q" type="search" value="{{ $q }}" maxlength="100" placeholder="Nama alumni" class="mt-1 w-full"></div>
+            <button type="submit" class="rf-btn">Cari</button>
+            @if ($q !== '')<a href="{{ route('alumni.index', array_diff_key($filters, ['q' => true])) }}" class="rf-btn-secondary">Reset</a>@endif
         </form>
-
-        <div class="mb-4 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-600">
-            <div>
-                Menampilkan <span class="font-semibold text-slate-800">{{ $alumni->total() }}</span>
-                dari <span class="font-semibold text-slate-800">{{ $totalAlumni }}</span> alumni.
-            </div>
-
-            @if ($hasFilters)
-                <div class="flex flex-wrap items-center gap-2">
-                    <span class="text-slate-500">Filter aktif:</span>
-                    @foreach ($activeFilters as $filter)
-                        <span class="rounded-full border border-indigo-100 bg-indigo-50 px-3 py-1 text-xs font-medium text-indigo-700">
-                            {{ $filter['label'] }}: {{ $filter['value'] }}
-                        </span>
-                    @endforeach
-                </div>
-            @endif
-        </div>
-
-        {{-- Table Section --}}
-        <div class="overflow-x-auto">
-            <table class="min-w-full border border-slate-200 text-sm">
-                <thead class="bg-slate-100 text-slate-600 uppercase text-xs">
-                    <tr>
-                        <th class="px-4 py-3 text-left">No</th>
-                        <th class="px-4 py-3 text-left">Nama</th>
-                        <th class="px-4 py-3 text-left">Angkatan</th>
-                        <th class="px-4 py-3 text-left">Wilayah</th>
-                        <th class="px-4 py-3 text-left">Role</th>
-                        <th class="px-4 py-3 text-left">Level Materi</th>
-                        <th class="px-4 py-3 text-center">Aksi</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-                    @forelse ($alumni as $item)
-                        <tr class="border-t hover:bg-slate-50">
-
-                            {{-- Nomor --}}
-                            <td class="px-4 py-2">
-                                {{ $alumni->firstItem() + $loop->index }}
-                            </td>
-
-                            {{-- Nama --}}
-                            <td class="px-4 py-2 font-medium">{{ $item->name }}</td>
-
-                            {{-- Angkatan --}}
-                            <td class="px-4 py-2">{{ $item->angkatan ?? '-' }}</td>
-
-                            {{-- Wilayah --}}
-                            <td class="px-4 py-2">
-                                {{ optional($item->wilayah)->name ?? '-' }}
-                            </td>
-
-                            {{-- Role --}}
-                            <td class="px-4 py-2">
-                                @if ($item->roles->count())
-                                    @foreach ($item->roles as $role)
-                                        @switch($role->name)
-                                            @case('super_admin')
-                                                <span
-                                                    class="px-2 py-1 rounded-full text-xs font-semibold bg-rose-200 text-rose-800 mr-1">
-                                                    Super Admin
-                                                </span>
-                                            @break
-
-                                            @case('admin')
-                                                <span
-                                                    class="px-2 py-1 rounded-full text-xs font-semibold bg-amber-200 text-amber-800 mr-1">
-                                                    Admin
-                                                </span>
-                                            @break
-
-                                            @case('koorda')
-                                                <span
-                                                    class="px-2 py-1 rounded-full text-xs font-semibold bg-violet-200 text-violet-800 mr-1">
-                                                    Koorda
-                                                </span>
-                                            @break
-
-                                            @case('alumni')
-                                                <span
-                                                    class="px-2 py-1 rounded-full text-xs font-semibold bg-sky-200 text-sky-800 mr-1">
-                                                    Alumni
-                                                </span>
-                                            @break
-
-                                            @default
-                                                <span
-                                                    class="px-2 py-1 rounded-full text-xs font-semibold bg-slate-200 text-slate-800 mr-1">
-                                                    {{ $role->name }}
-                                                </span>
-                                        @endswitch
-                                    @endforeach
-                                @else
-                                    <span class="text-slate-400">-</span>
-                                @endif
-                            </td>
-
-                            {{-- Level Materi --}}
-                            <td class="px-4 py-2">
-                                <span class="rf-badge bg-slate-100 text-slate-700">
-                                    {{ optional($item->level)->description ?? '-' }}
-                                </span>
-                            </td>
-
-                            {{-- Aksi --}}
-                            <td class="px-4 py-2 text-center">
-                                @php
-                                    $roleNames = $item->roles->pluck('name');
-                                    $canManageTarget = ($roleNames->contains('alumni') || $roleNames->contains('koorda'))
-                                        && !$roleNames->contains('super_admin') && !$roleNames->contains('admin');
-                                @endphp
-                                <div class="flex flex-wrap justify-center gap-2">
-                                    <a href="{{ route('alumni.show', $item->id) }}"
-                                        class="rf-btn inline-flex h-8 w-8 items-center justify-center bg-brand p-0 text-sm text-white hover:bg-brand-dark rounded-lg"
-                                        title="Detail {{ $item->name }}" aria-label="Detail {{ $item->name }}">
-                                        <i class="fas fa-eye"></i>
-                                    </a>
-
+        <div data-alumni-results>
+            <nav aria-label="Tampilan alumni" class="mt-5 flex flex-wrap gap-2 border-b border-slate-200 pb-4">
+                <a href="{{ route('alumni.index', array_merge($filters, ['view' => 'all'])) }}" @if ($view === 'all') aria-current="page" @endif class="rf-btn-secondary {{ $view === 'all' ? 'border-brand bg-blue-50 text-brand' : '' }}">Semua <span class="text-xs">{{ $totalAlumni }}</span></a>
+                @if ($canReview)<a href="{{ route('alumni.index', array_merge($filters, ['view' => 'verification'])) }}" @if ($view === 'verification') aria-current="page" @endif class="rf-btn-secondary {{ $view === 'verification' ? 'border-brand bg-blue-50 text-brand' : '' }}">Verifikasi <span class="text-xs">{{ $pendingCount }}</span></a>@endif
+            </nav>
+            <div data-alumni-workspace-status role="status" aria-live="polite" tabindex="-1" hidden class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm"></div>
+            <div role="region" aria-label="Daftar alumni, geser untuk melihat semua kolom" tabindex="0" class="mt-4 overflow-x-auto rounded-lg border border-slate-200">
+                <table class="w-full min-w-[760px] text-left text-sm">
+                    <caption class="sr-only">Daftar akun alumni. Klik header untuk mengurutkan data.</caption>
+                    <thead class="bg-slate-50 text-muted"><tr>
+                        @foreach (['name' => 'Nama', 'angkatan' => 'Angkatan', 'wilayah' => 'Wilayah', 'role' => 'Peran', 'level' => 'Level', 'status' => 'Status'] as $key => $label)
+                            <th scope="col" aria-sort="{{ $sort === $key ? ($dir === 'asc' ? 'ascending' : 'descending') : 'none' }}" class="px-3 py-2">
+                                <a href="{{ route('alumni.index', array_merge($filters, ['sort' => $key, 'dir' => $sort === $key && $dir === 'asc' ? 'desc' : 'asc'])) }}" class="inline-flex min-h-11 items-center gap-2 rounded font-semibold text-ink hover:text-brand" aria-label="Urutkan {{ $label }} {{ $sort === $key && $dir === 'asc' ? 'menurun' : 'menaik' }}">{{ $label }}<span aria-hidden="true">@if ($sort === $key) @if ($dir === 'asc') &#8593; @else &#8595; @endif @else &#8597; @endif</span></a>
+                            </th>
+                        @endforeach
+                        <th scope="col" class="px-3 py-2">Aksi</th>
+                    </tr></thead>
+                    <tbody class="divide-y divide-slate-200">
+                        @forelse ($alumni as $item)
+                            @php
+                                $roleNames = $item->roles->pluck('name');
+                                $canManageTarget = ($roleNames->contains('alumni') || $roleNames->contains('koorda')) && ! $roleNames->contains('super_admin') && ! $roleNames->contains('admin');
+                            @endphp
+                            <tr class="hover:bg-blue-50 focus-within:bg-blue-50">
+                                <td class="px-3 py-3 font-medium text-ink">{{ $item->name }}</td>
+                                <td class="px-3 py-3">{{ $item->angkatan ?? '-' }}</td>
+                                <td class="px-3 py-3">{{ $item->wilayah?->name ?? '-' }}</td>
+                                <td class="px-3 py-3"><div class="flex flex-wrap gap-1">@forelse ($item->roles as $role)
+                                    @php($roleClass = ['super_admin' => 'bg-rose-200 text-rose-800', 'admin' => 'bg-amber-200 text-amber-800', 'koorda' => 'bg-violet-200 text-violet-800', 'alumni' => 'bg-sky-200 text-sky-800'][$role->name] ?? 'bg-slate-100 text-slate-800')
+                                    <span class="rf-badge {{ $roleClass }}">{{ ['super_admin' => 'Super Admin', 'admin' => 'Admin', 'koorda' => 'Koorda', 'alumni' => 'Alumni'][$role->name] ?? $role->name }}</span>
+                                @empty<span>-</span>@endforelse</div></td>
+                                <td class="px-3 py-3">{{ $item->level?->description ?: ($item->level?->name ?? '-') }}</td>
+                                <td class="px-3 py-3"><span class="rf-badge {{ $item->status === 'active' ? 'bg-green-100 text-green-800' : ($item->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : 'bg-slate-100 text-slate-700') }}">{{ $statusLabels[$item->status] ?? $item->status }}</span></td>
+                                <td class="px-3 py-3"><div class="flex items-center gap-2">
+                                    @if (in_array($item->id, $reviewableIds, true))
+                                        <a href="{{ route('alumni.show', ['id' => $item->id] + $filters + ['page' => $alumni->currentPage()]) }}#verifikasi" data-verification-user data-name="{{ $item->name }}" data-email="{{ $item->email }}" data-approve-url="{{ route('verification.approve', $item) }}" data-reject-url="{{ route('verification.reject', $item) }}" class="rf-btn-secondary px-3">Verifikasi</a>
+                                    @endif
+                                    <a href="{{ route('alumni.show', $item) }}" class="rf-btn-secondary p-2" title="Detail {{ $item->name }}" aria-label="Detail {{ $item->name }}"><i class="fas fa-eye" aria-hidden="true"></i></a>
                                     @if ($canViewAll && $canManageTarget)
-                                        <a href="{{ route('alumni.edit', $item) }}"
-                                            class="rf-btn-secondary p-2"
-                                            title="Edit {{ $item->name }}" aria-label="Edit {{ $item->name }}">
-                                            <i class="fas fa-pen"></i>
-                                        </a>
+                                        <a href="{{ route('alumni.edit', $item) }}" class="rf-btn-secondary p-2" title="Edit {{ $item->name }}" aria-label="Edit {{ $item->name }}"><i class="fas fa-pen" aria-hidden="true"></i></a>
                                     @endif
-
-                                    @if ($canViewAll && !$item->is(auth()->user()) && $canManageTarget)
-                                        <form method="POST" action="{{ route('alumni.destroy', $item) }}"
-                                            onsubmit="return confirm('Hapus akun ini? Tindakan ini tidak dapat dibatalkan.');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit"
-                                                class="rf-btn-danger p-2"
-                                                title="Hapus {{ $item->name }}" aria-label="Hapus {{ $item->name }}">
-                                                <i class="fas fa-trash"></i>
-                                            </button>
-                                        </form>
+                                    @if ($canViewAll && ! $item->is(auth()->user()) && $canManageTarget)
+                                        <form method="POST" action="{{ route('alumni.destroy', $item) }}" onsubmit="return confirm('Hapus akun ini? Tindakan ini tidak dapat dibatalkan.');">@csrf @method('DELETE')<button type="submit" class="rf-btn-danger p-2" title="Hapus {{ $item->name }}" aria-label="Hapus {{ $item->name }}"><i class="fas fa-trash" aria-hidden="true"></i></button></form>
                                     @endif
-                                </div>
-                            </td>
-
-                        </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center py-10 text-slate-500">
-                                    @if ($hasFilters)
-                                        <div class="font-semibold text-slate-700">Tidak ada alumni yang cocok dengan filter.</div>
-                                        <div class="mt-1">Coba ubah kata kunci atau reset filter untuk melihat semua data alumni.</div>
-                                        <a href="{{ route('alumni.index') }}"
-                                            class="mt-4 inline-flex items-center gap-2 rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-50">
-                                            <i class="fas fa-rotate-left"></i> Reset Filter
-                                        </a>
-                                    @else
-                                        <div class="font-semibold text-slate-700">Belum ada data alumni.</div>
-                                        <div class="mt-1">Gunakan tombol Tambah Alumni untuk membuat data pertama.</div>
-                                    @endif
-                                </td>
+                                </div></td>
                             </tr>
-                        @endforelse
+                        @empty<tr><td colspan="7" class="px-3 py-8 text-muted">{{ $view === 'verification' ? 'Tidak ada akun yang perlu diverifikasi sesuai pencarian.' : ($q !== '' ? 'Tidak ada alumni dengan nama tersebut.' : 'Belum ada data alumni.') }}</td></tr>@endforelse
                     </tbody>
                 </table>
             </div>
-
-            {{-- Pagination --}}
-            <div class="mt-4">
-                {{ $alumni->links() }}
-            </div>
+            <footer class="mt-4 flex flex-wrap items-center justify-between gap-3 text-sm text-muted">
+                <p>Menampilkan {{ $alumni->firstItem() ?? 0 }} - {{ $alumni->lastItem() ?? 0 }} dari {{ $alumni->total() }} akun | Halaman {{ $alumni->currentPage() }} dari {{ $alumni->lastPage() }}</p>
+                @if ($alumni->hasPages())<nav aria-label="Halaman alumni" class="flex flex-wrap gap-2">
+                    @if (! $alumni->onFirstPage())<a href="{{ $alumni->previousPageUrl() }}" rel="prev" class="rf-btn-secondary px-3">Sebelumnya</a>@endif
+                    @if ($alumni->hasMorePages())<a href="{{ $alumni->nextPageUrl() }}" rel="next" class="rf-btn-secondary px-3">Berikutnya</a>@endif
+                </nav>@endif
+            </footer>
         </div>
-
+    </section>
         {{-- Modal --}}
         <div id="modal-register-alumni" role="dialog" aria-modal="true" aria-labelledby="alumni-modal-heading" aria-hidden="{{ $showCreateModal ? 'false' : 'true' }}" tabindex="-1"
             class="{{ $showCreateModal ? '' : 'hidden' }} fixed inset-0 bg-black bg-opacity-40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -328,4 +147,5 @@
                 </form>
             </div>
         </div>
-    @endsection
+        @if ($canReview) @include('verification.dialog') @endif
+@endsection

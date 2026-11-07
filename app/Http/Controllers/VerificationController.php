@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\VerificationApproveRequest;
+use App\Http\Requests\AlumniIndexRequest;
 use App\Notifications\AccountStatusNotification;
 use App\Http\Requests\VerificationRejectRequest;
 use App\Models\AuditLog;
@@ -14,28 +15,13 @@ use Illuminate\Support\Facades\DB;
 
 class VerificationController extends Controller
 {
-    public function index(Request $request)
+    public function index(AlumniIndexRequest $request)
     {
-        $me = $request->user();
+        $actor = $request->user();
+        abort_if(! $actor->hasAnyRole(['super_admin', 'admin']) && ! $actor->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
+        $filters = array_intersect_key($request->validated(), array_flip(['q', 'sort', 'dir']));
 
-        $query = User::query()
-            ->where('status', User::STATUS_PENDING)
-            ->with(['wilayah:id,name', 'level:id,name']);
-
-        if (!$me->hasAnyRole(['super_admin', 'admin'])) {
-            abort_unless($me->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
-            $query->where('wilayah_id', $me->wilayah_id);
-        }
-
-        if ($blockedRoles = $this->blockedRoles($me)) {
-            $query->whereDoesntHave('roles', fn ($roles) => $roles->whereIn('name', $blockedRoles));
-        }
-
-
-        $pending = $query->orderBy('name')->paginate(12)->withQueryString();
-        $levels  = Level::where('is_active', true)->orderBy('id')->get(['id','name']);
-
-        return view('verification.index', compact('pending','levels','me'));
+        return redirect()->route('alumni.index', array_merge($filters, ['view' => 'verification']));
     }
 
     public function approve(VerificationApproveRequest $request, User $user)
@@ -44,7 +30,7 @@ class VerificationController extends Controller
 
         // Cegah approve diri sendiri
         if ($user->id === $me->id) {
-            return back()->withErrors(['msg' => 'Tidak boleh memverifikasi akun sendiri.']);
+            return $this->failed($request, 'Tidak boleh memverifikasi akun sendiri.', 403);
         }
 
         $approved = DB::transaction(function () use ($request, $user, $me) {
@@ -102,10 +88,10 @@ class VerificationController extends Controller
         });
 
         if (!$approved) {
-            return back()->withErrors(['msg' => 'Akun ini tidak dalam status pending.']);
+            return $this->failed($request, 'Akun ini tidak dalam status pending.', 409);
         }
 
-        return back()->with('success', "Akun {$user->name} disetujui & diaktifkan.");
+        return $this->completed($request, "Akun {$user->name} disetujui dan diaktifkan.");
     }
 
     public function reject(VerificationRejectRequest $request, User $user)
@@ -113,7 +99,7 @@ class VerificationController extends Controller
         $me = $request->user();
 
         if ($user->id === $me->id) {
-            return back()->withErrors(['msg' => 'Tidak boleh menolak akun sendiri.']);
+            return $this->failed($request, 'Tidak boleh menolak akun sendiri.', 403);
         }
 
         $rejected = DB::transaction(function () use ($request, $user, $me) {
@@ -151,10 +137,24 @@ class VerificationController extends Controller
         });
 
         if (!$rejected) {
-            return back()->withErrors(['msg' => 'Akun ini tidak dalam status pending.']);
+            return $this->failed($request, 'Akun ini tidak dalam status pending.', 409);
         }
 
-        return back()->with('success', "Akun {$user->name} ditolak. Alasan tersimpan.");
+        return $this->completed($request, "Alasan perbaikan untuk {$user->name} tersimpan. Akun tetap menunggu verifikasi.");
+    }
+
+    private function failed(Request $request, string $message, int $status)
+    {
+        return $request->expectsJson()
+            ? response()->json(['message' => $message], $status)->header('Cache-Control', 'private, no-store')
+            : back()->withErrors(['msg' => $message]);
+    }
+
+    private function completed(Request $request, string $message)
+    {
+        return $request->expectsJson()
+            ? response()->json(['message' => $message])->header('Cache-Control', 'private, no-store')
+            : ($request->filled('_return') ? redirect($request->input('_return')) : back())->with('success', $message);
     }
 
     private function blockedRoles(User $actor): array

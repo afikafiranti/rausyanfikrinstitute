@@ -14,6 +14,7 @@ const series = (labels, values) => {
 const mount = (Chart, id, type, labels, values, dark = false) => {
   const color = dark ? '#E2E8F0' : '#334155';
   const pie = type === 'pie';
+  const bar = type === 'bar';
   new Chart(document.getElementById(id), {
     type,
     data: {
@@ -22,22 +23,24 @@ const mount = (Chart, id, type, labels, values, dark = false) => {
         label: 'Jumlah anggota',
         data: values,
         borderColor: pie ? '#FFFFFF' : '#A5B4FC',
-        backgroundColor: pie ? ['#4F46E5', '#0F766E', '#B45309', '#9F1239'] : '#A5B4FC',
-        borderWidth: pie ? 2 : 3,
-        tension: pie ? undefined : 0.25,
+        backgroundColor: pie ? ['#4F46E5', '#0F766E', '#B45309', '#9F1239'] : bar ? '#4F46E5' : '#A5B4FC',
+        borderWidth: pie ? 2 : bar ? 0 : 3,
+        tension: type === 'line' ? 0.25 : undefined,
       }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      animation: false,
+      ...(bar ? { indexAxis: 'y' } : {}),
       plugins: {
         legend: { display: pie, position: 'bottom', labels: { color } },
         tooltip: { enabled: true },
       },
       ...(pie ? {} : {
         scales: {
-          x: { ticks: { color }, grid: { color: '#334155' } },
-          y: { beginAtZero: true, ticks: { color, precision: 0 }, grid: { color: '#334155' } },
+          x: { beginAtZero: bar, ticks: { color, ...(bar ? { precision: 0 } : {}) }, grid: { color: dark ? '#334155' : '#E2E8F0' } },
+          y: { beginAtZero: !bar, ticks: { color, ...(!bar ? { precision: 0 } : {}) }, grid: { color: dark ? '#334155' : '#E2E8F0', display: !bar } },
         },
       }),
     },
@@ -62,7 +65,7 @@ const showValues = (id, labels, values) => {
   details.classList.remove('hidden');
 };
 
-async function loadPie(Chart, id, url) {
+async function loadChart(Chart, id, url, type = 'pie') {
   try {
     const response = await fetch(url, { headers: { Accept: 'application/json' }, credentials: 'same-origin' });
     if (!response.ok) throw new Error('HTTP ' + response.status);
@@ -72,7 +75,7 @@ async function loadPie(Chart, id, url) {
       status(id, 'Belum ada data untuk grafik ini.');
       return;
     }
-    mount(Chart, id, 'pie', labels, values);
+    mount(Chart, id, type, labels, values);
     showValues(id, labels, values);
     status(id, 'Grafik tersedia. Angka tiap kategori dapat dibaca pada tabel.');
   } catch {
@@ -87,7 +90,7 @@ export async function initDashboardCharts() {
   try {
     ({ default: Chart } = await import('chart.js/auto'));
   } catch {
-    for (const id of ['chart-alumni', 'chartStatusPernikahan', 'chartAb']) {
+    for (const id of ['chart-alumni', 'chartStatusPernikahan', 'chartJobs']) {
       status(id, 'Grafik tidak dapat dimuat. Muat ulang halaman untuk mencoba lagi.');
     }
     return;
@@ -108,7 +111,7 @@ export async function initDashboardCharts() {
 
   const urls = document.getElementById('chart-data-urls').dataset;
   await Promise.all([
-    loadPie(Chart, 'chartStatusPernikahan', urls.marriageUrl),
-    loadPie(Chart, 'chartAb', urls.abUrl),
+    loadChart(Chart, 'chartStatusPernikahan', urls.marriageUrl),
+    loadChart(Chart, 'chartJobs', urls.jobsUrl, 'bar'),
   ]);
 }

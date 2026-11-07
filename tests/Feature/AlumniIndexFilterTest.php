@@ -29,8 +29,8 @@ class AlumniIndexFilterTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Filter aktif')
-            ->assertSee('Cari: Fatimah')
+            ->assertSee('Cari nama')
+            ->assertSee('value="Fatimah"', false)
             ->assertSee('Reset')
             ->assertSee('Fatimah Alumni');
     }
@@ -50,8 +50,8 @@ class AlumniIndexFilterTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Tidak ada alumni yang cocok dengan filter.')
-            ->assertSee('Reset Filter')
+            ->assertSee('Tidak ada alumni dengan nama tersebut.')
+            ->assertSee('Reset')
             ->assertDontSee('Belum ada data alumni.');
     }
 
@@ -77,7 +77,7 @@ class AlumniIndexFilterTest extends TestCase
             ->assertDontSee('bg-emerald-200 text-emerald-800', false);
     }
 
-    public function test_alumni_index_shows_learning_level_column_instead_of_status_column(): void
+    public function test_alumni_index_includes_sortable_learning_level_and_status_columns(): void
     {
         $admin = $this->adminUser();
         $level = Level::create([
@@ -98,9 +98,9 @@ class AlumniIndexFilterTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('<th class="px-4 py-3 text-left">Level Materi</th>', false)
+            ->assertSee('Urutkan Level menaik')
             ->assertSee('akhir')
-            ->assertDontSee('<th class="px-4 py-3 text-left">Status</th>', false);
+            ->assertSee('Urutkan Status menaik');
     }
 
     public function test_action_buttons_are_icon_only_with_accessible_labels(): void

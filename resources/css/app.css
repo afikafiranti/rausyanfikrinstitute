@@ -53,6 +53,8 @@
 }
 
 .rf-report-dialog::backdrop {background: rgb(15 23 42 / .6);}
+.rf-verification-dialog::backdrop {background: rgb(15 23 42 / .6);}
+.rf-verification-dialog [hidden] {display: none !important;}
 .rf-materi-dialog::backdrop {background: rgb(15 23 42 / .6);}
 .rf-materi-dialog [data-materi-content] {max-height: 92dvh; overflow-y: auto; border-radius: inherit; scroll-padding-block: 1rem 5rem;}
 .rf-materi-dialog [hidden] {display: none !important;}

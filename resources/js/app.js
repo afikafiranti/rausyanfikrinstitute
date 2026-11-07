@@ -4,6 +4,7 @@ import './notus';
 import { initDashboardCharts } from './pages/dashboard';
 import { initReportModals } from './pages/reports';
 import { initMateriModals } from './pages/materi';
+import { initVerificationDialog } from './pages/verification';
 import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 
@@ -67,6 +68,7 @@ function initializePage() {
   initAlumniDialog();
   initReportModals();
   initMateriModals();
+  initVerificationDialog();
 }
 
 if (document.readyState === 'loading') {

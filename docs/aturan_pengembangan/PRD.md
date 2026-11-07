@@ -56,7 +56,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 
 ### Modul Data Alumni
 
-- Daftar/detail, pencarian, filter, sorting, pagination, tambah/edit/hapus akun dan penetapan level mengikuti izin serta wilayah aktor.
+- Satu menu Alumni memuat tab Semua dan Verifikasi; tab kedua hanya menampilkan akun pending yang boleh ditinjau aktor. URL verifikasi lama diarahkan ke tab tersebut. Detail, tambah/edit/hapus akun dan penetapan level tetap mengikuti izin serta wilayah aktor.
+- Pencarian utama cukup berdasarkan nama. Header Nama, Angkatan, Wilayah, Peran, Level dan Status dapat diurutkan naik/turun; Aksi tidak diurutkan dan nomor urut tidak menjadi kolom data. Peran multi-role diurutkan menurut nama peran pertama secara alfabetis. Daftar berhalaman 15 akun secara default, dengan rentang/total/posisi halaman terlihat; pergantian halaman mempertahankan pencarian, tab dan urutan.
 - Impor CSV UTF-8 dan XLSX menerima header terdefinisi, maksimal 200 baris data dan berkas 1 MB. XLS lama dan rumus Excel tidak didukung; nomor telepon harus tetap menjadi teks.
 - Nama wilayah dicocokkan dengan data terdaftar. Nama ambigu/tidak dikenal atau wilayah di luar izin dilaporkan gagal. Template legacy dengan wilayah_id tetap diterima.
 - Impor hanya menambah akun pending dengan role alumni, tanpa level/verifikasi email; password awal tidak dibagikan dan akun menyetelnya melalui lupa password. Email/telepon unik serta kegagalan per baris dijelaskan.
@@ -73,6 +74,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 ### Modul Verifikasi Akun
 
 - Pengelola melihat akun pending, menyetujui/menolak, dan menetapkan level awal yang sah. Hasil tindakan dicatat serta diberitahukan kepada akun terkait.
+- Verifikasi dibuka dari aksi baris Alumni melalui modal bersama. Tanpa JavaScript, tautan menuju bagian verifikasi pada detail akun. Level persetujuan dipilih secara eksplisit; alasan penolakan wajib. Validasi mempertahankan isian dan hasil tindakan memperbarui daftar dalam konteks pencarian/tab/urutan yang sama.
+- Penolakan menyimpan dan mengirimkan alasan perbaikan; status akun tetap pending sesuai kontrak existing. Tidak ada status ditolak baru atau penghapusan akun melalui tindakan verifikasi.
 - Aktor tidak dapat memverifikasi dirinya atau akun non-pending.
 - Koorda hanya meninjau target non-pengelola dalam wilayahnya. Target dengan role koorda/admin/super_admin, termasuk role ganda, disembunyikan dari antrean koorda dan ditolak pada endpoint.
 - Admin/super admin dapat meninjau akun lain lintas wilayah, termasuk super admin pending. Akun legacy tanpa role dapat disetujui dan memperoleh role alumni.
@@ -80,6 +83,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 ### Modul Dashboard
 
 - Pengelola aktif mendapat statistik dalam scope-nya: total/aktif/baru, persentase verifikasi, pending, pertumbuhan bulanan, serta sebaran angkatan/wilayah dan kategori yang ditampilkan.
+- Grafik Pekerjaan Alumni menggantikan grafik Status AB: batang horizontal berisi lima pekerjaan terbanyak, Lainnya untuk sisanya, dan Belum diisi untuk profil kosong. Variasi huruf besar/kecil dan spasi dihitung bersama; pekerjaan berbeda makna tidak digabung otomatis. Cakupan wilayah dan dasar hitung mengikuti statistik dashboard. Label ringkasan dibedakan bila sama dengan pekerjaan yang diisi pengguna.
+- Grafik pertumbuhan tahun berjalan berhenti pada bulan saat ini; endpoint untuk tahun lampau tetap memuat 12 bulan.
 - Istilah hitungan alumni saat ini mencakup seluruh akun dalam scope, termasuk pengelola; jumlah kajian bulanan masih diberi keterangan belum tersedia.
 - Alumni mempunyai dashboard pribadi berisi status, level/wilayah, data profil, akses materi yang memenuhi syarat dan notifikasi sendiri. Akun tanpa role diarahkan ke profil.
 - Angka/grafik memakai data nyata, menyediakan tabel angka, serta penjelasan ketika data kosong atau gagal dimuat.

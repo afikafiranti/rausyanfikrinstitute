@@ -22,62 +22,31 @@ class AlumniController extends Controller
     {
         $me = $request->user();
         $canViewAll = $me->hasAnyRole(['super_admin', 'admin']);
-        $scopedUsers = User::alumniListing($me, [])->reorder();
-        $filters = $request->validated();
+        $canReview = $me->can('review-user');
+        $filters = array_intersect_key($request->validated(), array_flip(['q', 'view', 'sort', 'dir', 'per_page']));
         $q = trim($filters['q'] ?? '');
-        $angkatan = (string) ($filters['angkatan'] ?? '');
-        $wilayahId = (int) ($filters['wilayah_id'] ?? 0);
-        $levelId = (int) ($filters['level_id'] ?? 0);
-        $ab = $filters['ab'] ?? '';
-        $perPage = (int) ($filters['per_page'] ?? 15);
-        $hasFilters = $q !== '' || $angkatan !== '' || $wilayahId > 0 || $levelId > 0 || $ab !== '';
-        $sort = $filters['sort'] ?? 'created_at';
-        $dir = ($filters['dir'] ?? '') === 'asc' ? 'asc' : 'desc';
+        $view = $filters['view'] ?? 'all';
+        $sort = $filters['sort'] ?? 'name';
+        $dir = $filters['dir'] ?? 'asc';
+        $filters = array_filter(array_merge($filters, compact('q', 'view', 'sort', 'dir')), fn ($value) => $value !== null && $value !== '');
         $alumni = User::alumniListing($me, $filters)
-            ->with(['wilayah:id,name', 'level:id,description', 'roles:id,name'])
-            ->paginate($perPage)->appends($request->query());
-
-        // Dropdown data
-        $wilayah = Wilayah::select('id', 'name')
-            ->when(!$canViewAll, fn ($query) => $query->whereKey($me->wilayah_id))
+            ->with(['wilayah:id,name', 'level:id,name,description', 'roles' => fn ($query) => $query->select('roles.id', 'roles.name')->orderBy('roles.name')])
+            ->paginate((int) ($filters['per_page'] ?? 15))->appends($filters);
+        if ($alumni->currentPage() > $alumni->lastPage()) {
+            return redirect()->route('alumni.index', $filters + ($alumni->lastPage() > 1 ? ['page' => $alumni->lastPage()] : []));
+        }
+        $totalAlumni = User::alumniListing($me, [])->reorder()->count();
+        $pendingCount = $canReview ? User::reviewableBy($me)->count() : 0;
+        $reviewableIds = $canReview
+            ? User::reviewableBy($me)->whereIn('users.id', $alumni->modelKeys())->pluck('users.id')->all()
+            : [];
+        $wilayah = Wilayah::select('id', 'name')->when(! $canViewAll, fn ($query) => $query->whereKey($me->wilayah_id))
             ->orderBy('name')->get();
-        $level   = Level::select('id', 'description')->orderBy('description')->get();
-        $totalAlumni = (clone $scopedUsers)->count();
+        $levels = Level::where('is_active', true)->orderBy('id')->get(['id', 'name', 'description']);
 
-        $activeFilters = [];
-        if ($q !== '') {
-            $activeFilters[] = ['label' => 'Cari', 'value' => $q];
-        }
-        if ($angkatan !== '') {
-            $activeFilters[] = ['label' => 'Angkatan', 'value' => $angkatan];
-        }
-        if ($wilayahId) {
-            $activeFilters[] = [
-                'label' => 'Wilayah',
-                'value' => optional($wilayah->firstWhere('id', $wilayahId))->name ?? $wilayahId,
-            ];
-        }
-        if ($levelId) {
-            $activeFilters[] = [
-                'label' => 'Level',
-                'value' => optional($level->firstWhere('id', $levelId))->description ?? $levelId,
-            ];
-        }
-        if ($ab !== '') {
-            $activeFilters[] = ['label' => 'AB', 'value' => $ab === 'iya' ? 'Iya' : 'Tidak'];
-        }
-
-        // List angkatan
-        $angkatanList = (clone $scopedUsers)->whereNotNull('angkatan')
-                            ->distinct()
-                            ->orderBy('angkatan')
-                            ->pluck('angkatan');
-
-        return view('alumni.index', compact(
-            'alumni', 'wilayah', 'level', 'angkatanList',
-            'q', 'angkatan', 'wilayahId', 'levelId', 'perPage', 'sort', 'dir', 'ab',
-            'hasFilters', 'activeFilters', 'totalAlumni', 'canViewAll'
-        ));
+        return response()->view('alumni.index', compact('alumni', 'wilayah', 'levels', 'q', 'view', 'sort', 'dir',
+            'filters', 'totalAlumni', 'pendingCount', 'canViewAll', 'canReview', 'reviewableIds'))
+            ->header('Cache-Control', 'private, no-store');
     }
 
     public function store(Request $request)
@@ -113,7 +82,7 @@ class AlumniController extends Controller
             ->with('success', "Alumni {$user->name} berhasil ditambahkan.");
     }
 
-    public function show($id)
+    public function show(AlumniIndexRequest $request, $id)
     {
         $me = request()->user();
         $canViewAll = $me->hasAnyRole(['super_admin', 'admin']);
@@ -134,7 +103,13 @@ class AlumniController extends Controller
             && !$alumni->hasAnyRole(['super_admin', 'admin']);
         $canEditProfile = $this->canManageAlumniProfile(request()->user(), $alumni);
 
-        return view('alumni.show', compact('alumni', 'levels', 'canUpdateLevel', 'canEditProfile'));
+        $canVerify = request()->user()->can('review-user') && User::reviewableBy($me)->whereKey($alumni->id)->exists();
+
+        $returnFilters = array_intersect_key($request->validated(), array_flip(['q', 'view', 'sort', 'dir', 'per_page', 'page']));
+        $returnTo = route('alumni.index', $returnFilters + ['view' => 'all'], false);
+
+        return response()->view('alumni.show', compact('alumni', 'levels', 'canUpdateLevel', 'canEditProfile', 'canVerify', 'returnTo'))
+            ->header('Cache-Control', 'private, no-store');
     }
 
     public function edit(Request $request, User $user)

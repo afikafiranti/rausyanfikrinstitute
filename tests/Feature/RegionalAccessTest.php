@@ -28,12 +28,12 @@ class RegionalAccessTest extends TestCase
             ->assertDontSee('Alumni Rahasia')
             ->assertViewHas('totalAlumni', 2)
             ->assertViewHas('wilayah', fn ($items) => $items->modelKeys() === [$ownRegion->id])
-            ->assertViewHas('angkatanList', fn ($items) => !$items->contains(1999));
+            ->assertDontSee('name="angkatan"', false);
 
         $this->get(route('alumni.index', ['wilayah_id' => $otherRegion->id]))
             ->assertOk()
             ->assertDontSee('Alumni Rahasia')
-            ->assertViewHas('alumni', fn ($items) => $items->total() === 0);
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 2);
     }
 
     public function test_koorda_cannot_open_alumni_from_another_region(): void
@@ -55,9 +55,9 @@ class RegionalAccessTest extends TestCase
         $otherTarget = User::factory()->create(['wilayah_id' => $otherRegion->id]);
         $level = Level::create(['name' => 'Level 1', 'description' => 'dasar', 'is_active' => true]);
 
-        $this->actingAs($koorda)->get(route('verification.index'))
+        $this->actingAs($koorda)->get(route('alumni.index', ['view' => 'verification']))
             ->assertOk()
-            ->assertViewHas('pending', fn ($items) => $items->getCollection()->modelKeys() === [$ownTarget->id]);
+            ->assertViewHas('alumni', fn ($items) => $items->getCollection()->modelKeys() === [$ownTarget->id]);
         $this->post(route('verification.approve', $otherTarget), ['level_id' => $level->id])->assertForbidden();
         $this->post(route('verification.reject', $otherTarget), ['reason' => 'Bukan wilayah sendiri'])->assertForbidden();
         $this->assertSame(User::STATUS_PENDING, $otherTarget->fresh()->status);
@@ -116,7 +116,7 @@ class RegionalAccessTest extends TestCase
         $this->actingAs($admin)->get(route('alumni.index'))->assertOk()->assertViewHas('totalAlumni', 3);
         $this->get(route('alumni.show', $target))->assertOk();
         $this->get(route('verification.index'))->assertOk()
-            ->assertViewHas('pending', fn ($items) => $items->total() === 2);
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 2);
         $this->post(route('verification.approve', $target), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();
         $this->post(route('verification.reject', $rejected), ['reason' => 'Data belum lengkap'])

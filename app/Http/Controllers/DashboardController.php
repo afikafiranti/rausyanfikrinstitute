@@ -51,11 +51,10 @@ class DashboardController extends Controller
             ->pluck('total', 'month')
             ->toArray();
 
-        // buat labels Jan..Des dan data 1..12
         $monthNames = ['Jan','Feb','Mar','Apr','Mei','Jun','Jul','Agu','Sep','Okt','Nov','Des'];
         $chartAlumni = [
-            'labels' => $monthNames,
-            'series' => array_map(fn ($m) => (int) ($byMonth[$m] ?? 0), range(1, 12)),
+            'labels' => array_slice($monthNames, 0, now()->month),
+            'series' => array_map(fn ($m) => (int) ($byMonth[$m] ?? 0), range(1, now()->month)),
         ];
 
         // --- Tabel: Sebaran Angkatan ---

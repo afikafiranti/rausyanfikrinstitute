@@ -39,6 +39,8 @@ Penyatuan halaman Laporan (RFIX-17) memakai scope/filter bersama untuk daftar da
 
 Penyatuan Materi (RFIX-17) membedakan akses pengelola aktif dan akses belajar anggota pada server. Modal tidak menggantikan pemeriksaan role, level, status terbit atau relasi video–playlist. Penghapusan playlist tetap meminta konfirmasi eksplisit dan menghapus video terkait melalui relasi database; schema dan kelayakan anggota tidak diubah. Hasil regresi serta batas bukti mengikuti [TASK](TASK.md).
 
+Penyatuan Alumni/Verifikasi (RFIX-17) mempertahankan gate, scope wilayah, batas role target, larangan self-review dan transaksi keputusan. Pemilihan tab bukan sumber kewenangan. Query daftar/ekspor harus tetap selaras dan pengurutan multi-role tidak boleh menggandakan akun; hasil regresi dicatat pada [TASK](TASK.md).
+
 ## Daftar risiko aktif
 
 - **Dependency tooling.** Residu low npm berasal dari satu advisory `GHSA-gcqx-w48m-w2h4` pada rantai `flowbite → flowbite-datepicker → @rollup/plugin-node-resolve → deepmerge 4.3.1`. Paket terakhir digunakan pada tooling build datepicker; aplikasi tidak memasukkan objek unggahan pengguna ke proses merge tersebut. Registry yang diperiksa pada tanggal penilaian masih menawarkan 4.3.1. Penurunan major Flowbite yang disarankan otomatis tidak diterapkan. Temuan tetap terlihat, dengan gate sesuai runner; triase ini bukan klaim seluruh risiko dependency hilang.
@@ -47,6 +49,7 @@ Penyatuan Materi (RFIX-17) membedakan akses pengelola aktif dan akses belajar an
 - **Operasional tujuan.** SMTP organisasi, QA staging, backup/restore serta RTO/RPO server membutuhkan bukti lingkungan tujuan. Drill sintetis lokal tidak menggantikannya.
 - **Kapasitas hosting.** Batas XLSX dipilih dari pengukuran lokal pada TASK. Memori/waktu hosting belum diukur; kontrak batas dan alternatif ekspor mengikuti PRD.
 - **Identitas/aset.** Lisensi memerlukan keputusan pemilik. Inventaris/pembersihan seluruh aset dan template lama masih perlu diselesaikan.
+- **Makna AB.** Kolom `users.ab` berisi iya/tidak, ditambahkan pada commit [57d63b1](https://github.com/afikafiranti/rausyanfikrinstitute/commit/57d63b15172e2882a433570459ed63da5130346b) tanggal 22 November 2025 dengan pesan “status Ab”. PRD, form profil, migration dan commit awal tidak memberikan kepanjangan atau aturan bisnis; pemakaian yang ditemukan hanya penyimpanan profil, filter dan grafik. Filter daftar dihapus dan grafik dashboard diganti Pekerjaan Alumni sesuai permintaan; data profil serta endpoint AB lama dipertahankan tanpa menafsirkan nilainya sebagai kategori lain.
 
 ## Perubahan status audit
 
