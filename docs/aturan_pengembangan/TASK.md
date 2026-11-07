@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Filter/Reset tunggal, ekspor Excel, kartu list dan pagination 12 laporan; regresi/browser lulus dari baseline 1db1fd5 |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Filter/Reset sejajar input desktop; responsif 320–1920 px dan pergantian label lulus dari baseline b047c1e |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -140,6 +140,8 @@ Branch `develop`, baseline `1db1fd5`. Arahan pengguna menyederhanakan kontrol Fi
 | Tampilan dan source | Kartu list, footer dan modal pada 320/390/768/1280 px tanpa overflow; screenshot desktop/ponsel diperiksa. Duplikasi teks footer bawaan dihapus, navigasi memakai Sebelumnya/Berikutnya. Lint 5 berkas PHP/Blade, `node --check resources/js/pages/reports.js`, `git diff --check` dan `npm.cmd run build` lulus; Vite 7.3.7, 177 modul. Review backend/UI tidak menemukan masalah konkret tersisa |
 
 Log server: `storage/logs/phpunit-report-excel-final-2026-11-07.txt` dan `phpunit-report-excel-final.xml`. Artefak browser terpisah dari run sebelumnya pada `storage/app/qa-report-ui-2026-11-07/filter-excel-report.json`, `filter-excel-workspace-1280.png` dan `filter-excel-workspace-390.png`, diabaikan Git. Server QA sementara port 8768 sudah dihentikan. Pemeriksaan 18 dokumen/111 tautan lokal lulus tanpa tautan/anchor putus. Tidak ada perubahan schema atau reset develop. Suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini; bahan diskusi pengguna tetap identik.
+
+Penyesuaian posisi tombol dari baseline `b047c1e`: tombol Filter/Reset menjadi kolom terakhir sejajar input desktop, sedangkan catatan ekspor berada di bawah form. Build Vite 7.3.7/177 modul, lint Blade dan `git diff --check` lulus. Chrome headless pada database QA terpisah mengukur selisih batas bawah tombol/input **0 px** dan jarak horizontal **12 px** pada 1280/1920 px; tidak ada overflow pada 320/390/768/1280/1920 px. Pergantian Filter ke Reset lulus dan screenshot diperiksa. Bukti: `storage/app/qa-report-ui-2026-11-07/filter-alignment-report.json`, `filter-button-aligned-1280.png`, `filter-button-aligned-390.png` (diabaikan Git). Server QA sementara sudah dihentikan. Tes PHP tidak diulang karena perubahan hanya susunan layout; bukti 61 tests/707 assertions di atas berasal dari perubahan sebelumnya.
 
 ## Riwayat sebelum rencana RFIX
 

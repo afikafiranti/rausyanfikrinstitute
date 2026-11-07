@@ -20,7 +20,7 @@
         @include('laporan.feedback')
         <div data-report-workspace-status role="status" aria-live="polite" tabindex="-1" hidden class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-ink"></div>
 
-        <form data-report-filters action="{{ route('laporan.index') }}" method="GET" class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+        <form data-report-filters action="{{ route('laporan.index') }}" method="GET" class="mt-5 grid items-end gap-3 sm:grid-cols-2 xl:grid-cols-[repeat(4,minmax(0,1fr))_auto]">
             <div>
                 <label for="filter-status" class="block text-sm font-medium text-ink">Status</label>
                 <select id="filter-status" name="status" class="mt-1 w-full">
@@ -51,11 +51,11 @@
                 <label for="filter-sampai" class="block text-sm font-medium text-ink">Sampai</label>
                 <input id="filter-sampai" name="sampai" type="date" value="{{ $filters['sampai'] ?? '' }}" min="1000-01-01" max="9999-12-31" class="mt-1 w-full">
             </div>
-            <div class="flex flex-wrap items-center gap-2 sm:col-span-2 xl:col-span-4">
+            <div class="flex sm:col-span-2 xl:col-span-1">
                 <button type="submit" data-report-filter-button class="rf-btn px-3">Filter</button>
-                <p id="report-export-note" class="text-xs leading-5 text-muted">Kehadiran dan Excel (.xlsx) hanya memuat laporan terkirim. Draf tidak diekspor.</p>
             </div>
         </form>
+        <p id="report-export-note" class="mt-3 text-xs leading-5 text-muted">Kehadiran dan Excel (.xlsx) hanya memuat laporan terkirim. Draf tidak diekspor.</p>
 
         <dl class="mt-5 flex flex-wrap gap-x-7 gap-y-2 border-y border-slate-200 py-3 text-sm">
             <div class="flex items-baseline gap-2"><dt class="text-muted">Laporan</dt><dd class="font-semibold text-ink">{{ number_format($totals['reports'], 0, ',', '.') }}</dd></div>
