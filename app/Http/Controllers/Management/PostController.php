@@ -12,11 +12,15 @@ use Throwable;
 
 class PostController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $request->validate(['edit' => ['nullable', 'integer', 'min:1']]);
+        $editingId = array_key_exists('_editing_id', $request->session()->getOldInput()) ? $request->old('_editing_id') : $request->query('edit');
+        $editingPost = $editingId ? Post::findOrFail($editingId) : null;
         $posts = Post::latest()->paginate(10);
 
-        return view('management.refleksi.index', compact('posts'));
+        return response()->view('management.refleksi.index', compact('posts', 'editingPost'))
+            ->header('Cache-Control', 'private, no-store');
     }
 
     public function store(Request $request)

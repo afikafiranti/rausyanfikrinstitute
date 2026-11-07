@@ -41,6 +41,8 @@ Penyatuan Materi (RFIX-17) membedakan akses pengelola aktif dan akses belajar an
 
 Penyatuan Alumni/Verifikasi (RFIX-17) mempertahankan gate, scope wilayah, batas role target, larangan self-review dan transaksi keputusan. Pembukaan modal bukan sumber kewenangan. Daftar tunggal dan ekspor memakai cakupan yang sama; pengurutan multi-role tidak boleh menggandakan akun. Konfirmasi serta toast global tidak menggantikan validasi/mutasi server; pesan dipasang sebagai teks dan toast harus dapat ditutup ketika modal terbuka, termasuk browser tanpa Popover API. Hasil regresi dicatat pada [TASK](TASK.md).
 
+Form samping Artikel/Galeri (RFIX-17) membedakan create/edit dari target server dan input lama, termasuk nilai null. Mode antarmuka tidak menjadi otorisasi. Regresi mempertahankan slug/jadwal publikasi, gambar lama, validasi berkas dan pembersihan file; perpindahan item tidak boleh membuang isian tanpa konfirmasi. Bukti mengikuti [TASK](TASK.md).
+
 ## Daftar risiko aktif
 
 - **Dependency tooling.** Residu low npm berasal dari satu advisory `GHSA-gcqx-w48m-w2h4` pada rantai `flowbite → flowbite-datepicker → @rollup/plugin-node-resolve → deepmerge 4.3.1`. Paket terakhir digunakan pada tooling build datepicker; aplikasi tidak memasukkan objek unggahan pengguna ke proses merge tersebut. Registry yang diperiksa pada tanggal penilaian masih menawarkan 4.3.1. Penurunan major Flowbite yang disarankan otomatis tidak diterapkan. Temuan tetap terlihat, dengan gate sesuai runner; triase ini bukan klaim seluruh risiko dependency hilang.

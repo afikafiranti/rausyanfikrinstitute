@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Grafik pekerjaan menggantikan AB; batas bulan berjalan, angka/scope serta kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Alumni satu daftar dan modal aksi, konfirmasi/toast global serta ikon daftar; suite penuh/browser lulus, bukti di bawah |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Artikel/Galeri memakai form samping tambah/edit; Alumni/Materi/Laporan tetap modal; regresi/browser lulus, bukti di bawah |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -199,6 +199,19 @@ Branch `develop`, baseline `5f38ee6`. Arahan lanjutan pengguna menyederhanakan A
 | Source/aset | Build Vite 7.3.7, 180 modul lulus; lint 41 berkas PHP/Blade dan node syntax lulus. Pemeriksaan 18 dokumen/125 tautan lokal serta 45 ID ARAH/KEP/RFIX lulus. Kontras teks toast sukses/gagal/informasi masing-masing 8,30/8,20/8,49:1. Source aktif tidak lagi memanggil confirm/alert/prompt/beforeunload native. Banner sukses tambahan dihapus; validasi dekat kolom dan petunjuk kegagalan pemuatan tetap tersedia |
 
 Log dan XML: `storage/logs/phpunit-modal-feedback-final.*`. Laporan browser: `report-core.json`, `report-no-popover.json`, `report-extended.json`, `report-management.json`, `report-visual-fallback.json` dan `report-final-feedback.json`; screenshot desktop/ponsel diperiksa. Proses QA port 8768 dihentikan setelah pemeriksaan. Database QA sintetis berakhir dengan fixture pendingOwn disetujui dan draf id4 dihapus; bangun ulang fixture sebelum mengulang skenario tersebut. Artefak browser serta screenshot di `storage/app/qa-alumni-modals-feedback-2026-11-07/`, diabaikan Git. Dialog aplikasi tidak dapat ditampilkan setelah tab/jendela browser ditutup; isian yang belum disimpan tetap dapat hilang pada tindakan tersebut. CI remote dan staging tidak diulang untuk perubahan ini. DOCX diskusi pengguna tetap identik dengan hash sebelumnya.
+
+## Form samping Artikel/Galeri 7 November — RFIX-17
+
+Branch `develop`, baseline `04bcac9`. Sesuai arahan pengguna, modal edit Artikel/Galeri dihapus dan form tambah yang sudah terlihat dipakai untuk kedua mode. Kontrak berada pada [Manajemen Konten](PRD.md#modul-manajemen-konten). Tidak ada perubahan schema atau endpoint mutasi.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi server | PHP 8.3.30 dengan ZIP, MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis/config cache terisolasi. `php -d extension=zip vendor/bin/phpunit --filter 'ContentEditorTest\|ContentManagementTest\|ArticlePublishingTest\|PublicContentTest\|ContentGateTest\|NavigationAccessibilityTest' --display-warnings --display-deprecations --display-notices`: **54 tests, 501 assertions**, tanpa failure/error/warning/deprecation/notice/skip; PHPUnit 11.5.57 |
+| Cakupan | Satu form POST/PUT, konteks item server, galeri wajib gambar hanya saat tambah, input gagal edit pulih, gagal tambah dari URL edit tetap create, role/status gate, XSS data, gambar lama/penggantian/cleanup, slug serta status terbit/jadwal tetap lulus |
+| Review | Fallback mobile diperbaiki agar form tersedia tanpa JavaScript. Nilai null input lama dibedakan dari kunci yang tidak ada; snapshot berkas kosong stabil; state tombol/preview kembali setelah bfcache. Review ulang tidak menyisakan temuan bermakna |
+| Source/aset | Build Vite 7.3.7, **181 modul**; lint 6 berkas PHP/Blade, node syntax app/editor dan git diff --check lulus. Pemeriksaan 18 dokumen/127 tautan lokal dan 45 ID ARAH/KEP/RFIX lulus. Chrome headless: **13 kelompok PASS** (7 fungsi, 2 layout/fallback, 4 edge), tanpa page error atau dialog native; desktop/mobile 320/390/768/1280 px diperiksa |
+
+Log: `storage/logs/phpunit-content-editor.txt` dan `phpunit-content-editor.xml`. Artefak browser: `storage/app/qa-content-editor-2026-11-07/report-functional.json`, `report-layout.json`, `report-edge.json` serta screenshot desktop/ponsel, diabaikan Git. Stored image di-stub PNG sintetis untuk pemeriksaan visual karena router QA memblokir /storage; persistensi/penggantian file diuji di server. Jadwal publikasi diuji pada regresi PHP, bukan browser. Server QA sementara port 8768 dihentikan setelah pemeriksaan. Tidak ada reset develop; data QA tersisa dua Artikel dan dua Galeri sintetis untuk inspeksi ulang. DOCX pengguna tetap identik dengan hash sebelumnya. Suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini.
 
 ## Riwayat sebelum rencana RFIX
 

@@ -5,6 +5,7 @@ import { initDashboardCharts } from './pages/dashboard';
 import { initReportModals } from './pages/reports';
 import { initMateriModals } from './pages/materi';
 import { initAlumniModals } from './pages/alumni';
+import { initManagementEditor } from './pages/management-editor';
 import { initFeedback } from './components/feedback';
 import Alpine from 'alpinejs';
 window.Alpine = Alpine;
@@ -17,6 +18,7 @@ function initializePage() {
   initReportModals();
   initMateriModals();
   initAlumniModals();
+  initManagementEditor();
 }
 
 if (document.readyState === 'loading') {

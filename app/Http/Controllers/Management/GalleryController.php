@@ -12,11 +12,15 @@ use Throwable;
 
 class GalleryController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        $request->validate(['edit' => ['nullable', 'integer', 'min:1']]);
+        $editingId = array_key_exists('_editing_id', $request->session()->getOldInput()) ? $request->old('_editing_id') : $request->query('edit');
+        $editingGallery = $editingId ? Gallery::findOrFail($editingId) : null;
         $galleries = Gallery::latest()->paginate(9);
 
-        return view('management.galeri.index', compact('galleries'));
+        return response()->view('management.galeri.index', compact('galleries', 'editingGallery'))
+            ->header('Cache-Control', 'private, no-store');
     }
 
     public function create()

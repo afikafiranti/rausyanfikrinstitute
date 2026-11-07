@@ -97,6 +97,7 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 ### Modul Manajemen Konten
 
 - Menu dan istilah antarmuka pengelolaan memakai **Artikel** secara konsisten: Tambah artikel, Daftar artikel, Edit artikel, label, tombol, konfirmasi dan pesan hasil. Artikel dan Refleksi publik tetap dua jenis Post; daftar/detail publik membatasi jenis serta hanya menampilkan konten yang sudah terbit.
+- Artikel dan Galeri memakai satu form samping untuk tambah/edit. Aksi Edit mengisi form yang sama, menandai item pilihan dan menampilkan Batal untuk kembali ke mode tambah. Perpindahan dengan perubahan belum disimpan meminta konfirmasi. Galeri mewajibkan gambar hanya saat tambah; saat edit gambar lama dipertahankan tanpa unggahan baru. Isian gagal validasi kembali ke mode dan item yang benar. Pada ponsel form dibuka saat Edit; tautan edit serta form tetap tersedia tanpa JavaScript.
 - Draf/terbit menggunakan published_at. Request legacy tanpa jenis/status tetap kompatibel dan konten lama berjenis Refleksi; penjadwalan publikasi baru tidak ditambahkan.
 - Hanya super admin aktif mengelola Post dan Galeri. Galeri langsung publik setelah disimpan dan tidak mempunyai status draf.
 - Unggah gambar divalidasi; penggantian/penghapusan konten membersihkan file lokal terkait dengan aman. Mengganti judul tulisan terbit mempertahankan URL yang sudah dibagikan.

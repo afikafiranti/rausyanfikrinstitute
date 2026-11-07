@@ -173,9 +173,9 @@ class ContentManagementTest extends TestCase
         $dom = new \DOMDocument;
         @$dom->loadHTML($response->getContent());
         $xpath = new \DOMXPath($dom);
-        $form = $xpath->query('//form[@id="editForm"]')->item(0);
+        $form = $xpath->query('//form[@data-editor-form]')->item(0);
         $this->assertSame(route('management.'.$resource.'.update', $record->id), $form->getAttribute('action'));
-        $this->assertSame('', $xpath->query('//input[@id="editTitle"]')->item(0)->getAttribute('value'));
+        $this->assertSame('', $xpath->query('//form[@data-editor-form]//input[@name="title"]')->item(0)->getAttribute('value'));
     }
 
     public function test_post_edit_content_is_escaped_data_instead_of_inline_javascript(): void
@@ -185,7 +185,7 @@ class ContentManagementTest extends TestCase
         $response = $this->get('/management/post')->assertOk()->assertDontSee('<script>alert(1)</script>', false);
         $dom = new \DOMDocument;
         @$dom->loadHTML($response->getContent());
-        $button = (new \DOMXPath($dom))->query('//button[@data-content]')->item(0);
+        $button = (new \DOMXPath($dom))->query('//a[@data-content]')->item(0);
         $this->assertNotNull($button);
         $this->assertFalse($button->hasAttribute('onclick'));
         $this->assertSame($payload, $button->getAttribute('data-content'));
