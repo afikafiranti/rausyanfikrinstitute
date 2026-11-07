@@ -331,6 +331,7 @@ ID RFIX adalah spesifikasi pekerjaan dan kriteria penerimaan. Status, commit, pe
 - Uji layar 320/390 piksel dan desktop, label/ID, pesan gagal dan tombol utama.
 - Jelaskan definisi hitungan “alumni” sesuai kontrak seluruh akun dalam scope; jangan mengubah angka diam-diam.
 - Ikuti arahan penyatuan alur Laporan pada [PRD](PRD.md#modul-laporan-kajian); jangan mempertahankan daftar/review/rekap sebagai tiga halaman kerja yang berulang.
+- Alur Materi mengikuti [kontrak modal dan pengelolaan terpadu](PRD.md#modul-materi-kajian), dengan batas akses pengelola dan level alumni tetap berlaku.
 
 **Syarat selesai:** form yang sama dapat digunakan pada ukuran layar terkait; tidak ada field/aksi penting hilang dan tidak terjadi ID ganda.
 
@@ -386,6 +387,8 @@ ID RFIX adalah spesifikasi pekerjaan dan kriteria penerimaan. Status, commit, pe
 ### RFIX-21 — Perjelas nama menu pengelolaan tulisan
 
 **Asal:** ARAH-04/11. Spesifikasi dan penerimaan nama menu Artikel, jenis tulisan publik, route, serta izin penerbit ada pada RFIX-24. ID ini dipertahankan untuk melacak rencana awal tanpa membuat pekerjaan atau kriteria ganda.
+
+Label publik Catatan Pemikiran mengikuti [PRD](PRD.md#modul-landing-page); label ini tidak mengubah menu pengelolaan Artikel atau jenis kontennya.
 
 ### RFIX-22 — Buktikan rebuild, integrasi dan pemulihan sesuai tahap
 

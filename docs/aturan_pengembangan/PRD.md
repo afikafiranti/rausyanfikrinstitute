@@ -43,8 +43,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 
 ### Modul Landing Page
 
-- Homepage berurutan Hero, maksimal empat cuplikan Artikel terbit, maksimal empat foto Galeri, lalu Footer; seluruh daftar berasal dari database dan mempunyai kondisi kosong.
-- Navigasi publik menghubungkan Artikel/Galeri dan Masuk/Area anggota. URL daftar/detail Refleksi publik tetap tersedia walau belum menjadi tautan menu utama/footer.
+- Homepage berurutan Hero, maksimal empat cuplikan artikel terbit berlabel Catatan Pemikiran, maksimal empat foto Galeri, lalu Footer; seluruh daftar berasal dari database dan mempunyai kondisi kosong. Hero tidak menampilkan tombol Masuk area anggota.
+- Label artikel pada antarmuka publik memakai Catatan Pemikiran; jenis `article` dan URL `/artikel` tetap. Navigasi publik menghubungkan Catatan Pemikiran/Galeri dan Masuk/Area anggota; menu pengelolaan tetap Artikel. URL daftar/detail Refleksi publik tetap tersedia walau belum menjadi tautan menu utama/footer.
 - Artikel membahas suatu topik; Refleksi publik membagikan pengalaman/renungan untuk umum. Perbedaan keduanya editorial, tanpa kriteria isi otomatis yang berbeda.
 
 ### Modul Autentikasi
@@ -94,6 +94,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 ### Modul Materi Kajian
 
 - Pengelola yang berwenang mengelola playlist/video; pengguna dapat mencari dan membuka detail materi.
+- Materi memakai satu daftar berhalaman: pengelola aktif melihat semua playlist yang dapat dikelolanya, sedangkan alumni hanya melihat playlist aktif sesuai level. Tambah/edit playlist, tambah/edit video, detail dan konfirmasi hapus dibuka dalam modal dari daftar yang sama; URL kelola lama mengarah ke daftar Materi.
+- Penyimpanan mempertahankan isian ketika validasi gagal, mencegah kiriman ganda, dan memperbarui daftar tanpa menghilangkan pencarian/posisi halaman. Modal mendukung fokus keyboard, Escape, kembali ke pemicu serta konfirmasi perubahan yang belum disimpan. Penghapusan playlist tetap meminta persetujuan eksplisit karena turut menghapus video terkait.
 - Akses memerlukan akun active dengan level yang memenuhi syarat; level kosong ditolak. Level berbeda dari role akun.
 - Judul/durasi diisi manual, sedangkan menonton membuka tautan YouTube. Pembatasan aplikasi tidak mencegah pembagian tautan YouTube yang sudah diketahui.
 

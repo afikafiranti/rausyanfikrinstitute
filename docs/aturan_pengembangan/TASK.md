@@ -26,11 +26,11 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Filter/Reset sejajar input desktop, ringkasan Peserta dan tanpa paragraf keterangan ekspor; bukti layout dan koreksi teks di bawah |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | IN_PROGRESS | develop baseline 47fe0a2: setelah koreksi publik, satukan daftar/pengelolaan Materi dengan modal; bukti Laporan tetap tersimpan di bawah |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
-| RFIX-21 | Nama menu Artikel | P2 | B | DONE | Koreksi UI 7 November mencakup seluruh copy pengelolaan; bukti terpisah di bawah |
+| RFIX-21 | Nama menu Artikel | P2 | B | DONE | Publik memakai Catatan Pemikiran dan CTA masuk hero dihapus; menu pengelolaan Artikel tetap, regresi publik lulus |
 | RFIX-22 | Rebuild, integrasi dan pemulihan | P1 | Integrasi | PARTIAL | Lokal lulus; bukti staging/rilis belum tersedia |
 | RFIX-23 | Seeder/factory develop | P1 | A+B | DONE | Fixture domain aktif idempoten; akun existing terjaga |
 | RFIX-24 | Hapus Refleksi saya | P1 | A+B | DONE | Kode/tabel/data develop dihapus; dampak dan endpoint lama diuji |
@@ -148,6 +148,12 @@ Koreksi teks lanjutan dari baseline `69b310d`: paragraf keterangan ekspor dihapu
 Penyempurnaan copy dari baseline `e231991`: subjudul halaman Laporan menjadi “Kelola laporan kajian dari draf hingga hasil peninjauan.” Lint Blade, pemeriksaan diff dan pencarian kalimat lama lulus; tidak ada perubahan fungsi. Build dan tes aplikasi tidak diulang untuk koreksi satu kalimat ini.
 
 Efek hover kartu dari baseline `8418f66`: latar biru muda dan garis tepi cobalt dengan transisi warna 150 ms; fokus pada aksi di dalam kartu memberi sorotan yang sama. Pemeriksaan Chrome headless terisolasi memakai kelas view aktual dan stylesheet hasil build membuktikan perubahan warna hover/fokus, tidak ada pergeseran geometri, serta reduced motion menurunkan transisi menjadi 0,01 ms. Build Vite 7.3.7/177 modul, lint Blade dan `git diff --check` lulus. Tidak ada perubahan logika; suite PHP dan alur aplikasi penuh tidak diulang untuk efek visual ini.
+
+## Label publik Catatan Pemikiran 7 November — RFIX-21
+
+Branch `develop`, baseline `47fe0a2`. Hero tidak lagi menampilkan tombol Masuk area anggota. Navigasi, judul bagian/daftar/detail, tautan, kondisi kosong, deskripsi dan metadata publik memakai Catatan Pemikiran; menu pengelolaan Artikel, jenis `article`, URL `/artikel`, Refleksi publik dan batas empat cuplikan homepage tetap mengikuti kontrak. Partial CTA historis yang tidak dirender tidak diaktifkan atau diubah.
+
+PHP 8.3.30/MySQL 8.4.3 pada database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi: `php -d extension=zip vendor/bin/phpunit --filter 'PublicContentTest\|ArticlePublishingTest\|RemovedMemberReflectionTest' --display-warnings --display-deprecations --display-notices` lulus **16 tests, 245 assertions**, tanpa failure/error/warning/deprecation/notice/skip. Pemeriksaan view ter-render mencakup label publik, CTA hero, konten terbit/privat dan nama menu pengelola. Lint view/tes dan `git diff --check` lulus. Log: `storage/logs/phpunit-public-thought-notes-2026-11-07.txt` dan `phpunit-public-thought-notes.xml`. Suite aplikasi penuh tidak diulang; perbaikan Materi masih mengikuti status RFIX-17.
 
 ## Riwayat sebelum rencana RFIX
 

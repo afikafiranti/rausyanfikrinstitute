@@ -49,7 +49,8 @@ class PublicContentTest extends TestCase
 
     public function test_empty_homepage_and_public_lists_have_honest_empty_states_and_no_demo_links(): void
     {
-        $response = $this->get('/')->assertOk()->assertSee('Belum ada artikel yang diterbitkan.')->assertSee('Belum ada foto galeri.');
+        $response = $this->get('/')->assertOk()->assertSee('Belum ada catatan pemikiran yang diterbitkan.')->assertSee('Belum ada foto galeri.')
+            ->assertSee('Catatan Pemikiran')->assertDontSee('Masuk area anggota');
         foreach (['Lorem Ipsum', 'Our Blogs', 'Testimonials', 'blog-details.html', 'javascript:void(0)', 'info@yourdomain.com'] as $demo) {
             $response->assertDontSee($demo, false);
         }

@@ -8,10 +8,10 @@
             <div class="mb-8 flex flex-wrap items-end justify-between gap-4 sm:mb-10">
                 <div>
                     <span class="mb-3 block h-1 w-10 bg-accent" aria-hidden="true"></span>
-                    <h2 class="rf-page-title text-4xl sm:text-5xl">{{ $isArticle ? 'Artikel' : 'Refleksi' }}</h2>
+                    <h2 class="rf-page-title text-4xl sm:text-5xl">{{ $isArticle ? 'Catatan Pemikiran' : 'Refleksi' }}</h2>
                     <p class="mt-3 text-muted">Tulisan dan catatan yang telah diterbitkan oleh pengelola.</p>
                 </div>
-                <a href="{{ route($isArticle ? 'public.articles.index' : 'public.posts.index') }}" class="rf-text-action">Semua {{ $isArticle ? 'artikel' : 'refleksi' }} <span aria-hidden="true">&rarr;</span></a>
+                <a href="{{ route($isArticle ? 'public.articles.index' : 'public.posts.index') }}" class="rf-text-action">{{ $isArticle ? 'Semua catatan' : 'Semua refleksi' }} <span aria-hidden="true">&rarr;</span></a>
             </div>
         @endif
         <div class="grid gap-5 sm:grid-cols-2 lg:grid-cols-12 lg:gap-6">
@@ -27,12 +27,12 @@
                         <div class="min-w-0 p-5 {{ $isFeatured ? 'sm:p-8' : 'sm:p-6' }}">
                             <time datetime="{{ $post->published_at->toAtomString() }}" class="text-sm font-medium text-muted">{{ $post->published_at->locale('id')->translatedFormat('d F Y') }}</time>
                             <h3 class="mt-3 break-words font-bold leading-snug text-ink {{ $isFeatured ? 'text-2xl sm:text-3xl' : 'text-xl' }}"><a href="{{ route($isArticle ? 'public.articles.show' : 'public.posts.show', $post->slug) }}" class="rounded-sm hover:text-brand focus-visible:outline focus-visible:outline-2 focus-visible:outline-brand">{{ $post->title }}</a></h3>
-                            <p class="mt-3 break-words leading-relaxed text-muted">{{ $post->excerpt ? Str::limit($post->excerpt, $isFeatured ? 220 : 130) : ($isArticle ? 'Baca artikel selengkapnya.' : 'Baca refleksi selengkapnya.') }}</p>
+                            <p class="mt-3 break-words leading-relaxed text-muted">{{ $post->excerpt ? Str::limit($post->excerpt, $isFeatured ? 220 : 130) : ($isArticle ? 'Baca catatan pemikiran selengkapnya.' : 'Baca refleksi selengkapnya.') }}</p>
                         </div>
                     </div>
                 </article>
             @empty
-                <p class="rounded-xl border border-ink/15 bg-white p-6 text-muted sm:col-span-2 lg:col-span-12" role="status">Belum ada {{ $isArticle ? 'artikel' : 'refleksi' }} yang diterbitkan.</p>
+                <p class="rounded-xl border border-ink/15 bg-white p-6 text-muted sm:col-span-2 lg:col-span-12" role="status">Belum ada {{ $isArticle ? 'catatan pemikiran' : 'refleksi' }} yang diterbitkan.</p>
             @endforelse
         </div>
     </div>
