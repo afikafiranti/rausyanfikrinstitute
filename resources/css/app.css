@@ -52,4 +52,22 @@
   *, *::before, *::after {scroll-behavior: auto !important; transition-duration: .01ms !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important;}
 }
 
+.rf-report-dialog::backdrop {background: rgb(15 23 42 / .6);}
+.rf-report-dialog [data-report-content] {max-height: 92dvh; overflow-y: auto; border-radius: inherit; scroll-padding-block: 1rem 5rem;}
+.rf-report-dialog [hidden] {display: none !important;}
+.rf-report-dialog [aria-disabled="true"] {pointer-events: none; opacity: .5;}
+.rf-report-tooltip {
+  position: fixed;
+  z-index: 100;
+  max-width: min(20rem, calc(100vw - 1rem));
+  border-radius: .5rem;
+  background: #14213d;
+  color: white;
+  padding: .5rem .75rem;
+  font-size: .8rem;
+  line-height: 1.35;
+  pointer-events: auto;
+  box-shadow: 0 8px 24px rgb(15 23 42 / .25);
+}
+
 

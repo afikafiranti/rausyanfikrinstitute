@@ -55,12 +55,16 @@ class KajianReportSubmissionTest extends TestCase
     {
         $owner = $this->member('koorda');
         $report = $this->draft($owner);
-        $this->actingAs($owner)->get('/laporan/'.$report->id)->assertSee('Kirim laporan');
+        $this->actingAs($owner)->get('/laporan/'.$report->id)
+            ->assertSee('action="'.route('laporan.submit', $report).'"', false)
+            ->assertSee('href="'.route('laporan.edit', $report).'"', false);
         $this->post('/laporan/'.$report->id.'/submit', ['judul' => 'Forged', 'status' => 'approved', 'user_id' => 999])
             ->assertRedirect('/laporan/'.$report->id)->assertSessionHas('success');
         $this->assertSame('submitted', $report->fresh()->status);
         $this->assertSame('Judul Lama', $report->fresh()->judul);
-        $this->get('/laporan/'.$report->id)->assertOk()->assertSee('Dikirim')->assertDontSee('Kirim laporan')->assertDontSee('Edit draf');
+        $this->get('/laporan/'.$report->id)->assertOk()->assertSee('Dikirim')
+            ->assertDontSee('action="'.route('laporan.submit', $report).'"', false)
+            ->assertDontSee('href="'.route('laporan.edit', $report).'"', false);
         $this->get('/laporan/'.$report->id.'/edit')->assertStatus(409);
         $this->put('/laporan/'.$report->id, $this->data())->assertStatus(409);
         $this->post('/laporan/'.$report->id.'/submit')->assertStatus(409);
@@ -74,7 +78,8 @@ class KajianReportSubmissionTest extends TestCase
         $foreign = $this->member('koorda');
         $this->actingAs($local)->get('/laporan/'.$report->id)->assertNotFound();
         $this->actingAs($owner)->post('/laporan/'.$report->id.'/submit')->assertRedirect();
-        $this->actingAs($local)->get('/laporan/'.$report->id)->assertOk()->assertDontSee('Edit draf');
+        $this->actingAs($local)->get('/laporan/'.$report->id)->assertOk()
+            ->assertDontSee('href="'.route('laporan.edit', $report).'"', false);
         $this->actingAs($foreign)->get('/laporan/'.$report->id)->assertNotFound();
     }
 

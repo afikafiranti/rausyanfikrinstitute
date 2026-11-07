@@ -34,7 +34,8 @@ class KajianReportReviewTest extends TestCase
             $author = $this->member('alumni');
             $report = $this->report($author, 'Laporan Terverifikasi');
             $reviewer = $this->member($role, $role === 'koorda' ? $author->wilayah_id : null);
-            $this->actingAs($reviewer)->get('/laporan/'.$report->id)->assertSee('Setujui laporan');
+            $this->actingAs($reviewer)->get('/laporan/'.$report->id)
+                ->assertSee('action="'.route('laporan.approve', $report).'"', false);
             $this->post('/laporan/'.$report->id.'/approve', ['user_id' => 999, 'judul' => 'Palsu', 'reviewed_by' => $author->id, 'status' => 'rejected', 'reject_reason' => 'Palsu'])
                 ->assertRedirect('/laporan/'.$report->id)->assertSessionHas('success');
             $report->refresh();
@@ -43,7 +44,8 @@ class KajianReportReviewTest extends TestCase
             $this->assertNotNull($report->reviewed_at);
             $this->assertNull($report->reject_reason);
             $this->assertSame('Laporan Terverifikasi', $report->judul);
-            $this->get('/laporan/'.$report->id)->assertSee('Disetujui')->assertSee($reviewer->name)->assertDontSee('Setujui laporan');
+            $this->get('/laporan/'.$report->id)->assertSee('Disetujui')->assertSee($reviewer->name)
+                ->assertDontSee('action="'.route('laporan.approve', $report).'"', false);
         }
     }
 
@@ -135,7 +137,8 @@ class KajianReportReviewTest extends TestCase
         $this->report($this->member('alumni'), 'Luar Filter');
         $this->actingAs($this->member('admin'))->get('/laporan/review?wilayah_id='.$author->wilayah_id)
             ->assertOk()->assertSee('Antrean 1')->assertDontSee('Antrean 13')->assertDontSee('Luar Filter')
-            ->assertSee('Tampilkan semua wilayah')->assertSee('wilayah_id='.$author->wilayah_id, false);
+            ->assertSee('href="'.route('laporan.review').'" data-report-tooltip="Tampilkan antrean dari semua wilayah"', false)
+            ->assertSee('wilayah_id='.$author->wilayah_id, false);
         $this->get('/laporan/review?wilayah_id='.$author->wilayah_id.'&page=2')->assertOk()->assertSee('Antrean 13')->assertDontSee('Luar Filter');
         foreach (['invalid', '999999', ['invalid']] as $value) {
             $this->getJson('/laporan/review?'.http_build_query(['wilayah_id' => $value]))->assertUnprocessable()->assertJsonValidationErrors('wilayah_id');

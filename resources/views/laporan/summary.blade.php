@@ -1,8 +1,8 @@
 @extends('layouts.app')
 
 @section('page-content')
-    <section class="rounded-xl bg-white p-6 shadow sm:p-8" aria-labelledby="summary-heading">
-        <a href="{{ route('laporan.index') }}" class="text-indigo-700 hover:underline">Kembali ke laporan</a>
+    <section data-report-workspace class="rf-card sm:p-8" aria-labelledby="summary-heading">
+        <a href="{{ route('laporan.index') }}" class="rf-btn-secondary px-3">Kembali</a>
         <h1 id="summary-heading" class="mt-4 text-2xl font-semibold text-slate-900">Rekap laporan kajian</h1>
         <p class="mt-3 text-slate-700">Hanya laporan yang sudah dikirim. Jumlah peserta adalah total kehadiran dalam laporan sesuai filter, bukan jumlah orang unik.</p>
         @include('laporan.feedback')
@@ -36,9 +36,9 @@
                 </div>
             @endforeach
             <div class="flex flex-wrap items-center gap-4 sm:col-span-2 lg:col-span-4">
-                <button type="submit" class="rounded-lg bg-brand px-5 py-3 font-medium text-white hover:bg-brand-dark">Terapkan filter</button>
-                <a href="{{ route('laporan.summary') }}" class="text-indigo-700 hover:underline">Reset filter</a>
-                <a href="{{ route('laporan.export', $filters) }}" class="rounded-lg border border-indigo-600 px-5 py-3 font-medium text-indigo-700 hover:bg-indigo-50">Unduh CSV sesuai filter</a>
+                <button type="submit" class="rf-btn px-3">Terapkan</button>
+                <a href="{{ route('laporan.summary') }}" class="rf-btn-secondary px-3">Reset</a>
+                <a href="{{ route('laporan.export', $filters) }}" data-report-tooltip="Unduh CSV sesuai filter saat ini" class="rf-btn-secondary px-3">Ekspor</a>
             </div>
         </form>
         <dl class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -49,7 +49,7 @@
         <ul class="mt-6 divide-y divide-slate-200">
             @forelse ($reports as $report)
                 <li class="py-5">
-                    <a href="{{ route('laporan.show', $report) }}" class="break-words text-lg font-semibold text-indigo-700 hover:underline">{{ $report->judul }}</a>
+                    <a href="{{ route('laporan.show', $report) }}" data-report-modal class="break-words text-lg font-semibold text-indigo-700 hover:underline">{{ $report->judul }}</a>
                     <p class="mt-2 text-sm text-slate-600">{{ $report->tanggal->format('d/m/Y') }} · {{ $report->wilayah?->name ?? 'Wilayah belum ditentukan' }} · {{ $report->user?->name }}</p>
                     <p class="mt-1 text-sm text-slate-700">@include('laporan.status', ['status' => $report->status]) · {{ (int) $report->peserta_l + (int) $report->peserta_p }} peserta</p>
                 </li>
@@ -59,4 +59,5 @@
         </ul>
         <div class="mt-5">{{ $reports->links() }}</div>
     </section>
+    @include('laporan.modal')
 @endsection

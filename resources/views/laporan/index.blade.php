@@ -1,23 +1,23 @@
 @extends('layouts.app')
 
 @section('page-content')
-    <section class="rf-card sm:p-6" aria-labelledby="laporan-heading">
+    <section data-report-workspace class="rf-card sm:p-6" aria-labelledby="laporan-heading">
         <header class="border-b border-slate-200 pb-5">
             <h1 id="laporan-heading" class="text-2xl font-semibold text-ink">Laporan Kajian</h1>
-            <p class="mt-2 text-sm leading-6 text-muted">Simpan catatan kegiatan sebagai draf, lalu kirim setelah diperiksa.</p>
+            <p class="mt-2 text-sm leading-6 text-muted">Simpan catatan sebagai draf, periksa, lalu kirim. Hanya pembuat draf yang dapat mengeditnya.</p>
             <nav class="mt-4 flex flex-wrap items-center gap-2" aria-label="Aksi laporan">
-                <a href="{{ route('laporan.create') }}" class="rf-btn px-3">Buat draf laporan</a>
+                <a href="{{ route('laporan.create') }}" data-report-modal class="rf-btn px-3">Buat</a>
                 @can('review-report')
-                    <a href="{{ route('laporan.review') }}" class="rf-btn-secondary px-3">Buka antrean review</a>
-                    <a href="{{ route('laporan.summary') }}" class="rf-btn-secondary px-3">Rekap dan ekspor</a>
+                    <a href="{{ route('laporan.review') }}" data-report-tooltip="Buka antrean laporan yang menunggu review" class="rf-btn-secondary px-3">Antrean</a>
+                    <a href="{{ route('laporan.summary') }}" class="rf-btn-secondary px-3">Rekap</a>
                 @endcan
             </nav>
         </header>
         @include('laporan.feedback')
         <ul class="divide-y divide-slate-200">
             @forelse ($reports as $report)
-                <li>
-                    <a href="{{ route('laporan.show', $report) }}" class="group flex min-w-0 items-start gap-3 rounded-lg py-4 sm:gap-4"
+                <li class="flex flex-wrap items-center gap-x-3 gap-y-1 py-3">
+                    <a href="{{ route('laporan.show', $report) }}" data-report-modal class="group flex min-w-0 flex-1 items-start gap-3 rounded-lg py-1 sm:gap-4"
                         aria-labelledby="report-title-{{ $report->id }}" aria-describedby="report-photo-{{ $report->id }}">
                         <span id="report-photo-{{ $report->id }}" role="img" aria-label="{{ $report->foto_url ? 'Foto dokumentasi tersedia' : 'Belum ada foto dokumentasi' }}"
                             class="relative flex h-16 w-20 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-slate-200 bg-slate-100">
@@ -36,11 +36,15 @@
                             </div>
                         </div>
                     </a>
+                    @if ($report->status === 'draft' && $report->user_id === auth()->id())
+                        <a href="{{ route('laporan.edit', $report) }}" data-report-modal data-report-tooltip="Edit isi dan foto draf milik Anda" class="rf-btn-secondary px-3">Edit</a>
+                    @endif
                 </li>
             @empty
-                <li class="py-8 text-sm text-muted">Belum ada laporan. Pilih Buat draf laporan untuk mencatat kegiatan pertama.</li>
+                <li class="py-8 text-sm text-muted">Belum ada laporan. Pilih Buat untuk mencatat kegiatan pertama.</li>
             @endforelse
         </ul>
         <div class="mt-5">{{ $reports->links() }}</div>
     </section>
+    @include('laporan.modal')
 @endsection

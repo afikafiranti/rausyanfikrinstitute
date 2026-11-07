@@ -2,6 +2,7 @@ import './bootstrap';
 import 'flowbite';
 import './notus';
 import { initDashboardCharts } from './pages/dashboard';
+import { initReportModals } from './pages/reports';
 import Alpine from 'alpinejs';
 window.Alpine = Alpine;
 
@@ -63,6 +64,7 @@ function initAlumniDialog() {
 function initializePage() {
   initDashboardCharts();
   initAlumniDialog();
+  initReportModals();
 }
 
 if (document.readyState === 'loading') {

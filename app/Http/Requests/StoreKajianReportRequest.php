@@ -33,4 +33,41 @@ class StoreKajianReportRequest extends FormRequest
             'foto' => ['nullable', 'image', 'mimes:jpg,jpeg,png', 'max:2048'],
         ];
     }
+
+    public function attributes(): array
+    {
+        return [
+            'wilayah_id' => 'Wilayah',
+            'tanggal' => 'Tanggal kegiatan',
+            'judul' => 'Judul kajian',
+            'tempat' => 'Tempat',
+            'pemateri' => 'Pemateri',
+            'peserta_l' => 'Peserta laki-laki',
+            'peserta_p' => 'Peserta perempuan',
+            'durasi_menit' => 'Durasi',
+            'catatan' => 'Catatan kegiatan',
+            'foto' => 'Foto dokumentasi',
+        ];
+    }
+
+    public function messages(): array
+    {
+        return [
+            'required' => ':attribute wajib diisi.',
+            'string' => ':attribute harus berupa teks.',
+            'integer' => ':attribute harus berupa bilangan bulat.',
+            'exists' => ':attribute yang dipilih tidak tersedia.',
+            'date_format' => ':attribute harus berupa tanggal yang valid.',
+            'after_or_equal' => ':attribute paling awal :date.',
+            'before_or_equal' => ':attribute paling akhir :date.',
+            'min' => ['numeric' => ':attribute minimal :min.'],
+            'max' => [
+                'numeric' => ':attribute maksimal :max.',
+                'string' => ':attribute maksimal :max karakter.',
+            ],
+            'foto.image' => 'Pilih foto dalam format JPG atau PNG.',
+            'foto.mimes' => 'Pilih foto dalam format JPG atau PNG.',
+            'foto.max' => 'Ukuran foto maksimal 2 MB.',
+        ];
+    }
 }

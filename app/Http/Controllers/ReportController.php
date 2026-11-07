@@ -33,7 +33,7 @@ class ReportController extends Controller
         $regions = Wilayah::query()->when(! $canChooseRegion, fn ($query) => $query->whereKey($request->user()->wilayah_id))
             ->orderBy('name')->get(['id', 'name']);
 
-        return view('laporan.create', compact('regions', 'canChooseRegion'));
+        return $this->reportView($request, 'laporan.create', 'laporan.partials.form', compact('regions', 'canChooseRegion'));
     }
 
     public function store(StoreKajianReportRequest $request)
@@ -74,7 +74,7 @@ class ReportController extends Controller
             throw $exception;
         }
 
-        return redirect()->route('laporan.show', $report)->with('success', 'Draf tersimpan. Periksa kembali isian sebelum mengirim laporan.');
+        return $this->reportSaved($request, $report, 'Draf tersimpan. Periksa kembali isian sebelum mengirim laporan.');
     }
 
     public function edit(Request $request, KajianReport $report)
@@ -83,7 +83,7 @@ class ReportController extends Controller
         $canChooseRegion = false;
         $regions = Wilayah::query()->whereKey($report->wilayah_id)->get(['id', 'name']);
 
-        return view('laporan.create', compact('report', 'regions', 'canChooseRegion'));
+        return $this->reportView($request, 'laporan.create', 'laporan.partials.form', compact('report', 'regions', 'canChooseRegion'));
     }
 
     public function update(UpdateKajianReportRequest $request, KajianReport $report)
@@ -113,7 +113,7 @@ class ReportController extends Controller
         }
         $this->deletePrivatePhoto($oldPath);
 
-        return redirect()->route('laporan.show', $report)->with('success', 'Perubahan draf tersimpan.');
+        return $this->reportSaved($request, $report, 'Perubahan draf tersimpan.');
     }
 
     public function submit(Request $request, KajianReport $report)
@@ -121,9 +121,10 @@ class ReportController extends Controller
         DB::transaction(function () use ($request, $report) {
             $draft = $this->ownedDraft($request, $report->id, true);
             $data = $draft->getAttributes();
-            $rules = (new StoreKajianReportRequest)->rules();
+            $validation = new StoreKajianReportRequest;
+            $rules = $validation->rules();
             unset($rules['foto']);
-            Validator::make($data, $rules)->validate();
+            Validator::make($data, $rules, $validation->messages(), $validation->attributes())->validate();
             $draft->status = KajianReport::STATUS_SUBMITTED;
             $draft->total_peserta = (int) $draft->peserta_l + (int) $draft->peserta_p;
             $draft->reviewed_by = null;
@@ -134,7 +135,7 @@ class ReportController extends Controller
             }
         });
 
-        return redirect()->route('laporan.show', $report)->with('success', 'Laporan berhasil dikirim dan menunggu review. Isian laporan kini terkunci.');
+        return $this->reportSaved($request, $report, 'Laporan berhasil dikirim dan menunggu review. Isian laporan kini terkunci.');
     }
 
     private function ownedDraft(Request $request, int $id, bool $lock = false): KajianReport
@@ -167,7 +168,7 @@ class ReportController extends Controller
             && $report->user_id !== $request->user()->id
             && $report->status === KajianReport::STATUS_SUBMITTED;
 
-        return view('laporan.show', compact('report', 'canReview'));
+        return $this->reportView($request, 'laporan.show', 'laporan.partials.detail', compact('report', 'canReview'));
     }
 
     public function photo(Request $request, KajianReport $report)
@@ -242,7 +243,10 @@ class ReportController extends Controller
             abort_unless($record->status === KajianReport::STATUS_SUBMITTED, 409, 'Hanya laporan yang menunggu review dapat diputuskan.');
             $reason = null;
             if ($status === KajianReport::STATUS_REJECTED) {
-                $data = $request->validate(['reject_reason' => ['required', 'string', 'max:16383']]);
+                $data = $request->validate(['reject_reason' => ['required', 'string', 'max:16383']], [
+                    'reject_reason.required' => 'Tulis alasan penolakan.',
+                    'reject_reason.max' => 'Alasan penolakan maksimal 16383 karakter.',
+                ]);
                 $reason = $data['reject_reason'];
             }
             $record->status = $status;
@@ -254,6 +258,32 @@ class ReportController extends Controller
             }
         });
 
-        return redirect()->route('laporan.show', $report)->with('success', $status === KajianReport::STATUS_APPROVED ? 'Laporan disetujui.' : 'Laporan ditolak. Alasan penolakan tersimpan.');
+        return $this->reportSaved($request, $report, $status === KajianReport::STATUS_APPROVED ? 'Laporan disetujui.' : 'Laporan ditolak. Alasan penolakan tersimpan.');
+    }
+
+    private function reportView(Request $request, string $page, string $fragment, array $data)
+    {
+        $isModal = $request->header('X-Report-Modal') === '1';
+        $response = response()->view($isModal ? $fragment : $page, $data)
+            ->header('Cache-Control', 'private, no-store')
+            ->header('Vary', 'X-Report-Modal');
+
+        if ($isModal) {
+            $response->header('X-Report-Modal', '1');
+        }
+
+        return $response;
+    }
+
+    private function reportSaved(Request $request, KajianReport $report, string $message)
+    {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'message' => $message,
+                'modal_url' => route('laporan.show', $report),
+            ])->header('Cache-Control', 'private, no-store');
+        }
+
+        return redirect()->route('laporan.show', $report)->with('success', $message);
     }
 }

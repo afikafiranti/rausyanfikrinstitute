@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Profil/modal teruji; tambahan toolbar laporan dan thumbnail 7 November diverifikasi di bawah |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Modal tambah/edit/detail Laporan, tombol singkat dan tooltip selektif diverifikasi pada pembaruan terakhir di bawah |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -97,6 +97,21 @@ Branch `develop`, baseline `0d500fc`. Ketiga aksi memakai komponen tombol proyek
 | Pengukuran UI | Lebar 320/390/768/1280/1920 px tidak overflow; tombol tinggi 44 px, teks 14 px, jarak minimal 8 px. Kontras teks tombol utama 6,75:1; metadata minimal 5,76:1 pada latarnya |
 
 Log di `storage/logs/phpunit-report-ui-2026-11-07.txt` dan `phpunit-report-listing-final-2026-11-07.txt`. Artefak browser, `report.json`, `desktop-1280.png` dan `mobile-390.png` berada pada `storage/app/qa-report-ui-2026-11-07/`, diabaikan Git. Screenshot desktop/mobile telah diperiksa; server QA sementara port 8768 sudah dihentikan. Bukti ini mencakup perubahan laporan, bukan pengulangan suite aplikasi penuh atau deployment server.
+
+## Modal dan penyederhanaan aksi Laporan 7 November — RFIX-17
+
+Branch `develop`, baseline `c084714`. Arahan pengguna dibatasi pada modul Laporan: label aksi satu kata (maksimal dua bila diperlukan), tooltip hanya untuk aksi yang memerlukan konteks, dan tambah/edit/detail dalam modal. Form edit mencakup penggantian serta pratinjau foto. Halaman langsung tetap mempunyai fallback HTML; alur aplikasi memakai satu dialog tanpa meninggalkan daftar, antrean atau rekap.
+
+Route dan otorisasi existing dipertahankan. GET dengan `X-Report-Modal: 1` mengembalikan fragmen privat; mutasi dengan Accept JSON memakai validasi/transaksi/foto privat yang sama, sedangkan permintaan HTML mempertahankan redirect/flash. Error ditampilkan dalam bahasa Indonesia, isian/foto tetap tersedia ketika validasi gagal, dan penutupan perubahan yang belum disimpan meminta konfirmasi. Kontrol dibekukan selama penyimpanan untuk mencegah kiriman ganda dan hilangnya perubahan; daftar serta detail dimuat ulang setelah sukses. Fokus keyboard dipertahankan, termasuk ketika baris hilang dari antrean.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi/integrasi server | PHP 8.3.30/MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi. Filter `KajianReport\|ReportAvailabilityTest`: **51 tests, 587 assertions**, tanpa failure/error/warning/deprecation/skip. Termasuk fragmen/cache/akses, JSON buat/edit/ganti foto/kirim/review, validasi dan pembatasan draf |
+| Source dan aset | PHP lint, `node --check resources/js/pages/reports.js`, `git diff --check` dan `npm run build` lulus; Node 24.14.0, Vite 7.3.7, 177 modul. Review independen memeriksa backend dan modal; temuan fokus setelah refresh ditutup |
+| Browser dengan data sintetis | Chrome headless pada `rf_report_browser_testing`: **8 kelompok pemeriksaan PASS**, tanpa page error. Mencakup tooltip hover/fokus selektif, dirty close/Escape, retensi berkas saat 422, pencegahan kiriman ganda, tambah/edit/foto/kirim, pemulihan gagal memuat, fokus Tab/Shift+Tab serta review yang memperbarui antrean |
+| Responsivitas | Modal dan kontrol diuji pada 320/390/768/1280 px, tanpa overflow. URL edit langsung membuka modal tanpa ID/form ganda. Screenshot desktop, ponsel dan pratinjau foto diperiksa |
+
+Log: `storage/logs/phpunit-report-modal-2026-11-07.txt` dan `phpunit-report-modal.xml`. Artefak browser: `storage/app/qa-report-ui-2026-11-07/modal-report.json`, `modal-1280.png`, `modal-390.png`, `modal-photo-390.png`; semuanya diabaikan Git. Server QA sementara port 8768 sudah dihentikan. Pemeriksaan ini merupakan pengujian modul dan alur browser, bukan pengulangan suite aplikasi penuh atau deployment server.
 
 ## Riwayat sebelum rencana RFIX
 
