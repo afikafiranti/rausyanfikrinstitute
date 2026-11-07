@@ -64,7 +64,7 @@
 
         <ul data-report-list class="mt-4 space-y-3">
             @forelse ($reports as $report)
-                <li data-report-row class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:flex-row lg:items-center">
+                <li data-report-row class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 transition-colors duration-150 hover:border-brand/40 hover:bg-blue-50 focus-within:border-brand/40 focus-within:bg-blue-50 lg:flex-row lg:items-center">
                     <a href="{{ route('laporan.show', $report) }}" data-report-modal class="group flex min-w-0 flex-1 items-start gap-3 rounded-lg py-1 sm:gap-4"
                         aria-labelledby="report-title-{{ $report->id }}" aria-describedby="report-photo-{{ $report->id }}">
                         <span id="report-photo-{{ $report->id }}" role="img" aria-label="{{ $report->foto_url ? 'Foto dokumentasi tersedia' : 'Belum ada foto dokumentasi' }}"
