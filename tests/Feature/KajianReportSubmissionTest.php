@@ -62,7 +62,7 @@ class KajianReportSubmissionTest extends TestCase
             ->assertRedirect('/laporan/'.$report->id)->assertSessionHas('success');
         $this->assertSame('submitted', $report->fresh()->status);
         $this->assertSame('Judul Lama', $report->fresh()->judul);
-        $this->get('/laporan/'.$report->id)->assertOk()->assertSee('Dikirim')
+        $this->get('/laporan/'.$report->id)->assertOk()->assertSee('Menunggu')
             ->assertDontSee('action="'.route('laporan.submit', $report).'"', false)
             ->assertDontSee('href="'.route('laporan.edit', $report).'"', false);
         $this->get('/laporan/'.$report->id.'/edit')->assertStatus(409);

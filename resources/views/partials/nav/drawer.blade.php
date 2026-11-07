@@ -24,14 +24,9 @@
                 <i class="fas fa-book-open w-5 text-center"></i><span>Materi</span>
             </a>
             @can('review-report')
-            <a href="{{ route('laporan.index') }}" class="{{ $link(request()->routeIs('laporan.index')) }}">
+            <a href="{{ route('laporan.index') }}" class="{{ $link(request()->routeIs('laporan.*')) }}">
                 <i class="fas fa-file-lines w-5 text-center"></i><span>Laporan</span>
             </a>
-            @endcan
-            @can('review-report')
-                <a href="{{ route('laporan.review') }}" class="{{ $link(request()->routeIs('laporan.review')) }}">
-                    <i class="fas fa-clipboard-check w-5 text-center"></i><span>Review Laporan</span>
-                </a>
             @endcan
             @can('review-user')
                 <a href="{{ route('verification.index') }}" class="{{ $link(request()->routeIs('verification.*')) }}">

@@ -4,10 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\StoreKajianReportRequest;
 use App\Http\Requests\UpdateKajianReportRequest;
+use App\Http\Requests\ReportWorkspaceRequest;
 use App\Models\KajianReport;
 use App\Models\Wilayah;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
@@ -16,14 +18,43 @@ use Throwable;
 
 class ReportController extends Controller
 {
-    public function listing(Request $request)
+    public function listing(ReportWorkspaceRequest $request)
     {
-        $reports = $this->visibleReports($request)
-            ->select(['id', 'user_id', 'wilayah_id', 'tanggal', 'judul', 'status', 'total_peserta', 'foto_url'])
-            ->with(['user:id,name', 'wilayah:id,name'])
-            ->orderByDesc('tanggal')->orderByDesc('id')->paginate(12);
+        $filters = $request->validated();
+        $query = $this->visibleReports($request)->matchingFilters($filters);
+        $groups = (clone $query)->selectRaw('status, COUNT(*) AS reports, SUM(peserta_l) AS male, SUM(peserta_p) AS female')
+            ->groupBy('status')->get();
+        $totals = ['reports' => 0, 'draft' => 0, 'submitted' => 0, 'approved' => 0, 'rejected' => 0, 'male' => 0, 'female' => 0, 'participants' => 0];
+        foreach ($groups as $group) {
+            $totals[$group->status] = (int) $group->reports;
+            $totals['reports'] += (int) $group->reports;
+            if ($group->status !== KajianReport::STATUS_DRAFT) {
+                $totals['male'] += (int) $group->male;
+                $totals['female'] += (int) $group->female;
+            }
+        }
+        $totals['participants'] = $totals['male'] + $totals['female'];
+        $lastPage = max(1, (int) ceil($totals['reports'] / 12));
+        if (Paginator::resolveCurrentPage() > $lastPage) {
+            $target = array_filter($filters, fn ($value) => $value !== null && $value !== '');
+            if ($lastPage > 1) {
+                $target['page'] = $lastPage;
+            }
 
-        return view('laporan.index', compact('reports'));
+            return redirect()->route('laporan.index', $target);
+        }
+        $direction = ($filters['status'] ?? '') === KajianReport::STATUS_SUBMITTED ? 'asc' : 'desc';
+        $reports = $query
+            ->select(['id', 'user_id', 'wilayah_id', 'tanggal', 'judul', 'status', 'total_peserta', 'peserta_l', 'peserta_p', 'foto_url'])
+            ->with(['user:id,name', 'wilayah:id,name'])
+            ->orderBy('tanggal', $direction)->orderBy('id', $direction)->paginate(12)
+            ->appends(array_filter($filters, fn ($value) => $value !== null && $value !== ''));
+        $canChooseRegion = $request->user()->hasAnyRole(['super_admin', 'admin']);
+        $regions = Wilayah::query()->when(! $canChooseRegion, fn (Builder $query) => $query->whereKey($request->user()->wilayah_id))
+            ->orderBy('name')->get(['id', 'name']);
+
+        return response()->view('laporan.index', compact('reports', 'filters', 'totals', 'regions', 'canChooseRegion'))
+            ->header('Cache-Control', 'private, no-store');
     }
 
     public function create(Request $request)
@@ -138,6 +169,27 @@ class ReportController extends Controller
         return $this->reportSaved($request, $report, 'Laporan berhasil dikirim dan menunggu review. Isian laporan kini terkunci.');
     }
 
+    public function destroy(Request $request, KajianReport $report)
+    {
+        $path = DB::transaction(function () use ($request, $report) {
+            $draft = $this->ownedDraft($request, $report->id, true);
+            $path = $draft->foto_url;
+            if (! $draft->delete()) {
+                throw new RuntimeException('Draf laporan gagal dihapus.');
+            }
+
+            return $path;
+        });
+        $this->deletePrivatePhoto($path);
+        $message = 'Draf laporan dihapus.';
+
+        if ($request->expectsJson()) {
+            return response()->json(['message' => $message, 'deleted' => true])->header('Cache-Control', 'private, no-store');
+        }
+
+        return redirect()->route('laporan.index')->with('success', $message);
+    }
+
     private function ownedDraft(Request $request, int $id, bool $lock = false): KajianReport
     {
         $query = $this->visibleReports($request)->where('user_id', $request->user()->id);
@@ -188,34 +240,15 @@ class ReportController extends Controller
     {
         $user = $request->user();
         abort_unless($user?->can('review-report'), 403);
-        $query = KajianReport::query();
-        if ($user->hasAnyRole(['super_admin', 'admin'])) {
-            return $query;
-        }
-        abort_unless($user->wilayah_id, 403);
-        $query->where('wilayah_id', $user->wilayah_id);
-        return $query->where(fn ($query) => $query->where('status', '!=', KajianReport::STATUS_DRAFT)->orWhere('user_id', $user->id));
+        return KajianReport::query()->visibleTo($user);
     }
 
-    public function index(Request $request)
+    public function index(ReportWorkspaceRequest $request)
     {
-        $query = $this->reviewableReports($request);
-        $wilayahId = (int) $request->attributes->get('wilayah_id');
-        if ($request->user()->hasAnyRole(['super_admin', 'admin'])) {
-            $data = Validator::make($request->query(), ['wilayah_id' => ['nullable', 'integer', 'exists:wilayah,id']])->validate();
-            $wilayahId = (int) ($data['wilayah_id'] ?? 0);
-            if ($wilayahId) {
-                $query->where('wilayah_id', $wilayahId);
-            }
-        }
-        $reports = $query->where('status', KajianReport::STATUS_SUBMITTED)
-            ->where('user_id', '!=', $request->user()->id)
-            ->select(['id', 'user_id', 'wilayah_id', 'tanggal', 'judul', 'status'])
-            ->with(['user:id,name', 'wilayah:id,name'])
-            ->orderBy('tanggal')->orderBy('id')->paginate(12)->withQueryString();
-        $regionName = $wilayahId ? Wilayah::query()->whereKey($wilayahId)->value('name') : null;
+        $filters = $request->validated();
+        $filters['status'] = KajianReport::STATUS_SUBMITTED;
 
-        return view('laporan.review', compact('wilayahId', 'reports', 'regionName'));
+        return redirect()->route('laporan.index', array_filter($filters, fn ($value) => $value !== null && $value !== ''));
     }
 
     public function approve(Request $request, KajianReport $report)

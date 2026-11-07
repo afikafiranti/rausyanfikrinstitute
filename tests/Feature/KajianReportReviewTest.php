@@ -12,7 +12,7 @@ class KajianReportReviewTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_queue_only_contains_submitted_reports_in_scope_excluding_own(): void
+    public function test_legacy_queue_redirects_to_submitted_workspace_in_scope(): void
     {
         $koorda = $this->member('koorda');
         $author = $this->member('alumni', $koorda->wilayah_id);
@@ -21,10 +21,14 @@ class KajianReportReviewTest extends TestCase
         $this->report($author, 'Draf Privat', 'draft');
         $this->report($author, 'Sudah Diputuskan', 'approved');
         $this->report($koorda, 'Laporan Sendiri');
-        $this->actingAs($koorda)->get('/laporan/review?wilayah_id='.$foreign->wilayah_id)->assertOk()
-            ->assertSee('Antrean Lokal')->assertDontSee('Antrean Asing')->assertDontSee('Draf Privat')->assertDontSee('Sudah Diputuskan')->assertDontSee('Laporan Sendiri');
+        $this->actingAs($koorda)->get('/laporan/review?wilayah_id='.$foreign->wilayah_id)
+            ->assertRedirect('/laporan?'.http_build_query(['wilayah_id' => $koorda->wilayah_id, 'status' => 'submitted']));
+        $this->get('/laporan?status=submitted')->assertOk()
+            ->assertSee('Antrean Lokal')->assertSee('Laporan Sendiri')
+            ->assertDontSee('Antrean Asing')->assertDontSee('Draf Privat');
         foreach (['admin', 'super_admin'] as $role) {
-            $this->actingAs($this->member($role))->get('/laporan/review')->assertOk()->assertSee($local->judul)->assertSee($foreign->judul);
+            $this->actingAs($this->member($role))->get('/laporan/review')->assertRedirect('/laporan?status=submitted');
+            $this->get('/laporan?status=submitted')->assertOk()->assertSee($local->judul)->assertSee($foreign->judul);
         }
     }
 
@@ -136,10 +140,11 @@ class KajianReportReviewTest extends TestCase
         }
         $this->report($this->member('alumni'), 'Luar Filter');
         $this->actingAs($this->member('admin'))->get('/laporan/review?wilayah_id='.$author->wilayah_id)
+            ->assertRedirect('/laporan?'.http_build_query(['wilayah_id' => $author->wilayah_id, 'status' => 'submitted']));
+        $this->get('/laporan?status=submitted&wilayah_id='.$author->wilayah_id)
             ->assertOk()->assertSee('Antrean 1')->assertDontSee('Antrean 13')->assertDontSee('Luar Filter')
-            ->assertSee('href="'.route('laporan.review').'" data-report-tooltip="Tampilkan antrean dari semua wilayah"', false)
             ->assertSee('wilayah_id='.$author->wilayah_id, false);
-        $this->get('/laporan/review?wilayah_id='.$author->wilayah_id.'&page=2')->assertOk()->assertSee('Antrean 13')->assertDontSee('Luar Filter');
+        $this->get('/laporan?status=submitted&wilayah_id='.$author->wilayah_id.'&page=2')->assertOk()->assertSee('Antrean 13')->assertDontSee('Luar Filter');
         foreach (['invalid', '999999', ['invalid']] as $value) {
             $this->getJson('/laporan/review?'.http_build_query(['wilayah_id' => $value]))->assertUnprocessable()->assertJsonValidationErrors('wilayah_id');
         }

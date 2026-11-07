@@ -1,5 +1,5 @@
     <article data-report-modal-content class="bg-white p-5 sm:p-7">
-        <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
+        <div class="sticky top-0 z-10 flex items-start justify-between gap-4 border-b border-slate-200 bg-white pb-4">
             <div><p class="text-sm font-medium text-brand">Detail Laporan</p>
                 <h1 id="report-modal-heading" tabindex="-1" class="mt-1 break-words text-2xl font-semibold text-ink">{{ $report->judul }}</h1>
                 <p class="mt-2 font-medium text-indigo-700">@include('laporan.status', ['status' => $report->status])</p>
@@ -39,14 +39,14 @@
         @endif
         @if ($canReview)
             <section class="mt-6 rounded-lg border border-slate-200 p-4" aria-labelledby="decision-heading">
-                <h2 id="decision-heading" class="font-semibold">Keputusan review</h2>
+                <h2 id="decision-heading" tabindex="-1" class="font-semibold">Keputusan review</h2>
                 <p class="mt-2 text-slate-700">Periksa isi dan dokumentasi sebelum mengambil keputusan. Keputusan yang tersimpan tidak dapat diubah.</p>
-                <form data-report-form action="{{ route('laporan.approve', $report) }}" method="POST" class="mt-4">
+                <form data-report-form data-report-decision="approve" action="{{ route('laporan.approve', $report) }}" method="POST" class="mt-4">
                     @csrf
                     <div data-report-form-errors role="alert" tabindex="-1" hidden class="mb-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800"></div>
                     <button type="submit" data-report-tooltip="Setujui laporan; keputusan tidak dapat diubah" class="rf-btn px-4">Setujui</button>
                 </form>
-                <form data-report-form action="{{ route('laporan.reject', $report) }}" method="POST" class="mt-5">
+                <form data-report-form data-report-decision="reject" action="{{ route('laporan.reject', $report) }}" method="POST" class="mt-5">
                     @csrf
                     <div data-report-form-errors role="alert" tabindex="-1" hidden class="mb-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800"></div>
                     <label for="reject_reason" class="block font-medium">Alasan penolakan *</label>
@@ -65,7 +65,4 @@
                 @endif
             </section>
         @endif
-        @can('review-report')
-            <a href="{{ route('laporan.summary') }}" class="rf-btn-secondary mt-6 px-4">Rekap</a>
-        @endcan
     </article>

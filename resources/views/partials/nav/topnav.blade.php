@@ -13,7 +13,6 @@
             $pageTitle = match (true) {
                 $r === 'dashboard' => 'Dashboard',
                 str_starts_with($r, 'materi.') => 'Materi',
-                $r === 'laporan.review' => 'Review Laporan',
                 str_starts_with($r, 'laporan.') => 'Laporan',
                 str_starts_with($r, 'verification.') => 'Verifikasi',
                 str_starts_with($r, 'alumni.') => 'Alumni',

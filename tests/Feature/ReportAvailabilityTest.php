@@ -19,16 +19,16 @@ class ReportAvailabilityTest extends TestCase
         }
     }
 
-    public function test_authorized_reviewers_see_empty_queue_with_effective_region(): void
+    public function test_authorized_reviewers_reach_filtered_workspace_with_effective_region(): void
     {
         $local = Wilayah::create(['name' => 'Wilayah Lokal']);
         $other = Wilayah::create(['name' => 'Wilayah Lain']);
         foreach (['admin', 'super_admin', 'koorda'] as $role) {
             $viewer = $this->member($role, $role === 'koorda' ? $local->id : null);
             $this->actingAs($viewer)->get(route('laporan.review', ['wilayah_id' => $other->id]))
-                ->assertOk()->assertSee('Tidak ada laporan yang menunggu review.')
-                ->assertViewHas('wilayahId', $role === 'koorda' ? $local->id : $other->id)
-                ->assertDontSee('Setujui')->assertDontSee('Tolak Laporan')->assertDontSee('Export');
+                ->assertRedirect('/laporan?'.http_build_query(['wilayah_id' => $role === 'koorda' ? $local->id : $other->id, 'status' => 'submitted']));
+            $this->get('/laporan?status=submitted')->assertOk()
+                ->assertViewHas('totals', fn ($totals) => $totals['reports'] === 0);
         }
     }
 

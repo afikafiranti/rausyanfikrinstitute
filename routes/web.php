@@ -77,6 +77,7 @@ Route::middleware(['auth', 'can:review-report', \App\Http\Middleware\ScopeWilaya
     Route::get('/{report}', [\App\Http\Controllers\ReportController::class, 'show'])->whereNumber('report')->name('show');
     Route::get('/{report}/edit', [\App\Http\Controllers\ReportController::class, 'edit'])->whereNumber('report')->name('edit');
     Route::put('/{report}', [\App\Http\Controllers\ReportController::class, 'update'])->whereNumber('report')->name('update');
+    Route::delete('/{report}', [\App\Http\Controllers\ReportController::class, 'destroy'])->whereNumber('report')->name('destroy');
     Route::post('/{report}/submit', [\App\Http\Controllers\ReportController::class, 'submit'])->whereNumber('report')->name('submit');
     Route::post('/{report}/approve', [\App\Http\Controllers\ReportController::class, 'approve'])->whereNumber('report')->middleware('can:review-report')->name('approve');
     Route::post('/{report}/reject', [\App\Http\Controllers\ReportController::class, 'reject'])->whereNumber('report')->middleware('can:review-report')->name('reject');

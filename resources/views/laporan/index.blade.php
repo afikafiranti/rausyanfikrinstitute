@@ -2,21 +2,71 @@
 
 @section('page-content')
     <section data-report-workspace class="rf-card sm:p-6" aria-labelledby="laporan-heading">
-        <header class="border-b border-slate-200 pb-5">
-            <h1 id="laporan-heading" class="text-2xl font-semibold text-ink">Laporan Kajian</h1>
-            <p class="mt-2 text-sm leading-6 text-muted">Simpan catatan sebagai draf, periksa, lalu kirim. Hanya pembuat draf yang dapat mengeditnya.</p>
-            <nav class="mt-4 flex flex-wrap items-center gap-2" aria-label="Aksi laporan">
+        <header class="flex flex-wrap items-start justify-between gap-4 border-b border-slate-200 pb-5">
+            <div class="min-w-0">
+                <h1 id="laporan-heading" class="text-2xl font-semibold text-ink">Laporan Kajian</h1>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-muted">Catat kegiatan, pantau status, dan tindak lanjuti laporan dari satu daftar.</p>
+            </div>
+            <div class="flex flex-wrap gap-2" aria-label="Aksi laporan">
                 <a href="{{ route('laporan.create') }}" data-report-modal class="rf-btn px-3">Buat</a>
-                @can('review-report')
-                    <a href="{{ route('laporan.review') }}" data-report-tooltip="Buka antrean laporan yang menunggu review" class="rf-btn-secondary px-3">Antrean</a>
-                    <a href="{{ route('laporan.summary') }}" class="rf-btn-secondary px-3">Rekap</a>
-                @endcan
-            </nav>
+                @if (($filters['status'] ?? '') === 'draft')
+                    <span class="rf-btn-secondary cursor-not-allowed px-3 opacity-50" aria-disabled="true" aria-describedby="report-export-note">Ekspor</span>
+                @else
+                    <a href="{{ route('laporan.export', array_filter($filters, fn ($value) => $value !== null && $value !== '')) }}" data-report-tooltip="Unduh CSV laporan terkirim sesuai filter" class="rf-btn-secondary px-3">Ekspor</a>
+                @endif
+            </div>
         </header>
+
         @include('laporan.feedback')
-        <ul class="divide-y divide-slate-200">
+        <div data-report-workspace-status role="status" aria-live="polite" tabindex="-1" hidden class="mt-4 rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm text-ink"></div>
+
+        <form data-report-filters action="{{ route('laporan.index') }}" method="GET" class="mt-5 grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+            <div>
+                <label for="filter-status" class="block text-sm font-medium text-ink">Status</label>
+                <select id="filter-status" name="status" class="mt-1 w-full">
+                    <option value="">Semua status</option>
+                    @foreach (['draft' => 'Draf', 'submitted' => 'Menunggu', 'approved' => 'Disetujui', 'rejected' => 'Ditolak'] as $value => $label)
+                        <option value="{{ $value }}" @selected(($filters['status'] ?? '') === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @if ($canChooseRegion)
+                <div>
+                    <label for="filter-wilayah_id" class="block text-sm font-medium text-ink">Wilayah</label>
+                    <select id="filter-wilayah_id" name="wilayah_id" class="mt-1 w-full">
+                        <option value="">Semua wilayah</option>
+                        @foreach ($regions as $region)
+                            <option value="{{ $region->id }}" @selected((string) ($filters['wilayah_id'] ?? '') === (string) $region->id)>{{ $region->name }}</option>
+                        @endforeach
+                    </select>
+                </div>
+            @else
+                <p class="self-end pb-3 text-sm text-muted">Wilayah: {{ $regions->first()?->name ?? 'Belum ditentukan' }}</p>
+            @endif
+            <div>
+                <label for="filter-dari" class="block text-sm font-medium text-ink">Dari</label>
+                <input id="filter-dari" name="dari" type="date" value="{{ $filters['dari'] ?? '' }}" min="1000-01-01" max="9999-12-31" class="mt-1 w-full">
+            </div>
+            <div>
+                <label for="filter-sampai" class="block text-sm font-medium text-ink">Sampai</label>
+                <input id="filter-sampai" name="sampai" type="date" value="{{ $filters['sampai'] ?? '' }}" min="1000-01-01" max="9999-12-31" class="mt-1 w-full">
+            </div>
+            <div class="flex flex-wrap items-center gap-2 sm:col-span-2 xl:col-span-4">
+                <button type="submit" class="rf-btn px-3">Terapkan</button>
+                <a href="{{ route('laporan.index') }}" class="rf-btn-secondary px-3">Reset</a>
+                <p id="report-export-note" class="text-xs leading-5 text-muted">Kehadiran dan CSV hanya menghitung laporan terkirim. Draf tidak diekspor.</p>
+            </div>
+        </form>
+
+        <dl class="mt-5 flex flex-wrap gap-x-7 gap-y-2 border-y border-slate-200 py-3 text-sm">
+            <div class="flex items-baseline gap-2"><dt class="text-muted">Laporan</dt><dd class="font-semibold text-ink">{{ number_format($totals['reports'], 0, ',', '.') }}</dd></div>
+            <div class="flex items-baseline gap-2"><dt class="text-muted">Menunggu</dt><dd class="font-semibold text-ink">{{ number_format($totals['submitted'], 0, ',', '.') }}</dd></div>
+            <div class="flex items-baseline gap-2"><dt class="text-muted">Kehadiran</dt><dd class="font-semibold text-ink">{{ number_format($totals['participants'], 0, ',', '.') }}</dd><span class="text-xs text-muted">L {{ number_format($totals['male'], 0, ',', '.') }} / P {{ number_format($totals['female'], 0, ',', '.') }}</span></div>
+        </dl>
+
+        <ul data-report-list class="divide-y divide-slate-200">
             @forelse ($reports as $report)
-                <li class="flex flex-wrap items-center gap-x-3 gap-y-1 py-3">
+                <li data-report-row class="flex flex-col gap-3 py-4 lg:flex-row lg:items-center">
                     <a href="{{ route('laporan.show', $report) }}" data-report-modal class="group flex min-w-0 flex-1 items-start gap-3 rounded-lg py-1 sm:gap-4"
                         aria-labelledby="report-title-{{ $report->id }}" aria-describedby="report-photo-{{ $report->id }}">
                         <span id="report-photo-{{ $report->id }}" role="img" aria-label="{{ $report->foto_url ? 'Foto dokumentasi tersedia' : 'Belum ada foto dokumentasi' }}"
@@ -32,16 +82,27 @@
                             <p class="mt-1 break-words text-sm leading-5 text-muted">{{ $report->tanggal->format('d/m/Y') }} · {{ $report->wilayah?->name ?? 'Wilayah belum ditentukan' }} · {{ $report->user?->name }}</p>
                             <div class="mt-2 flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted">
                                 <span class="rounded-md bg-slate-100 px-2 py-1 font-medium text-ink">@include('laporan.status', ['status' => $report->status])</span>
-                                <span>{{ $report->total_peserta }} peserta</span>
+                                <span>{{ (int) $report->peserta_l + (int) $report->peserta_p }} peserta</span>
                             </div>
                         </div>
                     </a>
-                    @if ($report->status === 'draft' && $report->user_id === auth()->id())
-                        <a href="{{ route('laporan.edit', $report) }}" data-report-modal data-report-tooltip="Edit isi dan foto draf milik Anda" class="rf-btn-secondary px-3">Edit</a>
-                    @endif
+                    <div role="group" class="flex flex-wrap items-center gap-2 pl-0 sm:pl-24 lg:pl-0" aria-label="Aksi {{ $report->judul }}">
+                        <a href="{{ route('laporan.show', $report) }}" data-report-modal class="rf-btn-secondary px-3">Detail</a>
+                        @if ($report->status === 'draft' && $report->user_id === auth()->id())
+                            <a href="{{ route('laporan.edit', $report) }}" data-report-modal class="rf-btn-secondary px-3">Edit</a>
+                            <form data-report-row-form action="{{ route('laporan.destroy', $report) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="rf-btn-danger px-3" data-report-tooltip="Hapus draf dan foto secara permanen">Hapus</button>
+                            </form>
+                        @elseif ($report->status === 'submitted' && $report->user_id !== auth()->id())
+                            <a href="{{ route('laporan.show', $report) }}" data-report-modal data-report-focus="approve" data-report-tooltip="Periksa laporan sebelum menyetujui" class="rf-btn-secondary px-3">Setujui</a>
+                            <a href="{{ route('laporan.show', $report) }}" data-report-modal data-report-focus="reject" data-report-tooltip="Periksa laporan dan beri alasan penolakan" class="rf-btn-secondary px-3">Tolak</a>
+                        @endif
+                    </div>
                 </li>
             @empty
-                <li class="py-8 text-sm text-muted">Belum ada laporan. Pilih Buat untuk mencatat kegiatan pertama.</li>
+                <li class="py-8 text-sm text-muted">Tidak ada laporan sesuai filter. Ubah filter atau pilih Buat untuk mencatat kegiatan.</li>
             @endforelse
         </ul>
         <div class="mt-5">{{ $reports->links() }}</div>

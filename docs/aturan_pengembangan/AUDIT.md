@@ -1,6 +1,6 @@
 # Audit dan Risiko Aktif
 
-Penilaian per 6 November 2026. [TASK](TASK.md#register-rfix) menjadi satu-satunya register penyelesaian dan [bukti eksekusi](TASK.md#verifikasi-aplikasi-terakhir). Dokumen ini mempertahankan asal temuan, triase, serta batas kesimpulan; keberhasilan lokal tidak membuktikan kondisi server.
+Penilaian dasar per 6 November 2026; tambahan alur Laporan 7 November. [TASK](TASK.md#register-rfix) menjadi satu-satunya register penyelesaian dan [bukti eksekusi](TASK.md#verifikasi-aplikasi-terakhir). Dokumen ini mempertahankan asal temuan, triase, serta batas kesimpulan; keberhasilan lokal tidak membuktikan kondisi server.
 
 ## Jenis dan batas bukti
 
@@ -34,6 +34,8 @@ Tabel ini memetakan alasan pekerjaan, bukan menyalin statusnya. Detail baseline 
 | RF-12 | Edit judul mengganti slug tulisan terbit | B2 | RFIX-15: pertahankan URL yang dibagikan |
 
 Perapian schema/fixture (RFIX-02/05/06/23/24) memerlukan inventaris dan regresi, bukan asumsi data telah rusak. Kontrak laporan yang berbeda antara helper/request dan route (RFIX-18) bukan bukti alumni berhasil menembus endpoint. Batas workbook/UX (RFIX-16/17), operasional (RFIX-19/22) dan dokumentasi/aset (RFIX-20) dinilai sesuai lingkungan dan kebutuhan, bukan hanya jumlah berkas/tabel.
+
+Penyatuan halaman Laporan (RFIX-17) memakai scope/filter bersama untuk daftar dan CSV; mutasi tetap memeriksa izin pada server. Penghapusan dibatasi pada draf sendiri dengan lock transaksi dan pembersihan foto setelah commit. Bukti regresi akses, rollback, konsistensi hitungan/CSV dan alur browser tercatat pada [TASK](TASK.md#halaman-laporan-terpadu-7-november--rfix-17); bukti lokal ini tidak mengubah risiko lingkungan tujuan di bawah.
 
 ## Daftar risiko aktif
 

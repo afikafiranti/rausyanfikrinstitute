@@ -19,7 +19,9 @@ class KajianReportSummaryTest extends TestCase
         $foreign = $this->member('alumni');
         $this->report($foreign, 'Kajian Asing', 'approved');
         $query = '?wilayah_id='.$foreign->wilayah_id;
-        $this->actingAs($viewer)->get('/laporan/rekap'.$query)->assertOk()->assertSee('Kajian Lokal')->assertDontSee('Kajian Asing')->assertDontSee('Draf Privat')
+        $this->actingAs($viewer)->get('/laporan/rekap'.$query)
+            ->assertRedirect('/laporan?wilayah_id='.$viewer->wilayah_id);
+        $this->get('/laporan'.$query)->assertOk()->assertSee('Kajian Lokal')->assertDontSee('Kajian Asing')->assertDontSee('Draf Privat')
             ->assertViewHas('totals', fn ($totals) => $totals['reports'] === 1 && $totals['participants'] === 5);
         $csv = $this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent();
         $this->assertStringContainsString('Kajian Lokal', $csv);
@@ -37,10 +39,16 @@ class KajianReportSummaryTest extends TestCase
         $this->report($a, 'Laporan Dikirim', 'submitted');
         $this->report($a, 'Luar Periode', 'approved', '2026-09-30');
         foreach (['admin', 'super_admin'] as $role) {
-            $this->actingAs($this->member($role))->get('/laporan/rekap')->assertOk()
+            $this->actingAs($this->member($role))->get('/laporan/rekap')->assertRedirect('/laporan');
+            $this->get('/laporan')->assertOk()
                 ->assertSee('Ditolak Wilayah Lain')->assertViewHas('totals', fn ($t) => $t['reports'] === 5 && $t['participants'] === 25 && $t['approved'] === 3 && $t['rejected'] === 1 && $t['submitted'] === 1);
             $query = '?'.http_build_query(['wilayah_id' => $a->wilayah_id, 'dari' => '2026-10-01', 'sampai' => '2026-10-16', 'status' => 'approved']);
-            $this->get('/laporan/rekap'.$query)->assertOk()->assertSee('Awal Periode')->assertSee('Akhir Periode')->assertDontSee('Luar Periode')->assertDontSee('Ditolak Wilayah Lain')->assertDontSee('Laporan Dikirim')
+            $redirect = $this->get('/laporan/rekap'.$query)->assertRedirect();
+            $this->assertSame('/laporan', parse_url($redirect->headers->get('Location'), PHP_URL_PATH));
+            parse_str(ltrim($query, '?'), $expectedFilters);
+            parse_str(parse_url($redirect->headers->get('Location'), PHP_URL_QUERY) ?? '', $redirectFilters);
+            $this->assertEquals($expectedFilters, $redirectFilters);
+            $this->get('/laporan'.$query)->assertOk()->assertSee('Awal Periode')->assertSee('Akhir Periode')->assertDontSee('Luar Periode')->assertDontSee('Ditolak Wilayah Lain')->assertDontSee('Laporan Dikirim')
                 ->assertViewHas('totals', fn ($t) => $t['reports'] === 2 && $t['participants'] === 10);
             $csv = $this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent();
             $this->assertStringContainsString('Awal Periode', $csv);
@@ -53,10 +61,10 @@ class KajianReportSummaryTest extends TestCase
     {
         $author = $this->member('alumni');
         for ($i = 1; $i <= 14; $i++) { $this->report($author, 'Kajian '.$i); }
-        $this->actingAs($this->member('admin'))->get('/laporan/rekap?status=submitted')->assertOk()
+        $this->actingAs($this->member('admin'))->get('/laporan?status=submitted')->assertOk()
             ->assertViewHas('totals', fn ($t) => $t['reports'] === 14 && $t['participants'] === 70)
             ->assertSee('status=submitted', false);
-        $this->get('/laporan/rekap?status=submitted&page=2')->assertOk()->assertSee('Kajian 2')->assertSee('Kajian 1');
+        $this->get('/laporan?status=submitted&page=2')->assertOk()->assertSee('Kajian 13')->assertSee('Kajian 14');
         $rows = $this->csvRows($this->get('/laporan/ekspor?status=submitted&page=2')->assertOk()->streamedContent());
         $this->assertCount(15, $rows);
         $this->assertSame('Kajian 1', $rows[1][2]);
@@ -94,6 +102,10 @@ class KajianReportSummaryTest extends TestCase
                 $this->getJson($url.'?'.http_build_query($query))->assertUnprocessable();
             }
         }
+        $this->get('/laporan?status=draft')->assertOk();
+        foreach ([['dari' => '2026-02-30'], ['wilayah_id' => 999999], ['status' => ['approved']]] as $query) {
+            $this->getJson('/laporan?'.http_build_query($query))->assertUnprocessable();
+        }
     }
 
     public function test_guests_alumni_inactive_and_unassigned_koorda_cannot_export_or_summarize(): void
@@ -110,7 +122,7 @@ class KajianReportSummaryTest extends TestCase
 
     public function test_empty_summary_has_zero_totals_and_export_only_header(): void
     {
-        $this->actingAs($this->member('admin'))->get('/laporan/rekap')->assertOk()->assertSee('Belum ada laporan sesuai filter.')
+        $this->actingAs($this->member('admin'))->get('/laporan')->assertOk()
             ->assertViewHas('totals', fn ($t) => $t['reports'] === 0 && $t['participants'] === 0);
         $rows = $this->csvRows($this->get('/laporan/ekspor')->assertOk()->streamedContent());
         $this->assertCount(1, $rows);

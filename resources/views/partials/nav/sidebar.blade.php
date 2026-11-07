@@ -51,19 +51,10 @@
                 {{-- Laporan --}}
                 @can('review-report')
                 <li class="items-center">
-                    <a href="{{ route('laporan.index') }}" class="{{ $link(request()->routeIs('laporan.index')) }}">
+                    <a href="{{ route('laporan.index') }}" class="{{ $link(request()->routeIs('laporan.*')) }}">
                         <i class="fas fa-file-lines mr-2 text-sm text-blueGray-300"></i> Laporan
                     </a>
                 </li>
-                @endcan
-
-                {{-- Review Laporan --}}
-                @can('review-report')
-                    <li class="items-center">
-                        <a href="{{ route('laporan.review') }}" class="{{ $link(request()->routeIs('laporan.review')) }}">
-                            <i class="fas fa-clipboard-check mr-2 text-sm text-blueGray-300"></i> Review Laporan
-                        </a>
-                    </li>
                 @endcan
 
                 {{-- Verifikasi --}}

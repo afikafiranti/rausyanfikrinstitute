@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Modal tambah/edit/detail Laporan, tombol singkat dan tooltip selektif diverifikasi pada pembaruan terakhir di bawah |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Laporan terpadu: filter/status, ringkasan, CSV dan aksi baris; modal serta responsivitas diuji dari baseline 2b56f97 |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -112,6 +112,21 @@ Route dan otorisasi existing dipertahankan. GET dengan `X-Report-Modal: 1` menge
 | Responsivitas | Modal dan kontrol diuji pada 320/390/768/1280 px, tanpa overflow. URL edit langsung membuka modal tanpa ID/form ganda. Screenshot desktop, ponsel dan pratinjau foto diperiksa |
 
 Log: `storage/logs/phpunit-report-modal-2026-11-07.txt` dan `phpunit-report-modal.xml`. Artefak browser: `storage/app/qa-report-ui-2026-11-07/modal-report.json`, `modal-1280.png`, `modal-390.png`, `modal-photo-390.png`; semuanya diabaikan Git. Server QA sementara port 8768 sudah dihentikan. Pemeriksaan ini merupakan pengujian modul dan alur browser, bukan pengulangan suite aplikasi penuh atau deployment server.
+
+## Halaman Laporan terpadu 7 November — RFIX-17
+
+Branch `develop`, baseline `2b56f97`. Arahan lanjutan pengguna menyatukan daftar, status, ringkasan, ekspor dan review di `/laporan`. Navigasi Review Laporan serta halaman review/rekap berulang dihapus; URL lama mengalihkan ke daftar dengan filter yang sesuai. Kontrak fungsi berada pada PRD, bukan register progres tambahan.
+
+Daftar dan CSV memakai scope/filter bersama. Hitungan laporan mencakup draf yang berizin, sedangkan kehadiran/CSV hanya laporan terkirim; petunjuk terlihat dan ekspor filter draf dinonaktifkan. Aksi baris mengikuti pemilik/status/kewenangan. Setujui/Tolak membuka modal pemeriksaan dan meminta konfirmasi keputusan; Tolak memfokuskan alasan. Penghapusan draf sendiri memakai lock transaksi, membersihkan foto sesudah commit, dan mempertahankan filter serta halaman valid. Tambah/edit/detail/foto tetap memakai modal yang sama.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi laporan dan navigasi | PHP 8.3.30/MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi. `php -d extension=zip vendor/bin/phpunit --filter 'KajianReport\|ReportAvailabilityTest\|UnifiedReportWorkspaceTest\|NavigationAccessibilityTest' --display-warnings --display-deprecations --display-notices`: **60 tests, 679 assertions**, tanpa failure/error/warning/deprecation/notice/skip. Termasuk scope, filter/CSV, larangan self-review, hapus draf/foto, rollback dan halaman terakhir setelah hapus |
+| Source dan aset | Lint 16 berkas PHP/Blade baru/berubah, `node --check resources/js/pages/reports.js`, `git diff --check` dan build Vite 7.3.7 lulus, 177 modul. Review independen backend/UI selesai tanpa temuan tersisa |
+| Chrome headless, data sintetis | Database `rf_report_browser_testing`: **10 kelompok pemeriksaan PASS**, tanpa page error. Mencakup satu navigasi Laporan, URL lama, filter/ringkasan/CSV, ekspor draf, keputusan modal, buat/detail/edit/foto privat, hapus batal/lanjut, scope koorda dan penolakan alumni |
+| Tampilan | Lebar 320/390/768/1280 px tanpa overflow. Screenshot halaman terpadu dan modal pada desktop/ponsel diperiksa; ringkasan berupa baris ringkas di atas satu daftar, aksi satu kata dengan tooltip selektif |
+
+Log: `storage/logs/phpunit-unified-report-2026-11-07.txt` dan `phpunit-unified-report.xml`. Artefak browser: `storage/app/qa-report-ui-2026-11-07/unified-report.json`, `unified-final.json`, `unified-workspace-1280.png`, `unified-workspace-390.png` dan screenshot modal pendamping, seluruhnya diabaikan Git. Server QA sementara port 8768 telah diverifikasi dan dihentikan. Pemeriksaan 18 dokumen/111 tautan lokal lulus tanpa tautan/anchor putus; ID keputusan/pekerjaan tetap lengkap. Verifikasi ini mencakup modul Laporan/navigasi; suite aplikasi penuh, CI remote dan staging tidak diulang. DOCX pengguna tetap identik dengan hash yang dicatat sebelumnya.
 
 ## Riwayat sebelum rencana RFIX
 

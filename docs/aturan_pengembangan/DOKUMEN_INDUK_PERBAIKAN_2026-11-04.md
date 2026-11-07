@@ -330,6 +330,7 @@ ID RFIX adalah spesifikasi pekerjaan dan kriteria penerimaan. Status, commit, pe
 - Samakan perilaku fokus modal tambah alumni dengan kebutuhan keyboard: fokus masuk, Escape, pembatasan fokus dan kembali ke pemicu.
 - Uji layar 320/390 piksel dan desktop, label/ID, pesan gagal dan tombol utama.
 - Jelaskan definisi hitungan “alumni” sesuai kontrak seluruh akun dalam scope; jangan mengubah angka diam-diam.
+- Ikuti arahan penyatuan alur Laporan pada [PRD](PRD.md#modul-laporan-kajian); jangan mempertahankan daftar/review/rekap sebagai tiga halaman kerja yang berulang.
 
 **Syarat selesai:** form yang sama dapat digunakan pada ukuran layar terkait; tidak ada field/aksi penting hilang dan tidak terjadi ID ganda.
 
