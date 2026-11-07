@@ -53,8 +53,8 @@
 }
 
 .rf-report-dialog::backdrop {background: rgb(15 23 42 / .6);}
-.rf-verification-dialog::backdrop {background: rgb(15 23 42 / .6);}
-.rf-verification-dialog [hidden] {display: none !important;}
+.rf-alumni-dialog::backdrop {background: rgb(15 23 42 / .6);}
+.rf-alumni-dialog [hidden] {display: none !important;}
 .rf-materi-dialog::backdrop {background: rgb(15 23 42 / .6);}
 .rf-materi-dialog [data-materi-content] {max-height: 92dvh; overflow-y: auto; border-radius: inherit; scroll-padding-block: 1rem 5rem;}
 .rf-materi-dialog [hidden] {display: none !important;}
@@ -76,4 +76,49 @@
   box-shadow: 0 8px 24px rgb(15 23 42 / .25);
 }
 
+.rf-feedback-dialog {
+  width: min(28rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: auto;
+  padding: 0;
+  border: 0;
+  border-radius: .75rem;
+  box-shadow: 0 20px 60px rgb(15 23 42 / .3);
+}
+.rf-feedback-dialog::backdrop {background: rgb(15 23 42 / .6);}
+.rf-feedback-panel {padding: 1.5rem;}
+.rf-feedback-toasts {
+  position: fixed;
+  z-index: 100;
+  inset: 1rem 1rem auto auto;
+  width: min(25rem, calc(100vw - 2rem));
+  max-height: calc(100dvh - 2rem);
+  margin: 0;
+  padding: 0;
+  overflow-y: auto;
+  border: 0;
+  background: transparent;
+  pointer-events: none;
+}
+.rf-toast {
+  display: flex;
+  align-items: start;
+  gap: .75rem;
+  margin-bottom: .5rem;
+  padding: .75rem;
+  border: 1px solid #94a3b8;
+  border-radius: .75rem;
+  background: white;
+  color: #14213d;
+  box-shadow: 0 8px 24px rgb(15 23 42 / .2);
+  font-size: .875rem;
+  line-height: 1.5;
+  pointer-events: auto;
+}
+.rf-toast > span {flex: 1; overflow-wrap: anywhere;}
+.rf-toast-success {border-color: #16a34a; background: #dcfce7; color: #14532d;}
+.rf-toast-error {border-color: #b91c1c; background: #fee2e2; color: #7f1d1d;}
+.rf-toast-info {border-color: #1d4ed8; background: #dbeafe; color: #1e3a8a;}
+.rf-toast-dismiss {min-width: 44px; min-height: 44px; margin: -.75rem; font-size: 1.5rem;}
+.rf-action-tooltip {position: fixed; z-index: 100; max-width: min(20rem, calc(100vw - 1rem)); padding: .5rem .75rem; border-radius: .5rem; background: #14213d; color: white; font-size: .8rem; line-height: 1.4; pointer-events: none;}
 

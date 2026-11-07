@@ -19,9 +19,9 @@ class VerificationController extends Controller
     {
         $actor = $request->user();
         abort_if(! $actor->hasAnyRole(['super_admin', 'admin']) && ! $actor->wilayah_id, 403, 'Wilayah belum ditetapkan pada akun.');
-        $filters = array_intersect_key($request->validated(), array_flip(['q', 'sort', 'dir']));
+        $filters = array_intersect_key($request->validated(), array_flip(['q']));
 
-        return redirect()->route('alumni.index', array_merge($filters, ['view' => 'verification']));
+        return redirect()->route('alumni.index', array_merge($filters, ['sort' => 'status', 'dir' => 'asc']));
     }
 
     public function approve(VerificationApproveRequest $request, User $user)

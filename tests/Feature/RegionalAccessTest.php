@@ -26,7 +26,7 @@ class RegionalAccessTest extends TestCase
             ->assertOk()
             ->assertSee('Alumni Sendiri')
             ->assertDontSee('Alumni Rahasia')
-            ->assertViewHas('totalAlumni', 2)
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 2)
             ->assertViewHas('wilayah', fn ($items) => $items->modelKeys() === [$ownRegion->id])
             ->assertDontSee('name="angkatan"', false);
 
@@ -57,7 +57,10 @@ class RegionalAccessTest extends TestCase
 
         $this->actingAs($koorda)->get(route('alumni.index', ['view' => 'verification']))
             ->assertOk()
-            ->assertViewHas('alumni', fn ($items) => $items->getCollection()->modelKeys() === [$ownTarget->id]);
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 2
+                && $items->getCollection()->contains('id', $ownTarget->id)
+                && ! $items->getCollection()->contains('id', $otherTarget->id))
+            ->assertViewHas('reviewableIds', fn ($ids) => $ids === [$ownTarget->id]);
         $this->post(route('verification.approve', $otherTarget), ['level_id' => $level->id])->assertForbidden();
         $this->post(route('verification.reject', $otherTarget), ['reason' => 'Bukan wilayah sendiri'])->assertForbidden();
         $this->assertSame(User::STATUS_PENDING, $otherTarget->fresh()->status);
@@ -113,10 +116,14 @@ class RegionalAccessTest extends TestCase
         $rejected = User::factory()->create(['wilayah_id' => $region->id]);
         $level = Level::create(['name' => 'Level 1', 'description' => 'dasar']);
 
-        $this->actingAs($admin)->get(route('alumni.index'))->assertOk()->assertViewHas('totalAlumni', 3);
+        $this->actingAs($admin)->get(route('alumni.index'))->assertOk()
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 3);
         $this->get(route('alumni.show', $target))->assertOk();
-        $this->get(route('verification.index'))->assertOk()
-            ->assertViewHas('alumni', fn ($items) => $items->total() === 2);
+        $this->get(route('verification.index'))->assertRedirect(route('alumni.index', ['sort' => 'status', 'dir' => 'asc']));
+        $this->get(route('alumni.index', ['sort' => 'status', 'dir' => 'asc']))->assertOk()
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 3)
+            ->assertViewHas('reviewableIds', fn ($ids) => count($ids) === 2
+                && in_array($target->id, $ids, true) && in_array($rejected->id, $ids, true));
         $this->post(route('verification.approve', $target), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();
         $this->post(route('verification.reject', $rejected), ['reason' => 'Data belum lengkap'])

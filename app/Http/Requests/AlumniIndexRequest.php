@@ -20,6 +20,7 @@ final class AlumniIndexRequest extends FormRequest
             'level_id'   => ['nullable','integer','min:1'],
             'ab'         => ['nullable','in:iya,tidak'],
             'view'       => ['nullable','in:all,verification'],
+            'modal'      => ['nullable','in:1,detail,delete,verification'],
             'sort'       => ['nullable','in:name,email,angkatan,wilayah,role,level,status,created_at'],
             'dir'        => ['nullable','in:asc,desc'],
             'page'       => ['nullable','integer','min:1'],

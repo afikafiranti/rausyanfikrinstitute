@@ -22,7 +22,7 @@ class NavigationAccessibilityTest extends TestCase
         $dom = new \DOMDocument;
         @$dom->loadHTML('<?xml encoding="UTF-8">'.$page->getContent());
         $xpath = new \DOMXPath($dom);
-        $this->assertSame('false', $xpath->query('//*[@id="modal-register-alumni"]')->item(0)->getAttribute('aria-hidden'));
+        $this->assertSame('true', $xpath->query('//*[@id="alumni-dialog"]')->item(0)->getAttribute('data-auto-create'));
 
         $this->flushSession();
         $this->actingAs($admin)->from('/alumni')->delete(route('alumni.destroy', $admin))
@@ -30,7 +30,7 @@ class NavigationAccessibilityTest extends TestCase
         $page = $this->get('/alumni')->assertOk();
         @$dom->loadHTML('<?xml encoding="UTF-8">'.$page->getContent());
         $xpath = new \DOMXPath($dom);
-        $this->assertSame('true', $xpath->query('//*[@id="modal-register-alumni"]')->item(0)->getAttribute('aria-hidden'));
+        $this->assertSame('false', $xpath->query('//*[@id="alumni-dialog"]')->item(0)->getAttribute('data-auto-create'));
     }
 
     public function test_internal_navigation_exposes_named_controls_dialog_and_skip_link_without_dummy_search(): void

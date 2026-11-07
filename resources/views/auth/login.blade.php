@@ -4,10 +4,6 @@
   <div class="rf-section">
     <h1 class="text-xl font-semibold mb-4">Masuk</h1>
 
-    @if(session('status'))
-      <div class="rf-card mb-4 bg-blue-50"> {{ session('status') }} </div>
-    @endif
-
     <form method="POST" action="{{ route('login') }}" class="space-y-3">
       @csrf
       <div>

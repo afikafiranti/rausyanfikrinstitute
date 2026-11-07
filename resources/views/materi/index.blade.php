@@ -12,9 +12,6 @@
             @endif
         </header>
 
-        @if (session('success'))
-            <p role="status" class="mt-4 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-900">{{ session('success') }}</p>
-        @endif
         @error('q')
             <p role="alert" class="mt-4 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800">{{ $message }}</p>
         @enderror
@@ -45,10 +42,10 @@
                         <p class="mt-2 line-clamp-2 break-words text-sm leading-6 text-muted">{{ $playlist->description }}</p>
                     @endif
                     <div role="group" aria-label="Aksi {{ $playlist->title }}" class="mt-3 flex flex-wrap gap-2">
-                        <a href="{{ route('materi.show', $playlist) }}" data-materi-modal class="rf-btn-secondary px-3">Detail</a>
+                        <a href="{{ route('materi.show', $playlist) }}" data-materi-modal class="rf-btn-secondary p-2" aria-label="Detail playlist {{ $playlist->title }}" title="Detail playlist {{ $playlist->title }}" data-action-tooltip="Detail playlist {{ $playlist->title }}"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></a>
                         @if ($canManage)
-                            <a href="{{ route('materi.playlists.edit', $playlist) }}" data-materi-modal class="rf-btn-secondary px-3">Edit</a>
-                            <a href="{{ route('materi.playlists.confirm-delete', $playlist) }}" data-materi-modal class="rf-btn-danger px-3">Hapus</a>
+                            <a href="{{ route('materi.playlists.edit', $playlist) }}" data-materi-modal class="rf-btn-secondary p-2" aria-label="Edit playlist {{ $playlist->title }}" title="Edit playlist {{ $playlist->title }}" data-action-tooltip="Edit playlist {{ $playlist->title }}"><i class="fas fa-pen" aria-hidden="true"></i></a>
+                            <a href="{{ route('materi.playlists.confirm-delete', $playlist) }}" data-materi-modal class="rf-btn-danger p-2" aria-label="Hapus playlist {{ $playlist->title }}" title="Hapus playlist {{ $playlist->title }}" data-action-tooltip="Hapus playlist {{ $playlist->title }}"><i class="fas fa-trash" aria-hidden="true"></i></a>
                         @endif
                     </div>
                 </li>

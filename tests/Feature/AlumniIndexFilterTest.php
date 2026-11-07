@@ -122,7 +122,7 @@ class AlumniIndexFilterTest extends TestCase
             ->assertSee('aria-label="Detail Alumni Icon Only"', false)
             ->assertSee('aria-label="Edit Alumni Icon Only"', false)
             ->assertSee('aria-label="Hapus Alumni Icon Only"', false)
-            ->assertSee('fas fa-eye', false)
+            ->assertSee('fas fa-magnifying-glass', false)
             ->assertSee('fas fa-pen', false)
             ->assertSee('fas fa-trash', false)
             ->assertDontSee('<i class="fas fa-eye"></i> Detail', false)

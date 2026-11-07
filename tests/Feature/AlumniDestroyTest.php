@@ -148,9 +148,9 @@ class AlumniDestroyTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('action="' . route('alumni.destroy', $alumni) . '"', false)
-            ->assertSee('action="' . route('alumni.destroy', $koorda) . '"', false)
-            ->assertDontSee('action="' . route('alumni.destroy', $otherAdmin) . '"', false);
+            ->assertSee('href="' . route('alumni.show', ['id' => $alumni->id, 'action' => 'delete']) . '"', false)
+            ->assertSee('href="' . route('alumni.show', ['id' => $koorda->id, 'action' => 'delete']) . '"', false)
+            ->assertDontSee('href="' . route('alumni.show', ['id' => $otherAdmin->id, 'action' => 'delete']) . '"', false);
     }
 
     public function test_delete_confirmation_does_not_interpret_a_user_name_as_javascript(): void
@@ -165,11 +165,9 @@ class AlumniDestroyTest extends TestCase
 
         foreach ($names as $name) {
             $alumni = $this->userWithRole('alumni', ['name' => $name]);
-            $response = $this->actingAs($admin)->get(route('alumni.index'))->assertOk();
-            $html = $response->getContent();
-            $action = preg_quote(route('alumni.destroy', $alumni), '/');
-            $this->assertSame(1, preg_match('/<form[^>]*action="'.$action.'"[^>]*onsubmit="([^"]*)"/s', $html, $match));
-            $this->assertSame("return confirm('Hapus akun ini? Tindakan ini tidak dapat dibatalkan.');", $match[1]);
+            $this->actingAs($admin)->get(route('alumni.show', ['id' => $alumni->id, 'modal' => 'delete']))
+                ->assertOk()->assertSee($name)->assertSee('action="'.route('alumni.destroy', $alumni).'"', false)
+                ->assertDontSee('onsubmit=', false)->assertDontSee('<strong>Nama</strong>', false);
         }
     }
 

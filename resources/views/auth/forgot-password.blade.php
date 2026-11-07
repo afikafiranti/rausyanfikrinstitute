@@ -5,10 +5,6 @@
     <h1 class="text-xl font-semibold mb-4">Lupa Password</h1>
     <p class="text-sm text-slate-600 mb-4">Masukkan email akun Anda untuk meminta tautan penggantian password. Periksa juga folder spam setelah mengirim permintaan.</p>
 
-    @if(session('status'))
-      <div role="status" class="rf-card mb-4 bg-blue-50">{{ session('status') }}</div>
-    @endif
-
     <form method="POST" action="{{ route('password.email') }}" class="space-y-3">
       @csrf
       <div>

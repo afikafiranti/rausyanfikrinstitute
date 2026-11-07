@@ -62,7 +62,7 @@ class UnifiedAlumniWorkspaceTest extends TestCase
         $target = $this->account("O'Rahman", 'alumni', 'pending');
         $level = Level::create(['name' => 'Dasar', 'is_active' => true]);
         $this->actingAs($admin)->get(route('verification.index'))
-            ->assertRedirect(route('alumni.index', ['view' => 'verification']));
+            ->assertRedirect(route('alumni.index', ['sort' => 'status', 'dir' => 'asc']));
         $this->get(route('alumni.show', $target))->assertOk()
             ->assertSee('id="verifikasi"', false)->assertSee('action="'.route('verification.approve', $target).'"', false);
         $this->postJson(route('verification.approve', $target), [])->assertUnprocessable()->assertJsonValidationErrors('level_id');
@@ -84,13 +84,22 @@ class UnifiedAlumniWorkspaceTest extends TestCase
         $other = Wilayah::create(['name' => 'Lain']);
         $actor = $this->account('Pengelola', 'koorda');
         $actor->update(['wilayah_id' => $region->id]);
+        $pendingId = null;
         foreach ([['Target Pending', 'alumni', 'pending', $region], ['Target Active', 'alumni', 'active', $region],
             ['Target Foreign', 'alumni', 'pending', $other], ['Target Manager', 'koorda', 'pending', $region]] as [$name, $role, $status, $area]) {
-            $this->account($name, $role, $status)->update(['wilayah_id' => $area->id]);
+            $user = $this->account($name, $role, $status);
+            $user->update(['wilayah_id' => $area->id]);
+            if ($name === 'Target Pending') {
+                $pendingId = $user->id;
+            }
         }
         $filters = ['view' => 'verification', 'q' => 'Target'];
         $this->actingAs($actor)->get(route('alumni.index', $filters))->assertOk()
-            ->assertViewHas('pendingCount', 1)->assertViewHas('alumni', fn ($rows) => $rows->total() === 1 && $rows->first()->name === 'Target Pending');
+            ->assertViewHas('alumni', fn ($rows) => $rows->total() === 3
+                && $rows->getCollection()->contains('name', 'Target Pending')
+                && $rows->getCollection()->contains('name', 'Target Active')
+                && $rows->getCollection()->contains('name', 'Target Manager'))
+            ->assertViewHas('reviewableIds', fn ($ids) => $ids === [$pendingId]);
         $csv = $this->get(route('alumni.csv.export', $filters + ['page' => 2]))->assertOk()->streamedContent();
         $this->assertStringContainsString('Target Pending', $csv);
         foreach (['Target Active', 'Target Foreign', 'Target Manager'] as $excluded) {
@@ -104,11 +113,11 @@ class UnifiedAlumniWorkspaceTest extends TestCase
         $target = $this->account('Target', 'alumni', 'pending');
         $level = Level::create(['name' => 'Dasar', 'is_active' => true]);
         $context = ['view' => 'verification', 'q' => 'Target', 'sort' => 'angkatan', 'dir' => 'desc', 'page' => 2];
-        $returnTo = route('alumni.index', $context, false);
+        $returnTo = route('alumni.index', array_diff_key($context, ['view' => true]), false);
         $this->actingAs($admin)->get(route('alumni.show', ['id' => $target->id] + $context))
             ->assertOk()->assertViewHas('returnTo', function ($url) use ($context) {
                 parse_str(parse_url($url, PHP_URL_QUERY), $actual);
-                return $actual == $context;
+                return $actual == array_diff_key($context, ['view' => true]);
             });
         $this->postJson(route('verification.approve', $target), ['level_id' => $level->id, '_return' => 'https://example.test/alumni?view=verification'])
             ->assertUnprocessable()->assertJsonValidationErrors('_return');

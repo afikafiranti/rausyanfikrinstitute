@@ -5,9 +5,7 @@
     <h1 class="text-xl font-semibold mb-2">Verifikasi Email</h1>
     <p class="text-sm text-slate-600">Verifikasi alamat email melalui tautan di inbox Anda. Anda dapat meminta tautan baru di bawah ini.</p>
 
-    @if (session('status') == 'verification-link-sent')
-      <div role="status" class="rf-card mt-3 bg-green-50">Email verifikasi baru telah dikirim.</div>
-    @elseif (session('status') == 'verification-link-failed')
+    @if (session('status') == 'verification-link-failed')
       <div role="alert" class="rf-card mt-3 bg-red-50">Email verifikasi belum dapat dikirim. Coba kirim ulang nanti. Akun Anda tetap tersimpan.</div>
     @endif
 

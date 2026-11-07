@@ -67,7 +67,7 @@ ID RFIX adalah spesifikasi pekerjaan dan kriteria penerimaan. Status, commit, pe
 **Langkah:**
 
 - Reproduksi dengan nama biasa, apostrof, kutip ganda, karakter HTML dan ekspresi penanda sintetis pada lingkungan uji.
-- Gunakan pesan konfirmasi statis atau atribut data yang dibaca sebagai teks; pilih perubahan terkecil.
+- Gunakan modal aplikasi sesuai [kontrak umpan balik](PRD.md#umpan-balik-antarmuka); nama/pesan dinamis tetap diperlakukan sebagai teks.
 - Pertahankan CSRF, method DELETE, batas aktor/target dan larangan penghapusan yang sudah berlaku.
 - Uji handler melalui browser aplikasi ketika runtime tersedia, termasuk batal dan lanjut hapus.
 - Jalankan pengujian endpoint penghapusan serta build bila JavaScript/aset berubah.
@@ -320,6 +320,8 @@ Penggantian grafik AB dengan Pekerjaan Alumni dan batas bulan pertumbuhan mengik
 **Syarat selesai:** ekspor tidak gagal diam-diam pada volume yang didukung; batas berdasarkan pengukuran; hasil tetap mengikuti izin dan filter.
 
 ### RFIX-17 — Rapikan form dan interaksi tanpa mengubah cakupan data
+
+Konfirmasi/toast lintas aplikasi mengikuti [Umpan Balik Antarmuka](PRD.md#umpan-balik-antarmuka); pola ikon daftar mengikuti DESIGN.
 
 **Asal:** perapian UX. **Prioritas:** P2.
 

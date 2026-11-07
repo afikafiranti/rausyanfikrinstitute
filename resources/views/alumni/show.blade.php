@@ -8,11 +8,7 @@
             ->implode(', ');
     @endphp
 
-    @if (session('success'))
-        <div class="mx-auto mb-4 max-w-5xl rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-            {{ session('success') }}
-        </div>
-    @endif
+
 
     @if ($errors->any())
         <div class="mx-auto mb-4 max-w-5xl rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
@@ -153,6 +149,9 @@
             </a>
         </div>
     </div>
+    @if (request('action') === 'delete' && $canEditProfile && !$alumni->is(auth()->user()))
+        <div class="rf-card mx-auto mt-6 max-w-3xl">@include('alumni.partials.delete')</div>
+    @endif
     @if ($canVerify)
         <section id="verifikasi" class="rf-card mx-auto mt-6 max-w-3xl" aria-labelledby="verification-detail-heading">
             <h2 id="verification-detail-heading" class="text-xl font-semibold">Verifikasi {{ $alumni->name }}</h2>

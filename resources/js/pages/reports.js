@@ -1,3 +1,5 @@
+import { confirmAction, toast } from '../components/feedback';
+
 export function initReportModals() {
   const dialog = document.getElementById('report-dialog');
   if (!dialog || typeof dialog.showModal !== 'function') return;
@@ -127,9 +129,10 @@ export function initReportModals() {
     dialog.showModal();
     document.documentElement.classList.add('overflow-hidden');
   };
-  const close = () => {
+  const close = async () => {
     if (saving) return;
-    if (isDirty() && !confirm('Perubahan draf belum disimpan. Tutup formulir?')) return;
+    if (isDirty() && !await confirmAction({ title: 'Tutup formulir?', message: 'Perubahan draf belum disimpan dan akan hilang.', confirmLabel: 'Tutup', danger: true })) return;
+    if (saving || !dialog.open) return;
     baseline = contentSnapshot();
     request?.abort();
     request = null;
@@ -193,6 +196,7 @@ export function initReportModals() {
     } catch (error) {
       if (error.name === 'AbortError' || request !== loading || !dialog.open) return false;
       showState(error.message || 'Koneksi gagal. Coba lagi.', { retry: true });
+      toast(error.message || 'Koneksi gagal. Coba lagi.', { type: 'error' });
       live.textContent = 'Gagal membuka laporan';
       return false;
     }
@@ -215,7 +219,7 @@ export function initReportModals() {
   const workspaceStatus = (message, error = false) => {
     const status = document.querySelector('[data-report-workspace-status]');
     if (!status) return;
-    status.hidden = false;
+    status.hidden = !message;
     status.textContent = message;
     status.classList.toggle('border-red-300', error);
     status.classList.toggle('bg-red-50', error);
@@ -235,6 +239,7 @@ export function initReportModals() {
     if (summary) { summary.hidden = true; summary.replaceChildren(); }
   };
   const showErrors = (form, payload) => {
+    toast(payload.errors ? 'Periksa isian yang ditandai.' : (payload.message || 'Permintaan gagal.'), { type: 'error' });
     const summary = form.querySelector('[data-report-form-errors]');
     if (!summary) return;
     summary.hidden = false;
@@ -270,11 +275,15 @@ export function initReportModals() {
 
   const submit = async form => {
     if (saving) return;
-    if (form.dataset.reportDecision && !confirm(
-      form.dataset.reportDecision === 'approve'
-        ? 'Setujui laporan ini? Keputusan tidak dapat diubah.'
-        : 'Tolak laporan ini dengan alasan yang sudah ditulis? Keputusan tidak dapat diubah.'
-    )) return;
+    if (form.dataset.reportDecision && !await confirmAction({
+      title: form.dataset.reportDecision === 'approve' ? 'Setujui laporan?' : 'Tolak laporan?',
+      message: form.dataset.reportDecision === 'approve'
+        ? 'Laporan akan disetujui. Keputusan ini tidak dapat diubah.'
+        : 'Laporan akan ditolak dengan alasan yang ditulis. Keputusan ini tidak dapat diubah.',
+      confirmLabel: form.dataset.reportDecision === 'approve' ? 'Setujui' : 'Tolak',
+      danger: form.dataset.reportDecision !== 'approve',
+    })) return;
+    if (saving || !dialog.open) return;
     const body = new FormData(form);
     saving = true;
     dialog.setAttribute('aria-busy', 'true');
@@ -306,30 +315,31 @@ export function initReportModals() {
         return;
       }
       live.textContent = payload.message || 'Laporan tersimpan';
+      toast(payload.message || 'Laporan tersimpan.', { type: 'success' });
       let refreshed = false;
       try { refreshed = await refreshWorkspace(); } catch { /* save already succeeded */ }
       const opened = await load(payload.modal_url);
       if (dialog.open) {
-        const notice = document.createElement('div');
-        notice.setAttribute('role', 'status');
-        notice.className = refreshed
-          ? 'm-5 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-900'
-          : 'm-5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900';
-        const visible = [...(document.querySelector('[data-report-list]')?.querySelectorAll('a[data-report-modal]') || [])]
-          .some(link => link.href === payload.modal_url);
-        notice.textContent = opened
-          ? `${payload.message || 'Laporan tersimpan.'} ${refreshed && !visible ? 'Laporan tidak tampil dalam daftar dengan filter atau halaman saat ini. ' : ''}`
-          : 'Perubahan tersimpan; detail belum terbuka. ';
-        if (!refreshed) {
-          notice.append('Daftar laporan belum terbarui. ');
-          const button = document.createElement('button');
-          button.type = 'button';
-          button.dataset.reportRefresh = '';
-          button.className = 'ml-2 font-semibold underline';
-          button.textContent = 'Segarkan';
-          notice.append(button);
+        const visible = [...(document.querySelector('[data-report-list]')?.querySelectorAll('a[data-report-modal]') || [])].some(link => link.href === payload.modal_url);
+        if (!refreshed || !opened || !visible) {
+          const notice = document.createElement('div');
+          notice.setAttribute('role', 'status');
+          notice.className = refreshed
+            ? 'm-5 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-900'
+            : 'm-5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900';
+          notice.textContent = opened
+            ? (refreshed ? 'Laporan tidak tampil dalam daftar dengan filter atau halaman saat ini. ' : 'Daftar laporan belum terbarui. ')
+            : 'Detail laporan belum terbuka. ';
+          if (!refreshed) {
+            const button = document.createElement('button');
+            button.type = 'button';
+            button.dataset.reportRefresh = '';
+            button.className = 'ml-2 font-semibold underline';
+            button.textContent = 'Segarkan';
+            notice.append(button);
+          }
+          content.prepend(notice);
         }
-        content.prepend(notice);
       }
     } catch {
       showErrors(form, { message: 'Koneksi terputus. Periksa daftar laporan sebelum mencoba lagi agar data tidak terkirim dua kali.' });
@@ -343,7 +353,8 @@ export function initReportModals() {
   };
 
   const deleteDraft = async form => {
-    if (saving || !confirm('Hapus draf ini beserta foto dokumentasinya secara permanen?')) return;
+    if (saving || !await confirmAction({ title: 'Hapus draf?', message: 'Draf dan foto dokumentasinya akan dihapus permanen.', confirmLabel: 'Hapus', danger: true })) return;
+    if (saving) return;
     saving = true;
     const button = form.querySelector('button[type="submit"]');
     if (button) button.disabled = true;
@@ -356,14 +367,18 @@ export function initReportModals() {
       });
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || payload.deleted !== true) {
-        workspaceStatus(payload.message || `Draf gagal dihapus (${response.status}).`, true);
+        workspaceStatus('');
+        toast(payload.message || 'Draf gagal dihapus.', { type: 'error' });
         return;
       }
       let refreshed = false;
       try { refreshed = await refreshWorkspace(); } catch { /* deletion already succeeded */ }
-      workspaceStatus(refreshed ? (payload.message || 'Draf dihapus.') : 'Draf dihapus, tetapi daftar belum terbarui. Muat ulang halaman.', !refreshed);
+      workspaceStatus('');
+      document.querySelector('[data-report-list] a[data-report-modal], [data-report-workspace] a[data-report-modal]')?.focus();
+      toast(refreshed ? (payload.message || 'Draf dihapus.') : 'Draf dihapus, tetapi daftar belum terbarui. Muat ulang halaman.', { type: refreshed ? 'success' : 'error' });
     } catch {
-      workspaceStatus('Koneksi terputus. Periksa daftar sebelum mencoba menghapus lagi.', true);
+      workspaceStatus('');
+      toast('Koneksi terputus. Periksa daftar sebelum mencoba menghapus lagi.', { type: 'error' });
     } finally {
       saving = false;
       if (button?.isConnected) button.disabled = false;
@@ -401,7 +416,7 @@ export function initReportModals() {
     });
   };
 
-  document.addEventListener('click', event => {
+  document.addEventListener('click', async event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
     const closer = target.closest('[data-report-close]');
@@ -423,7 +438,11 @@ export function initReportModals() {
     const link = target.closest('a[data-report-modal]');
     if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') return;
     if (saving) { event.preventDefault(); return; }
-    if (dialog.open && isDirty() && !confirm('Perubahan draf belum disimpan. Pindah halaman?')) { event.preventDefault(); return; }
+    if (dialog.open && isDirty()) {
+      event.preventDefault();
+      if (!await confirmAction({ title: 'Pindah halaman?', message: 'Perubahan draf belum disimpan dan akan hilang.', confirmLabel: 'Pindah', danger: true })) return;
+      if (saving || !dialog.open) return;
+    }
     try { sameOriginUrl(link.href); } catch { return; }
     event.preventDefault();
     load(link.href, link.dataset.reportFocus || null);
@@ -517,9 +536,6 @@ export function initReportModals() {
     }
   });
   window.addEventListener('scroll', hideTooltip, true);
-  window.addEventListener('beforeunload', event => {
-    if (saving || (dialog.open && isDirty())) { event.preventDefault(); event.returnValue = ''; }
-  });
   const standalone = [...document.querySelectorAll('[data-report-modal-content]')].find(node => !dialog.contains(node));
   if (standalone) {
     directReturnUrl = standalone.querySelector('[data-report-close]')?.href || null;

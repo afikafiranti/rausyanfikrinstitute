@@ -18,9 +18,6 @@
       </form>
     </div>
 
-    @if (session('success'))
-      <div class="rf-card mb-4 bg-green-50">{{ session('success') }}</div>
-    @endif
 
     <div class="rounded-xl bg-white p-4 shadow">
       <div class="flex items-center justify-between mb-3">
@@ -70,9 +67,6 @@
       </form>
     </div>
 
-    @if (session('success'))
-      <div class="rf-card mt-3 bg-green-50">{{ session('success') }}</div>
-    @endif
 
     <div class="mt-3 space-y-3">
       @forelse($notifications as $n)

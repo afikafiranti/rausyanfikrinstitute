@@ -71,6 +71,8 @@ class User extends Authenticatable implements MustVerifyEmail
             $query->orderBy(Role::query()->select('roles.name')
                 ->join('role_user', 'roles.id', '=', 'role_user.role_id')
                 ->whereColumn('role_user.user_id', 'users.id')->orderBy('roles.name')->limit(1), $direction);
+        } elseif ($sort === 'users.status') {
+            $query->orderByRaw("CASE users.status WHEN 'pending' THEN 0 WHEN 'active' THEN 1 WHEN 'suspended' THEN 2 ELSE 3 END {$direction}");
         } else {
             $query->orderBy($sort, $direction);
         }

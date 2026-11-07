@@ -23,7 +23,7 @@ class AlumniEditTest extends TestCase
 
         $response
             ->assertOk()
-            ->assertSee('Edit Data Alumni')
+            ->assertSee('Edit alumni')
             ->assertSee('Andi Puji Lestari')
             ->assertSee('name="name"', false)
             ->assertSee(route('alumni.update', $alumni), false);

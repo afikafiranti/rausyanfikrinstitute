@@ -37,8 +37,8 @@
                     <div role="group" aria-label="Aksi video {{ $video->title }}" class="flex flex-wrap gap-2">
                         <a href="https://www.youtube.com/watch?v={{ rawurlencode($video->youtube_video_id) }}" target="_blank" rel="noopener noreferrer" aria-label="Tonton {{ $video->title }} di YouTube (tab baru)" class="rf-btn-secondary px-3">Tonton</a>
                         @if ($canManage)
-                            <a href="{{ route('materi.videos.edit', [$playlist, $video]) }}" data-materi-modal class="rf-btn-secondary px-3">Edit</a>
-                            <a href="{{ route('materi.videos.confirm-delete', [$playlist, $video]) }}" data-materi-modal class="rf-btn-danger px-3">Hapus</a>
+                            <a href="{{ route('materi.videos.edit', [$playlist, $video]) }}" data-materi-modal class="rf-btn-secondary p-2" aria-label="Edit video {{ $video->title }}" title="Edit video {{ $video->title }}" data-action-tooltip="Edit video {{ $video->title }}"><i class="fas fa-pen" aria-hidden="true"></i></a>
+                            <a href="{{ route('materi.videos.confirm-delete', [$playlist, $video]) }}" data-materi-modal class="rf-btn-danger p-2" aria-label="Hapus video {{ $video->title }}" title="Hapus video {{ $video->title }}" data-action-tooltip="Hapus video {{ $video->title }}"><i class="fas fa-trash" aria-hidden="true"></i></a>
                         @endif
                     </div>
                 </li>

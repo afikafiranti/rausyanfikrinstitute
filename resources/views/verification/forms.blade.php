@@ -1,7 +1,10 @@
 @php($restore = $target && (string) old('_verification_target') === (string) $target->id)
+<section data-alumni-modal-content class="p-5 sm:p-6">
+<h2 id="alumni-modal-heading" tabindex="-1" class="pr-20 text-xl font-semibold">Verifikasi akun</h2>
+<p class="mt-3 break-words font-semibold">{{ $target->name }}</p><p class="mt-1 break-words text-sm text-muted">{{ $target->email }}</p>
 <div data-verification-forms>
     @if ($restore && $errors->any())<div role="alert" class="mt-4 rounded-lg bg-red-50 p-3 text-red-800"><ul>@foreach ($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-    <form data-verification-form="approve" action="{{ $target ? route('verification.approve', $target) : '' }}" method="POST" class="mt-5 space-y-3">
+    <form data-alumni-form data-alumni-confirm-title="Setujui akun?" data-alumni-confirm="Akun akan diaktifkan sesuai level yang dipilih." data-alumni-confirm-label="Setujui" data-verification-form="approve" action="{{ $target ? route('verification.approve', $target) : '' }}" method="POST" class="mt-5 space-y-3">
         @csrf
         @if ($target)<input type="hidden" name="_return" value="{{ $returnTo }}">@endif
         <input type="hidden" name="_verification_target" value="{{ $target?->id }}">
@@ -11,7 +14,7 @@
         @if ($levels->isEmpty())<p class="text-sm text-amber-800">Belum ada level aktif untuk persetujuan.</p>@endif
         <button type="submit" class="rf-btn" @disabled($levels->isEmpty())>Setujui</button>
     </form>
-    <form data-verification-form="reject" action="{{ $target ? route('verification.reject', $target) : '' }}" method="POST" class="mt-6 space-y-3 border-t border-slate-200 pt-5">
+    <form data-alumni-form data-alumni-confirm-title="Kirim alasan?" data-alumni-confirm="Alasan perbaikan dikirim kepada pemilik akun. Akun tetap menunggu verifikasi." data-alumni-confirm-label="Kirim" data-verification-form="reject" action="{{ $target ? route('verification.reject', $target) : '' }}" method="POST" class="mt-6 space-y-3 border-t border-slate-200 pt-5">
         @csrf
         @if ($target)<input type="hidden" name="_return" value="{{ $returnTo }}">@endif
         <input type="hidden" name="_verification_target" value="{{ $target?->id }}">
@@ -21,3 +24,4 @@
         <button type="submit" class="rf-btn-danger">Tolak</button>
     </form>
 </div>
+</section>

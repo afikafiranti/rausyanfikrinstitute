@@ -39,7 +39,7 @@ Penyatuan halaman Laporan (RFIX-17) memakai scope/filter bersama untuk daftar da
 
 Penyatuan Materi (RFIX-17) membedakan akses pengelola aktif dan akses belajar anggota pada server. Modal tidak menggantikan pemeriksaan role, level, status terbit atau relasi video–playlist. Penghapusan playlist tetap meminta konfirmasi eksplisit dan menghapus video terkait melalui relasi database; schema dan kelayakan anggota tidak diubah. Hasil regresi serta batas bukti mengikuti [TASK](TASK.md).
 
-Penyatuan Alumni/Verifikasi (RFIX-17) mempertahankan gate, scope wilayah, batas role target, larangan self-review dan transaksi keputusan. Pemilihan tab bukan sumber kewenangan. Query daftar/ekspor harus tetap selaras dan pengurutan multi-role tidak boleh menggandakan akun; hasil regresi dicatat pada [TASK](TASK.md).
+Penyatuan Alumni/Verifikasi (RFIX-17) mempertahankan gate, scope wilayah, batas role target, larangan self-review dan transaksi keputusan. Pembukaan modal bukan sumber kewenangan. Daftar tunggal dan ekspor memakai cakupan yang sama; pengurutan multi-role tidak boleh menggandakan akun. Konfirmasi serta toast global tidak menggantikan validasi/mutasi server; pesan dipasang sebagai teks dan toast harus dapat ditutup ketika modal terbuka, termasuk browser tanpa Popover API. Hasil regresi dicatat pada [TASK](TASK.md).
 
 ## Daftar risiko aktif
 

@@ -43,7 +43,7 @@ class AlumniListingQueryTest extends TestCase
     {
         $admin = $this->account('admin', 'Admin Actor');
         $target = $this->account('alumni', 'Alumni Target');
-        $action = 'action="'.route('alumni.destroy', $target).'"';
+        $action = 'href="'.route('alumni.show', ['id' => $target->id, 'action' => 'delete']).'"';
 
         $this->actingAs($admin)->get(route('alumni.index'))
             ->assertOk()->assertSee($action, false);

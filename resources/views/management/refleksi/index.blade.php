@@ -91,14 +91,14 @@
                             </div>
                         </div>
                         <div class="mt-3 flex flex-wrap gap-2 border-t border-slate-200 pt-3">
-                            <button type="button" class="edit-post-btn rf-btn-secondary" data-id="{{ $post->id }}"
+                            <button type="button" class="edit-post-btn rf-btn-secondary p-2" aria-label="Edit artikel {{ $post->title }}" title="Edit artikel {{ $post->title }}" data-action-tooltip="Edit artikel {{ $post->title }}" data-id="{{ $post->id }}"
                                 data-title="{{ $post->title }}" data-excerpt="{{ $post->excerpt }}" data-content="{{ $post->content }}"
-                                data-type="{{ $post->type }}" data-update-url="{{ route('management.post.update', $post) }}">Edit</button>
+                                data-type="{{ $post->type }}" data-update-url="{{ route('management.post.update', $post) }}"><i class="fas fa-pen" aria-hidden="true"></i></button>
                             <form action="{{ route('management.post.destroy', $post->id) }}" method="POST"
-                                onsubmit="return confirm('Yakin ingin menghapus artikel ini?')">
+                                data-confirm-title="Hapus artikel" data-confirm-message="Artikel ini akan dihapus permanen." data-confirm-label="Hapus" data-confirm-danger>
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="rf-btn-danger">Hapus</button>
+                                <button type="submit" class="rf-btn-danger p-2" aria-label="Hapus artikel {{ $post->title }}" title="Hapus artikel {{ $post->title }}" data-action-tooltip="Hapus artikel {{ $post->title }}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                             </form>
                         </div>
                     </article>
@@ -135,19 +135,19 @@
                                 <td class="py-2">
                                     <div class="flex gap-3">
                                         <button
-                                            type="button" class="edit-post-btn rf-text-action"
+                                            type="button" class="edit-post-btn rf-btn-secondary p-2" aria-label="Edit artikel {{ $post->title }}" title="Edit artikel {{ $post->title }}" data-action-tooltip="Edit artikel {{ $post->title }}"
                                             data-id="{{ $post->id }}" data-title="{{ $post->title }}"
                                             data-excerpt="{{ $post->excerpt }}" data-content="{{ $post->content }}"
                                             data-type="{{ $post->type }}"
                                             data-update-url="{{ route('management.post.update', $post) }}">
-                                            Edit
+                                            <i class="fas fa-pen" aria-hidden="true"></i>
                                         </button>
 
                                         <form action="{{ route('management.post.destroy', $post->id) }}" method="POST"
-                                            onsubmit="return confirm('Yakin ingin menghapus artikel ini?')">
+                                            data-confirm-title="Hapus artikel" data-confirm-message="Artikel ini akan dihapus permanen." data-confirm-label="Hapus" data-confirm-danger>
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="rf-text-action text-[#C5282F]">Hapus</button>
+                                            <button type="submit" class="rf-btn-danger p-2" aria-label="Hapus artikel {{ $post->title }}" title="Hapus artikel {{ $post->title }}" data-action-tooltip="Hapus artikel {{ $post->title }}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                                         </form>
                                     </div>
                                 </td>

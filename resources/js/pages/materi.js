@@ -1,3 +1,5 @@
+import { confirmAction, toast } from '../components/feedback';
+
 export function initMateriModals() {
   const dialog = document.getElementById('materi-dialog');
   if (!dialog || typeof dialog.showModal !== 'function') return;
@@ -33,16 +35,6 @@ export function initMateriModals() {
   const snapshot = () => [...content.querySelectorAll('form[data-materi-form]:not([data-materi-delete])')]
     .map(form => [...new FormData(form)].map(([key, value]) => JSON.stringify([key, value])).join('|')).join('||');
   const isDirty = () => snapshot() !== baseline;
-  const workspaceStatus = (message, error = false) => {
-    const status = document.querySelector('[data-materi-workspace-status]');
-    if (!status) return;
-    status.hidden = false;
-    status.textContent = message;
-    status.classList.toggle('border-red-300', error);
-    status.classList.toggle('bg-red-50', error);
-    status.classList.toggle('text-red-800', error);
-    status.focus();
-  };
   const showState = (message, failed = false) => {
     content.replaceChildren();
     baseline = '';
@@ -83,9 +75,10 @@ export function initMateriModals() {
     dialog.showModal();
     document.documentElement.classList.add('overflow-hidden');
   };
-  const close = (saved = false) => {
+  const close = async (saved = false) => {
     if (saving && !saved) return;
-    if (!saved && isDirty() && !confirm('Perubahan belum disimpan. Tutup formulir?')) return;
+    if (!saved && isDirty() && !await confirmAction({ title: 'Tutup formulir?', message: 'Perubahan belum disimpan dan akan hilang.', confirmLabel: 'Tutup', danger: true })) return;
+    if (!saved && (saving || !dialog.open)) return;
     baseline = snapshot();
     request?.abort();
     request = null;
@@ -129,6 +122,7 @@ export function initMateriModals() {
     } catch (error) {
       if (error.name === 'AbortError' || request !== loading || !dialog.open) return false;
       showState(error.message || 'Koneksi gagal. Coba lagi.', true);
+      toast(error.message || 'Koneksi gagal. Coba lagi.', { type: 'error' });
       live.textContent = 'Gagal membuka materi';
       return false;
     }
@@ -160,6 +154,7 @@ export function initMateriModals() {
     if (summary) { summary.hidden = true; summary.replaceChildren(); }
   };
   const showErrors = (form, payload) => {
+    toast(payload.errors ? 'Periksa isian yang ditandai.' : (payload.message || 'Permintaan gagal.'), { type: 'error' });
     const summary = form.querySelector('[data-materi-form-errors]');
     if (!summary) return;
     summary.hidden = false;
@@ -222,6 +217,7 @@ export function initMateriModals() {
       let refreshed = false;
       try { refreshed = await refreshWorkspace(); } catch { /* mutation already succeeded */ }
       if (payload.deleted === true) {
+        toast(payload.message || 'Playlist dihapus.', { type: 'success' });
         baseline = snapshot();
         if (directReturnUrl) {
           showState(payload.message || 'Playlist dihapus.');
@@ -230,24 +226,25 @@ export function initMateriModals() {
           return;
         }
         close(true);
-        workspaceStatus(refreshed ? (payload.message || 'Playlist dihapus.') : 'Playlist dihapus, tetapi daftar belum terbarui. Muat ulang halaman.', !refreshed);
+        if (!refreshed) toast('Daftar belum terbarui. Muat ulang halaman.', { type: 'error' });
         return;
       }
       const opened = await load(payload.modal_url);
       if (!dialog.open) return;
-      const notice = document.createElement('p');
-      notice.role = 'status';
-      notice.className = refreshed
-        ? 'm-5 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-900'
-        : 'm-5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900';
-      const visible = [...(document.querySelector('[data-materi-list]')?.querySelectorAll('a[data-materi-modal]') || [])]
-        .some(link => link.href === payload.modal_url);
-      notice.textContent = opened
-        ? `${payload.message || 'Materi tersimpan.'} ${refreshed && !visible ? 'Playlist tidak tampil dalam daftar dengan pencarian atau halaman saat ini.' : ''}`
-        : 'Perubahan tersimpan; detail belum terbuka.';
-      if (!refreshed) notice.append(' Daftar belum terbarui. Muat ulang halaman.');
-      content.prepend(notice);
+      const visible = [...(document.querySelector('[data-materi-list]')?.querySelectorAll('a[data-materi-modal]') || [])].some(link => link.href === payload.modal_url);
+      if (!refreshed || !opened || !visible) {
+        const notice = document.createElement('p');
+        notice.role = 'status';
+        notice.className = refreshed
+          ? 'm-5 rounded-lg border border-green-300 bg-green-50 p-3 text-sm text-green-900'
+          : 'm-5 rounded-lg border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900';
+        notice.textContent = opened
+          ? (refreshed ? 'Playlist tidak tampil dalam daftar dengan pencarian atau halaman saat ini.' : 'Daftar belum terbarui. Muat ulang halaman.')
+          : 'Detail materi belum terbuka.';
+        content.prepend(notice);
+      }
       live.textContent = payload.message || 'Materi tersimpan';
+      toast(payload.message || 'Materi tersimpan.', { type: 'success' });
     } catch {
       showErrors(form, { message: 'Koneksi terputus. Periksa daftar materi sebelum mencoba lagi agar data tidak terkirim dua kali.' });
     } finally {
@@ -260,7 +257,7 @@ export function initMateriModals() {
     }
   };
 
-  document.addEventListener('click', event => {
+  document.addEventListener('click', async event => {
     const target = event.target instanceof Element ? event.target : null;
     if (!target) return;
     const closer = target.closest('[data-materi-close]');
@@ -270,7 +267,11 @@ export function initMateriModals() {
     const link = target.closest('a[data-materi-modal]');
     if (!link || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || link.target === '_blank') return;
     if (saving) { event.preventDefault(); return; }
-    if (dialog.open && isDirty() && !confirm('Perubahan belum disimpan. Pindah formulir?')) { event.preventDefault(); return; }
+    if (dialog.open && isDirty()) {
+      event.preventDefault();
+      if (!await confirmAction({ title: 'Pindah formulir?', message: 'Perubahan belum disimpan dan akan hilang.', confirmLabel: 'Pindah', danger: true })) return;
+      if (saving || !dialog.open) return;
+    }
     try { sameOriginUrl(link.href); } catch { return; }
     event.preventDefault();
     load(link.href);
@@ -317,9 +318,6 @@ export function initMateriModals() {
     if (event.target !== dialog) return;
     const bounds = content.getBoundingClientRect();
     if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) close();
-  });
-  window.addEventListener('beforeunload', event => {
-    if (saving || (dialog.open && isDirty())) { event.preventDefault(); event.returnValue = ''; }
   });
 
   const standalone = [...document.querySelectorAll('[data-materi-modal-content]')].find(node => !dialog.contains(node));

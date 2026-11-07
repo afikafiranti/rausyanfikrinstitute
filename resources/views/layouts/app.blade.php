@@ -47,6 +47,7 @@
         };
     </script>
     @include('partials.nav.drawer')
+    @include('components.feedback')
 
 </body>
 

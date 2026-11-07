@@ -60,13 +60,13 @@
                                     data-caption="{{ $gallery->caption }}"
                                     data-image="{{ $gallery->public_image_url }}"
                                     data-update-url="{{ route('management.galeri.update', $gallery) }}"
-                                    type="button" class="edit-btn rf-btn-secondary">
-                                    Edit
+                                    type="button" class="edit-btn rf-btn-secondary p-2" aria-label="Edit galeri {{ $gallery->title }}" title="Edit galeri {{ $gallery->title }}" data-action-tooltip="Edit galeri {{ $gallery->title }}">
+                                    <i class="fas fa-pen" aria-hidden="true"></i>
                                 </button>
                                 <form action="{{ route('management.galeri.destroy', $gallery->id) }}" method="POST"
-                                    onsubmit="return confirm('Hapus galeri ini?')">
+                                    data-confirm-title="Hapus galeri" data-confirm-message="Galeri ini akan dihapus permanen." data-confirm-label="Hapus" data-confirm-danger>
                                     @csrf @method('DELETE')
-                                    <button type="submit" class="rf-btn-danger">Hapus</button>
+                                    <button type="submit" class="rf-btn-danger p-2" aria-label="Hapus galeri {{ $gallery->title }}" title="Hapus galeri {{ $gallery->title }}" data-action-tooltip="Hapus galeri {{ $gallery->title }}"><i class="fas fa-trash" aria-hidden="true"></i></button>
                                 </form>
                             </div>
                         </article>

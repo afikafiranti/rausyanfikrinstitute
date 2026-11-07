@@ -41,6 +41,11 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 
 ## 4. Modul Produk
 
+### Umpan Balik Antarmuka
+
+- Konfirmasi tindakan di seluruh aplikasi memakai modal yang menjelaskan akibat, menyediakan Batal, dan tidak mengeksekusi tindakan sebelum disetujui. Penutupan form yang berubah meminta konfirmasi; pengiriman ganda dicegah selama menyimpan.
+- Hasil sukses/gagal ditampilkan sekali melalui toast yang dapat ditutup, tanpa banner sukses tambahan. Pesan gagal tetap tersedia sampai ditutup; pesan sukses berhenti menghitung waktu ketika disorot atau difokuskan. Kesalahan validasi tetap ditampilkan di form/kolom terkait agar dapat diperbaiki.
+
 ### Modul Landing Page
 
 - Homepage berurutan Hero, maksimal empat cuplikan artikel terbit berlabel Catatan Pemikiran, maksimal empat foto Galeri, lalu Footer; seluruh daftar berasal dari database dan mempunyai kondisi kosong. Hero tidak menampilkan tombol Masuk area anggota.
@@ -56,8 +61,8 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 
 ### Modul Data Alumni
 
-- Satu menu Alumni memuat tab Semua dan Verifikasi; tab kedua hanya menampilkan akun pending yang boleh ditinjau aktor. URL verifikasi lama diarahkan ke tab tersebut. Detail, tambah/edit/hapus akun dan penetapan level tetap mengikuti izin serta wilayah aktor.
-- Pencarian utama cukup berdasarkan nama. Header Nama, Angkatan, Wilayah, Peran, Level dan Status dapat diurutkan naik/turun; Aksi tidak diurutkan dan nomor urut tidak menjadi kolom data. Peran multi-role diurutkan menurut nama peran pertama secara alfabetis. Daftar berhalaman 15 akun secara default, dengan rentang/total/posisi halaman terlihat; pergantian halaman mempertahankan pencarian, tab dan urutan.
+- Satu menu Alumni memakai satu daftar tanpa tab Semua/Verifikasi. Aksi verifikasi tersedia pada baris akun pending yang boleh ditinjau aktor. URL verifikasi lama mengarah ke daftar dengan urutan Status menaik. Buat, detail, edit, hapus, verifikasi dan perubahan level dikerjakan melalui modal; endpoint HTML tetap tersedia sebagai fallback. Izin serta wilayah aktor tetap berlaku pada setiap endpoint.
+- Pencarian utama cukup berdasarkan nama. Header Nama, Angkatan, Wilayah, Peran, Level dan Status dapat diurutkan naik/turun; Aksi tidak diurutkan dan nomor urut tidak menjadi kolom data. Peran multi-role diurutkan menurut nama peran pertama secara alfabetis. Urutan Status menaik mendahulukan Menunggu, lalu Aktif dan Ditangguhkan. Daftar berhalaman 15 akun secara default, dengan rentang/total/posisi halaman terlihat; pergantian halaman mempertahankan pencarian dan urutan.
 - Impor CSV UTF-8 dan XLSX menerima header terdefinisi, maksimal 200 baris data dan berkas 1 MB. XLS lama dan rumus Excel tidak didukung; nomor telepon harus tetap menjadi teks.
 - Nama wilayah dicocokkan dengan data terdaftar. Nama ambigu/tidak dikenal atau wilayah di luar izin dilaporkan gagal. Template legacy dengan wilayah_id tetap diterima.
 - Impor hanya menambah akun pending dengan role alumni, tanpa level/verifikasi email; password awal tidak dibagikan dan akun menyetelnya melalui lupa password. Email/telepon unik serta kegagalan per baris dijelaskan.
@@ -74,7 +79,7 @@ Status akun adalah pending, active, suspended. Penolakan verifikasi mempertahank
 ### Modul Verifikasi Akun
 
 - Pengelola melihat akun pending, menyetujui/menolak, dan menetapkan level awal yang sah. Hasil tindakan dicatat serta diberitahukan kepada akun terkait.
-- Verifikasi dibuka dari aksi baris Alumni melalui modal bersama. Tanpa JavaScript, tautan menuju bagian verifikasi pada detail akun. Level persetujuan dipilih secara eksplisit; alasan penolakan wajib. Validasi mempertahankan isian dan hasil tindakan memperbarui daftar dalam konteks pencarian/tab/urutan yang sama.
+- Verifikasi dibuka dari aksi baris Alumni melalui modal bersama. Tanpa JavaScript, tautan menuju bagian verifikasi pada detail akun. Level persetujuan dipilih secara eksplisit; alasan penolakan wajib. Validasi mempertahankan isian dan hasil tindakan memperbarui daftar dalam konteks pencarian dan urutan yang sama.
 - Penolakan menyimpan dan mengirimkan alasan perbaikan; status akun tetap pending sesuai kontrak existing. Tidak ada status ditolak baru atau penghapusan akun melalui tindakan verifikasi.
 - Aktor tidak dapat memverifikasi dirinya atau akun non-pending.
 - Koorda hanya meninjau target non-pengelola dalam wilayahnya. Target dengan role koorda/admin/super_admin, termasuk role ganda, disembunyikan dari antrean koorda dan ditolak pada endpoint.

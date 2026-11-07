@@ -32,7 +32,7 @@ class VerificationRoleAccessTest extends TestCase
             $this->actingAs($actor)->post(route('verification.approve', $target), ['level_id' => $level->id])->assertForbidden();
             $this->post(route('verification.reject', $target), ['reason' => 'Tidak sesuai'])->assertForbidden();
             $this->get(route('alumni.index', ['view' => 'verification']))
-                ->assertOk()->assertViewHas('alumni', fn ($items) => !$items->getCollection()->contains('id', $target->id));
+                ->assertOk()->assertViewHas('reviewableIds', fn ($ids) => !in_array($target->id, $ids, true));
             $this->assertSame(User::STATUS_PENDING, $target->fresh()->status);
             $this->assertSame(0, $target->notifications()->count());
             $this->assertSame(0, AuditLog::where('entity_id', $target->id)->count());
@@ -41,7 +41,8 @@ class VerificationRoleAccessTest extends TestCase
         $mixed = $this->account('alumni', $own, User::STATUS_PENDING);
         $mixed->roles()->attach(Role::firstOrCreate(['name' => 'admin']));
         $this->get(route('alumni.index', ['view' => 'verification']))
-            ->assertViewHas('alumni', fn ($items) => !$items->getCollection()->contains('id', $mixed->id));
+            ->assertViewHas('alumni', fn ($items) => $items->getCollection()->contains('id', $mixed->id))
+            ->assertViewHas('reviewableIds', fn ($ids) => !in_array($mixed->id, $ids, true));
         $this->post(route('verification.approve', $mixed), ['level_id' => $level->id])->assertForbidden();
         $this->post(route('verification.reject', $mixed), ['reason' => 'Tidak sesuai'])->assertForbidden();
     }
@@ -57,11 +58,14 @@ class VerificationRoleAccessTest extends TestCase
         $level = Level::create(['name' => 'Dasar', 'is_active' => true]);
 
         $this->actingAs($actor)->get(route('alumni.index', ['view' => 'verification']))->assertOk()
-            ->assertViewHas('alumni', fn ($items) => $items->total() === 4
+            ->assertViewHas('alumni', fn ($items) => $items->total() === 5
                 && $items->getCollection()->contains('id', $superAdmin->id)
                 && $items->getCollection()->contains('id', $mixed->id)
                 && $items->getCollection()->contains('id', $peer->id)
-                && $items->getCollection()->contains('id', $koorda->id));
+                && $items->getCollection()->contains('id', $koorda->id))
+            ->assertViewHas('reviewableIds', fn ($ids) => count($ids) === 4
+                && in_array($superAdmin->id, $ids, true) && in_array($mixed->id, $ids, true)
+                && in_array($peer->id, $ids, true) && in_array($koorda->id, $ids, true));
 
         $this->post(route('verification.approve', $superAdmin), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();
@@ -96,7 +100,7 @@ class VerificationRoleAccessTest extends TestCase
         $level = Level::create(['name' => 'Dasar', 'is_active' => true]);
 
         $this->actingAs($actor)->get(route('alumni.index', ['view' => 'verification']))
-            ->assertViewHas('alumni', fn ($items) => $items->getCollection()->contains('id', $target->id));
+            ->assertViewHas('reviewableIds', fn ($ids) => in_array($target->id, $ids, true));
         $this->post(route('verification.approve', $target), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();
         $this->assertSame(User::STATUS_ACTIVE, $target->fresh()->status);
@@ -111,8 +115,8 @@ class VerificationRoleAccessTest extends TestCase
         $level = Level::create(['name' => 'Dasar', 'is_active' => true]);
 
         $this->actingAs($actor)->get(route('alumni.index', ['view' => 'verification']))
-            ->assertViewHas('alumni', fn ($items) => $items->getCollection()->contains('id', $alumni->id)
-                && $items->getCollection()->contains('id', $legacy->id));
+            ->assertViewHas('reviewableIds', fn ($ids) => in_array($alumni->id, $ids, true)
+                && in_array($legacy->id, $ids, true));
         $this->post(route('verification.approve', $alumni), ['level_id' => $level->id])
             ->assertSessionHasNoErrors()->assertRedirect();
         $this->post(route('verification.approve', $legacy), ['level_id' => $level->id])

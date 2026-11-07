@@ -11,9 +11,6 @@
 
 @section('page-content')
 
-    @if (session('success'))
-        <div class="rf-card mb-4 bg-green-50">{{ session('success') }}</div>
-    @endif
     @if ($errors->any())
         <div class="rf-card mb-4 bg-red-50">
             <ul class="list-disc pl-5">

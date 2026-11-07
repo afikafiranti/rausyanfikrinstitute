@@ -23,6 +23,7 @@
     <main class="mx-auto max-w-md px-4 pb-12">
         @yield('content')
     </main>
+    @include('components.feedback')
 </body>
 
 </html>

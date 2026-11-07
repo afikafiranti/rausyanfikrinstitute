@@ -23,20 +23,17 @@ class AlumniController extends Controller
         $me = $request->user();
         $canViewAll = $me->hasAnyRole(['super_admin', 'admin']);
         $canReview = $me->can('review-user');
-        $filters = array_intersect_key($request->validated(), array_flip(['q', 'view', 'sort', 'dir', 'per_page']));
+        $filters = array_intersect_key($request->validated(), array_flip(['q', 'sort', 'dir', 'per_page']));
         $q = trim($filters['q'] ?? '');
-        $view = $filters['view'] ?? 'all';
         $sort = $filters['sort'] ?? 'name';
         $dir = $filters['dir'] ?? 'asc';
-        $filters = array_filter(array_merge($filters, compact('q', 'view', 'sort', 'dir')), fn ($value) => $value !== null && $value !== '');
+        $filters = array_filter(array_merge($filters, compact('q', 'sort', 'dir')), fn ($value) => $value !== null && $value !== '');
         $alumni = User::alumniListing($me, $filters)
             ->with(['wilayah:id,name', 'level:id,name,description', 'roles' => fn ($query) => $query->select('roles.id', 'roles.name')->orderBy('roles.name')])
             ->paginate((int) ($filters['per_page'] ?? 15))->appends($filters);
         if ($alumni->currentPage() > $alumni->lastPage()) {
             return redirect()->route('alumni.index', $filters + ($alumni->lastPage() > 1 ? ['page' => $alumni->lastPage()] : []));
         }
-        $totalAlumni = User::alumniListing($me, [])->reorder()->count();
-        $pendingCount = $canReview ? User::reviewableBy($me)->count() : 0;
         $reviewableIds = $canReview
             ? User::reviewableBy($me)->whereIn('users.id', $alumni->modelKeys())->pluck('users.id')->all()
             : [];
@@ -44,8 +41,8 @@ class AlumniController extends Controller
             ->orderBy('name')->get();
         $levels = Level::where('is_active', true)->orderBy('id')->get(['id', 'name', 'description']);
 
-        return response()->view('alumni.index', compact('alumni', 'wilayah', 'levels', 'q', 'view', 'sort', 'dir',
-            'filters', 'totalAlumni', 'pendingCount', 'canViewAll', 'canReview', 'reviewableIds'))
+        return response()->view('alumni.index', compact('alumni', 'wilayah', 'levels', 'q', 'sort', 'dir',
+            'filters', 'canViewAll', 'canReview', 'reviewableIds'))
             ->header('Cache-Control', 'private, no-store');
     }
 
@@ -77,9 +74,9 @@ class AlumniController extends Controller
             return $user;
         });
 
-        return redirect()
-            ->route('alumni.index')
-            ->with('success', "Alumni {$user->name} berhasil ditambahkan.");
+        $message = "Alumni {$user->name} berhasil ditambahkan.";
+        return $request->expectsJson() ? response()->json(compact('message'))->header('Cache-Control', 'private, no-store')
+            : redirect()->route('alumni.index')->with('success', $message);
     }
 
     public function show(AlumniIndexRequest $request, $id)
@@ -90,7 +87,7 @@ class AlumniController extends Controller
 
         $alumni = User::with([
             'wilayah:id,name',
-            'level:id,description',
+            'level:id,name,description',
             'roles:id,name'   // <-- AGAR ROLE TAMPIL DI HALAMAN DETAIL
         ])->when(!$canViewAll, fn ($query) => $query->where('wilayah_id', $me->wilayah_id))
             ->findOrFail($id);
@@ -105,8 +102,24 @@ class AlumniController extends Controller
 
         $canVerify = request()->user()->can('review-user') && User::reviewableBy($me)->whereKey($alumni->id)->exists();
 
-        $returnFilters = array_intersect_key($request->validated(), array_flip(['q', 'view', 'sort', 'dir', 'per_page', 'page']));
-        $returnTo = route('alumni.index', $returnFilters + ['view' => 'all'], false);
+        $returnFilters = array_intersect_key($request->validated(), array_flip(['q', 'sort', 'dir', 'per_page', 'page']));
+        $returnTo = route('alumni.index', array_merge(['sort' => 'name', 'dir' => 'asc'], $returnFilters), false);
+
+        $modal = $request->validated('modal');
+        if ($modal === 'delete') {
+            abort_unless($canEditProfile && !$alumni->is($me), 403);
+            return response()->view('alumni.partials.delete', compact('alumni'))
+                ->header('Cache-Control', 'private, no-store')->header('X-Alumni-Modal', '1');
+        }
+        if ($modal === 'verification') {
+            abort_unless($canVerify, 403);
+            return response()->view('verification.forms', ['target' => $alumni, 'levels' => $levels, 'returnTo' => $returnTo])
+                ->header('Cache-Control', 'private, no-store')->header('X-Alumni-Modal', '1');
+        }
+        if (in_array($modal, ['1', 'detail'], true)) {
+            return response()->view('alumni.partials.detail', compact('alumni', 'levels', 'canUpdateLevel', 'canEditProfile', 'canVerify', 'returnTo'))
+                ->header('Cache-Control', 'private, no-store')->header('X-Alumni-Modal', '1');
+        }
 
         return response()->view('alumni.show', compact('alumni', 'levels', 'canUpdateLevel', 'canEditProfile', 'canVerify', 'returnTo'))
             ->header('Cache-Control', 'private, no-store');
@@ -115,13 +128,16 @@ class AlumniController extends Controller
     public function edit(Request $request, User $user)
     {
         if (!$this->canManageAlumniProfile($request->user(), $user)) {
-            return back()->withErrors(['edit' => 'Hanya super admin dan admin yang dapat mengedit data alumni atau koorda.']);
+            return $this->failed($request, 'edit', 'Hanya super admin dan admin yang dapat mengedit data alumni atau koorda.');
         }
 
-        $alumni = $user->load(['wilayah:id,name', 'level:id,description', 'roles:id,name']);
+        $alumni = $user->load(['wilayah:id,name', 'level:id,name,description', 'roles:id,name']);
         $wilayah = Wilayah::select('id', 'name')->orderBy('name')->get();
 
-        return view('alumni.edit', compact('alumni', 'wilayah'));
+        $modal = $request->query('modal') === '1';
+        $response = response()->view($modal ? 'alumni.partials.edit' : 'alumni.edit', compact('alumni', 'wilayah'))
+            ->header('Cache-Control', 'private, no-store');
+        return $modal ? $response->header('X-Alumni-Modal', '1') : $response;
     }
 
     public function update(Request $request, User $user)
@@ -129,7 +145,7 @@ class AlumniController extends Controller
         $actor = $request->user();
 
         if (!$this->canManageAlumniProfile($actor, $user)) {
-            return back()->withErrors(['edit' => 'Hanya super admin dan admin yang dapat mengedit data alumni atau koorda.']);
+            return $this->failed($request, 'edit', 'Hanya super admin dan admin yang dapat mengedit data alumni atau koorda.');
         }
 
         $validated = $request->validate([
@@ -199,11 +215,11 @@ class AlumniController extends Controller
             return $needsVerification;
         });
 
-        return redirect()
-            ->route('alumni.show', $user)
-            ->with('success', $criticalChanged
-                ? "Data alumni {$user->name} diperbarui. Perubahan wilayah/angkatan menunggu verifikasi."
-                : "Data alumni {$user->name} berhasil diperbarui.");
+        $message = $criticalChanged
+            ? "Data alumni {$user->name} diperbarui. Perubahan wilayah/angkatan menunggu verifikasi."
+            : "Data alumni {$user->name} berhasil diperbarui.";
+        return $request->expectsJson() ? response()->json(compact('message'))->header('Cache-Control', 'private, no-store')
+            : redirect()->route('alumni.show', $user)->with('success', $message);
     }
 
     public function updateLevel(Request $request, User $user)
@@ -211,11 +227,11 @@ class AlumniController extends Controller
         $actor = $request->user();
 
         if (!$actor->hasAnyRole(['super_admin', 'admin'])) {
-            return back()->withErrors(['level' => 'Hanya super admin dan admin yang dapat mengubah level materi.']);
+            return $this->failed($request, 'level', 'Hanya super admin dan admin yang dapat mengubah level materi.');
         }
 
         if ($user->hasAnyRole(['super_admin', 'admin']) || !$user->hasAnyRole(['alumni', 'koorda'])) {
-            return back()->withErrors(['level' => 'Level materi hanya dapat diubah untuk akun alumni dan koorda.']);
+            return $this->failed($request, 'level', 'Level materi hanya dapat diubah untuk akun alumni dan koorda.');
         }
 
         $validated = $request->validate([
@@ -239,9 +255,9 @@ class AlumniController extends Controller
             ]);
         });
 
-        return redirect()
-            ->route('alumni.show', $user)
-            ->with('success', "Level materi {$user->name} berhasil diperbarui.");
+        $message = "Level materi {$user->name} berhasil diperbarui.";
+        return $request->expectsJson() ? response()->json(compact('message'))->header('Cache-Control', 'private, no-store')
+            : redirect()->route('alumni.show', $user)->with('success', $message);
     }
 
     public function destroy(Request $request, User $user)
@@ -249,19 +265,19 @@ class AlumniController extends Controller
         $actor = $request->user();
 
         if (!$actor->hasAnyRole(['super_admin', 'admin'])) {
-            return back()->withErrors(['delete' => 'Hanya super admin dan admin yang dapat menghapus akun alumni atau koorda.']);
+            return $this->failed($request, 'delete', 'Hanya super admin dan admin yang dapat menghapus akun alumni atau koorda.');
         }
 
         if ($user->is($request->user())) {
-            return back()->withErrors(['delete' => 'Tidak boleh menghapus akun yang sedang digunakan.']);
+            return $this->failed($request, 'delete', 'Tidak boleh menghapus akun yang sedang digunakan.');
         }
 
         if ($user->hasAnyRole(['super_admin', 'admin'])) {
-            return back()->withErrors(['delete' => 'Akun super admin dan admin tidak dapat dihapus dari daftar alumni.']);
+            return $this->failed($request, 'delete', 'Akun super admin dan admin tidak dapat dihapus dari daftar alumni.');
         }
 
         if (!$user->hasAnyRole(['alumni', 'koorda'])) {
-            return back()->withErrors(['delete' => 'Hanya akun alumni dan koorda yang dapat dihapus dari halaman ini.']);
+            return $this->failed($request, 'delete', 'Hanya akun alumni dan koorda yang dapat dihapus dari halaman ini.');
         }
 
         [$name, $avatarUrl] = DB::transaction(function () use ($user, $actor) {
@@ -288,9 +304,15 @@ class AlumniController extends Controller
 
         AccountIntegrity::removeOwnedAvatar($avatarUrl);
 
-        return redirect()
-            ->route('alumni.index')
-            ->with('success', "Data alumni {$name} berhasil dihapus.");
+        $message = "Data alumni {$name} berhasil dihapus.";
+        return $request->expectsJson() ? response()->json(compact('message'))->header('Cache-Control', 'private, no-store')
+            : redirect()->route('alumni.index')->with('success', $message);
+    }
+
+    private function failed(Request $request, string $key, string $message)
+    {
+        return $request->expectsJson() ? response()->json(compact('message'), 403)->header('Cache-Control', 'private, no-store')
+            : back()->withErrors([$key => $message]);
     }
 
     private function canManageAlumniProfile(User $actor, User $target): bool
