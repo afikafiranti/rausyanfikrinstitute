@@ -10,7 +10,7 @@
             <div class="flex flex-wrap gap-2" aria-label="Aksi laporan">
                 <a href="{{ route('laporan.create') }}" data-report-modal class="rf-btn px-3">Buat</a>
                 @if (($filters['status'] ?? '') === 'draft')
-                    <span class="rf-btn-secondary cursor-not-allowed px-3 opacity-50" aria-disabled="true" aria-describedby="report-export-note">Ekspor</span>
+                    <span class="rf-btn-secondary cursor-not-allowed px-3 opacity-50" aria-disabled="true" aria-label="Ekspor tidak tersedia untuk draf">Ekspor</span>
                 @else
                     <a href="{{ route('laporan.export', array_filter($filters, fn ($value) => $value !== null && $value !== '')) }}" data-report-tooltip="Unduh Excel (.xlsx) laporan terkirim sesuai filter" class="rf-btn-secondary px-3">Ekspor</a>
                 @endif
@@ -55,12 +55,11 @@
                 <button type="submit" data-report-filter-button class="rf-btn px-3">Filter</button>
             </div>
         </form>
-        <p id="report-export-note" class="mt-3 text-xs leading-5 text-muted">Kehadiran dan Excel (.xlsx) hanya memuat laporan terkirim. Draf tidak diekspor.</p>
 
         <dl class="mt-5 flex flex-wrap gap-x-7 gap-y-2 border-y border-slate-200 py-3 text-sm">
             <div class="flex items-baseline gap-2"><dt class="text-muted">Laporan</dt><dd class="font-semibold text-ink">{{ number_format($totals['reports'], 0, ',', '.') }}</dd></div>
             <div class="flex items-baseline gap-2"><dt class="text-muted">Menunggu</dt><dd class="font-semibold text-ink">{{ number_format($totals['submitted'], 0, ',', '.') }}</dd></div>
-            <div class="flex items-baseline gap-2"><dt class="text-muted">Kehadiran</dt><dd class="font-semibold text-ink">{{ number_format($totals['participants'], 0, ',', '.') }}</dd><span class="text-xs text-muted">L {{ number_format($totals['male'], 0, ',', '.') }} / P {{ number_format($totals['female'], 0, ',', '.') }}</span></div>
+            <div class="flex items-baseline gap-2"><dt class="text-muted">Peserta</dt><dd class="font-semibold text-ink">{{ number_format($totals['participants'], 0, ',', '.') }}</dd><span class="text-xs text-muted">L {{ number_format($totals['male'], 0, ',', '.') }} / P {{ number_format($totals['female'], 0, ',', '.') }}</span></div>
         </dl>
 
         <ul data-report-list class="mt-4 space-y-3">
