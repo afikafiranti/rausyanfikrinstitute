@@ -3,7 +3,12 @@
 namespace Tests\Feature;
 
 use App\Models\{KajianReport, Role, User, Wilayah};
+use App\Support\ReportExcel;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\ValidationException;
+use PhpOffice\PhpSpreadsheet\Cell\DataType;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Tests\TestCase;
 
 class KajianReportSummaryTest extends TestCase
@@ -23,10 +28,10 @@ class KajianReportSummaryTest extends TestCase
             ->assertRedirect('/laporan?wilayah_id='.$viewer->wilayah_id);
         $this->get('/laporan'.$query)->assertOk()->assertSee('Kajian Lokal')->assertDontSee('Kajian Asing')->assertDontSee('Draf Privat')
             ->assertViewHas('totals', fn ($totals) => $totals['reports'] === 1 && $totals['participants'] === 5);
-        $csv = $this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent();
-        $this->assertStringContainsString('Kajian Lokal', $csv);
-        $this->assertStringNotContainsString('Kajian Asing', $csv);
-        $this->assertStringNotContainsString('Draf Privat', $csv);
+        $titles = array_column($this->downloadSheet($this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent())->toArray(), 2);
+        $this->assertContains('Kajian Lokal', $titles);
+        $this->assertNotContains('Kajian Asing', $titles);
+        $this->assertNotContains('Draf Privat', $titles);
     }
 
     public function test_admins_get_global_totals_or_explicit_region_and_inclusive_date_status_filters(): void
@@ -50,10 +55,10 @@ class KajianReportSummaryTest extends TestCase
             $this->assertEquals($expectedFilters, $redirectFilters);
             $this->get('/laporan'.$query)->assertOk()->assertSee('Awal Periode')->assertSee('Akhir Periode')->assertDontSee('Luar Periode')->assertDontSee('Ditolak Wilayah Lain')->assertDontSee('Laporan Dikirim')
                 ->assertViewHas('totals', fn ($t) => $t['reports'] === 2 && $t['participants'] === 10);
-            $csv = $this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent();
-            $this->assertStringContainsString('Awal Periode', $csv);
-            $this->assertStringContainsString('Akhir Periode', $csv);
-            $this->assertStringNotContainsString('Luar Periode', $csv);
+            $titles = array_column($this->downloadSheet($this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent())->toArray(), 2);
+            $this->assertContains('Awal Periode', $titles);
+            $this->assertContains('Akhir Periode', $titles);
+            $this->assertNotContains('Luar Periode', $titles);
         }
     }
 
@@ -65,13 +70,14 @@ class KajianReportSummaryTest extends TestCase
             ->assertViewHas('totals', fn ($t) => $t['reports'] === 14 && $t['participants'] === 70)
             ->assertSee('status=submitted', false);
         $this->get('/laporan?status=submitted&page=2')->assertOk()->assertSee('Kajian 13')->assertSee('Kajian 14');
-        $rows = $this->csvRows($this->get('/laporan/ekspor?status=submitted&page=2')->assertOk()->streamedContent());
-        $this->assertCount(15, $rows);
-        $this->assertSame('Kajian 1', $rows[1][2]);
-        $this->assertSame('Kajian 14', $rows[14][2]);
+        $sheet = $this->downloadSheet($this->get('/laporan/ekspor?status=submitted&page=2')->assertOk()->streamedContent());
+        $this->assertSame(15, $sheet->getHighestDataRow());
+        $titles = array_column($sheet->toArray(), 2);
+        $this->assertContains('Kajian 1', $titles);
+        $this->assertContains('Kajian 14', $titles);
     }
 
-    public function test_csv_is_private_quoted_and_neutralizes_formulas_without_exposing_private_fields(): void
+    public function test_excel_is_private_typed_and_formula_safe_without_exposing_private_fields(): void
     {
         $author = $this->member('alumni');
         $author->update(['name' => '=HYPERLINK("bad")']);
@@ -79,19 +85,31 @@ class KajianReportSummaryTest extends TestCase
         $report->update(['pemateri' => '+SUM(1,1)', 'tempat' => '  @formula', 'reject_reason' => "\t=cmd()", 'catatan' => 'CATATAN_RAHASIA', 'foto_url' => 'report-photos/RAHASIA.jpg']);
         $response = $this->actingAs($this->member('admin'))->get('/laporan/ekspor')->assertOk();
         $this->assertStringContainsString('attachment', $response->headers->get('Content-Disposition'));
+        $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
+        $this->assertSame('application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', $response->headers->get('Content-Type'));
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
         $this->assertStringContainsString('private', $response->headers->get('Cache-Control'));
-        $csv = $response->streamedContent();
-        $rows = $this->csvRows($csv);
-        $this->assertSame($report->judul, $rows[1][2]);
-        $this->assertSame("'=HYPERLINK(\"bad\")", $rows[1][4]);
-        $this->assertSame("'+SUM(1,1)", $rows[1][5]);
-        $this->assertSame("'  @formula", $rows[1][6]);
-        $this->assertSame("'\t=cmd()", $rows[1][15]);
-        $this->assertSame('5', $rows[1][9]);
-        $this->assertStringNotContainsString('CATATAN_RAHASIA', $csv);
-        $this->assertStringNotContainsString('RAHASIA.jpg', $csv);
-        $this->assertStringNotContainsString($author->email, $csv);
+        $this->assertSame('nosniff', $response->headers->get('X-Content-Type-Options'));
+        $sheet = $this->downloadSheet($response->streamedContent());
+        $this->assertSame('Laporan', $sheet->getTitle());
+        $this->assertSame('A2', $sheet->getFreezePane());
+        $this->assertSame('A1:P1', $sheet->getAutoFilter()->getRange());
+        $this->assertTrue($sheet->getStyle('A1')->getFont()->getBold());
+        $this->assertSame($report->judul, $sheet->getCell('C2')->getValue());
+        $this->assertSame('Menunggu', $sheet->getCell('L2')->getValue());
+        $this->assertSame(DataType::TYPE_STRING, $sheet->getCell('L2')->getDataType());
+        foreach (['E2' => '=HYPERLINK("bad")', 'F2' => '+SUM(1,1)', 'G2' => '  @formula', 'P2' => "\t=cmd()"] as $address => $value) {
+            $this->assertSame($value, $sheet->getCell($address)->getValue());
+            $this->assertSame(DataType::TYPE_STRING, $sheet->getCell($address)->getDataType());
+        }
+        foreach (['A2' => $report->id, 'H2' => 2, 'I2' => 3, 'J2' => 5] as $address => $value) {
+            $this->assertSame($value, $sheet->getCell($address)->getValue());
+            $this->assertSame(DataType::TYPE_NUMERIC, $sheet->getCell($address)->getDataType());
+        }
+        $values = json_encode($sheet->toArray());
+        $this->assertStringNotContainsString('CATATAN_RAHASIA', $values);
+        $this->assertStringNotContainsString('RAHASIA.jpg', $values);
+        $this->assertStringNotContainsString($author->email, $values);
     }
 
     public function test_filters_are_validated_for_both_endpoints(): void
@@ -124,20 +142,52 @@ class KajianReportSummaryTest extends TestCase
     {
         $this->actingAs($this->member('admin'))->get('/laporan')->assertOk()
             ->assertViewHas('totals', fn ($t) => $t['reports'] === 0 && $t['participants'] === 0);
-        $rows = $this->csvRows($this->get('/laporan/ekspor')->assertOk()->streamedContent());
-        $this->assertCount(1, $rows);
+        $sheet = $this->downloadSheet($this->get('/laporan/ekspor')->assertOk()->streamedContent());
+        $this->assertSame(1, $sheet->getHighestDataRow());
     }
 
-    private function csvRows(string $csv): array
+    public function test_excel_limit_rejects_extra_rows_and_allows_exact_limit_or_narrow_filter(): void
     {
-        $stream = fopen('php://temp', 'r+');
-        fwrite($stream, ltrim($csv, "\xEF\xBB\xBF"));
-        rewind($stream);
-        $rows = [];
-        while (($row = fgetcsv($stream, 0, ',', '"', '')) !== false) { $rows[] = $row; }
-        fclose($stream);
+        $author = $this->member('alumni');
+        $now = now();
+        for ($start = 1; $start <= ReportExcel::MAX_EXPORT_ROWS + 1; $start += 500) {
+            $batch = [];
+            for ($i = $start; $i < min($start + 500, ReportExcel::MAX_EXPORT_ROWS + 2); $i++) {
+                $batch[] = [
+                    'user_id' => $author->id, 'wilayah_id' => $author->wilayah_id,
+                    'tanggal' => '2026-10-16', 'judul' => 'Batas '.$i, 'status' => 'submitted',
+                    'created_at' => $now, 'updated_at' => $now,
+                ];
+            }
+            DB::table('kajian_reports')->insert($batch);
+        }
+        $this->report($author, 'Filter Disetujui', 'approved');
+        $admin = $this->member('admin');
+        $this->actingAs($admin)->getJson('/laporan/ekspor?status=submitted')
+            ->assertUnprocessable()->assertJsonValidationErrors('export');
+        try {
+            ReportExcel::export(KajianReport::query()->visibleTo($admin)->where('status', 'submitted')
+                ->select(['id', 'tanggal', 'judul', 'wilayah_id', 'user_id', 'pemateri', 'tempat', 'peserta_l', 'peserta_p', 'durasi_menit', 'status', 'reviewed_by', 'reviewed_at', 'reject_reason'])
+                ->with(['wilayah:id,name', 'user:id,name', 'reviewer:id,name']));
+            $this->fail('Ekspor yang berubah saat iterasi tidak boleh menghasilkan workbook terpotong.');
+        } catch (ValidationException $exception) {
+            $this->assertArrayHasKey('export', $exception->errors());
+        }
+        $approved = $this->get('/laporan/ekspor?status=approved')->assertOk();
+        $this->assertSame(2, $this->downloadSheet($approved->streamedContent())->getHighestDataRow());
 
-        return $rows;
+        DB::table('kajian_reports')->where('judul', 'Batas 5001')->delete();
+        $atLimit = $this->get('/laporan/ekspor?status=submitted')->assertOk();
+        $this->assertSame(ReportExcel::MAX_EXPORT_ROWS + 1, $this->downloadSheet($atLimit->streamedContent())->getHighestDataRow());
+    }
+
+    private function downloadSheet(string $content): \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet
+    {
+        $path = tempnam(sys_get_temp_dir(), 'report_export_');
+        file_put_contents($path, $content);
+        $this->beforeApplicationDestroyed(fn () => @unlink($path));
+
+        return IOFactory::load($path)->getActiveSheet();
     }
 
     private function member(string $role, ?int $region = null): User

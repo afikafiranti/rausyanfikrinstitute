@@ -22,6 +22,19 @@ export function initReportModals() {
     if (url.origin !== location.origin) throw new Error('Alamat laporan tidak valid.');
     return url;
   };
+  const updateFilterButton = form => {
+    const button = form?.querySelector('[data-report-filter-button]');
+    if (!button) return;
+    const applied = new URLSearchParams(location.search);
+    const fields = [...form.elements].filter(field => field.name && field.matches('input, select'));
+    const reset = fields.some(field => applied.get(field.name))
+      && fields.every(field => field.value === (applied.get(field.name) || ''));
+    button.textContent = reset ? 'Reset' : 'Filter';
+    button.dataset.reportFilterAction = reset ? 'reset' : 'filter';
+    button.classList.toggle('rf-btn', !reset);
+    button.classList.toggle('rf-btn-secondary', reset);
+  };
+  updateFilterButton(document.querySelector('[data-report-filters]'));
 
   const formSnapshot = form => [...new FormData(form)].map(([key, value]) => [
     key,
@@ -195,6 +208,7 @@ export function initReportModals() {
     if (!updated) return false;
     existing.replaceWith(document.importNode(updated, true));
     if (sameOriginUrl(response.url).href !== location.href) history.replaceState(history.state, '', response.url);
+    updateFilterButton(document.querySelector('[data-report-filters]'));
     return true;
   };
 
@@ -416,10 +430,25 @@ export function initReportModals() {
   });
   document.addEventListener('submit', event => {
     const form = event.target;
+    if (form instanceof HTMLFormElement && form.matches('[data-report-filters]')) {
+      updateFilterButton(form);
+      if (form.querySelector('[data-report-filter-button]')?.dataset.reportFilterAction === 'reset') {
+        event.preventDefault();
+        location.assign(form.action);
+      }
+      return;
+    }
     if (!(form instanceof HTMLFormElement) || !form.matches('[data-report-row-form]')) return;
     event.preventDefault();
     deleteDraft(form);
   });
+  document.addEventListener('input', event => {
+    updateFilterButton(event.target instanceof Element ? event.target.closest('[data-report-filters]') : null);
+  });
+  document.addEventListener('change', event => {
+    updateFilterButton(event.target instanceof Element ? event.target.closest('[data-report-filters]') : null);
+  });
+  window.addEventListener('pageshow', () => updateFilterButton(document.querySelector('[data-report-filters]')));
   dialog.addEventListener('cancel', event => { event.preventDefault(); close(); });
   dialog.addEventListener('keydown', event => {
     if (event.key !== 'Tab') return;

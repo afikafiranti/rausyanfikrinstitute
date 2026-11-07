@@ -12,7 +12,7 @@
                 @if (($filters['status'] ?? '') === 'draft')
                     <span class="rf-btn-secondary cursor-not-allowed px-3 opacity-50" aria-disabled="true" aria-describedby="report-export-note">Ekspor</span>
                 @else
-                    <a href="{{ route('laporan.export', array_filter($filters, fn ($value) => $value !== null && $value !== '')) }}" data-report-tooltip="Unduh CSV laporan terkirim sesuai filter" class="rf-btn-secondary px-3">Ekspor</a>
+                    <a href="{{ route('laporan.export', array_filter($filters, fn ($value) => $value !== null && $value !== '')) }}" data-report-tooltip="Unduh Excel (.xlsx) laporan terkirim sesuai filter" class="rf-btn-secondary px-3">Ekspor</a>
                 @endif
             </div>
         </header>
@@ -52,9 +52,8 @@
                 <input id="filter-sampai" name="sampai" type="date" value="{{ $filters['sampai'] ?? '' }}" min="1000-01-01" max="9999-12-31" class="mt-1 w-full">
             </div>
             <div class="flex flex-wrap items-center gap-2 sm:col-span-2 xl:col-span-4">
-                <button type="submit" class="rf-btn px-3">Terapkan</button>
-                <a href="{{ route('laporan.index') }}" class="rf-btn-secondary px-3">Reset</a>
-                <p id="report-export-note" class="text-xs leading-5 text-muted">Kehadiran dan CSV hanya menghitung laporan terkirim. Draf tidak diekspor.</p>
+                <button type="submit" data-report-filter-button class="rf-btn px-3">Filter</button>
+                <p id="report-export-note" class="text-xs leading-5 text-muted">Kehadiran dan Excel (.xlsx) hanya memuat laporan terkirim. Draf tidak diekspor.</p>
             </div>
         </form>
 
@@ -64,9 +63,9 @@
             <div class="flex items-baseline gap-2"><dt class="text-muted">Kehadiran</dt><dd class="font-semibold text-ink">{{ number_format($totals['participants'], 0, ',', '.') }}</dd><span class="text-xs text-muted">L {{ number_format($totals['male'], 0, ',', '.') }} / P {{ number_format($totals['female'], 0, ',', '.') }}</span></div>
         </dl>
 
-        <ul data-report-list class="divide-y divide-slate-200">
+        <ul data-report-list class="mt-4 space-y-3">
             @forelse ($reports as $report)
-                <li data-report-row class="flex flex-col gap-3 py-4 lg:flex-row lg:items-center">
+                <li data-report-row class="flex flex-col gap-3 rounded-xl border border-slate-200 bg-white p-4 lg:flex-row lg:items-center">
                     <a href="{{ route('laporan.show', $report) }}" data-report-modal class="group flex min-w-0 flex-1 items-start gap-3 rounded-lg py-1 sm:gap-4"
                         aria-labelledby="report-title-{{ $report->id }}" aria-describedby="report-photo-{{ $report->id }}">
                         <span id="report-photo-{{ $report->id }}" role="img" aria-label="{{ $report->foto_url ? 'Foto dokumentasi tersedia' : 'Belum ada foto dokumentasi' }}"
@@ -102,10 +101,26 @@
                     </div>
                 </li>
             @empty
-                <li class="py-8 text-sm text-muted">Tidak ada laporan sesuai filter. Ubah filter atau pilih Buat untuk mencatat kegiatan.</li>
+                <li class="rounded-xl border border-dashed border-slate-300 p-6 text-sm text-muted">Tidak ada laporan sesuai filter. Ubah filter atau pilih Buat untuk mencatat kegiatan.</li>
             @endforelse
         </ul>
-        <div class="mt-5">{{ $reports->links() }}</div>
+        <footer class="mt-5 flex flex-col gap-2 border-t border-slate-200 pt-4 text-sm text-muted">
+            <p>Menampilkan {{ $reports->firstItem() ?? 0 }}–{{ $reports->lastItem() ?? 0 }} dari {{ number_format($reports->total(), 0, ',', '.') }} laporan · Halaman {{ $reports->currentPage() }} dari {{ $reports->lastPage() }}</p>
+            @if ($reports->hasPages())
+                <nav aria-label="Halaman laporan" class="flex flex-wrap gap-2">
+                    @if ($reports->onFirstPage())
+                        <span class="rf-btn-secondary cursor-not-allowed px-3 opacity-50" aria-disabled="true">Sebelumnya</span>
+                    @else
+                        <a href="{{ $reports->previousPageUrl() }}" rel="prev" class="rf-btn-secondary px-3">Sebelumnya</a>
+                    @endif
+                    @if ($reports->hasMorePages())
+                        <a href="{{ $reports->nextPageUrl() }}" rel="next" class="rf-btn-secondary px-3">Berikutnya</a>
+                    @else
+                        <span class="rf-btn-secondary cursor-not-allowed px-3 opacity-50" aria-disabled="true">Berikutnya</span>
+                    @endif
+                </nav>
+            @endif
+        </footer>
     </section>
     @include('laporan.modal')
 @endsection

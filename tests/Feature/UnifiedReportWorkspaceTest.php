@@ -6,6 +6,7 @@ use App\Models\{KajianReport, Role, User, Wilayah};
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use RuntimeException;
 use Tests\TestCase;
 
@@ -57,10 +58,10 @@ class UnifiedReportWorkspaceTest extends TestCase
             ->assertSee('Dalam Filter')->assertDontSee('Di Luar Tanggal')->assertDontSee('Status Lain')
             ->assertViewHas('totals', fn ($t) => $t['reports'] === 1 && $t['approved'] === 1
                 && $t['participants'] === 5 && $t['male'] === 2 && $t['female'] === 3);
-        $csv = $this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent();
-        $this->assertStringContainsString('Dalam Filter', $csv);
+        $titles = array_column($this->downloadSheet($this->get('/laporan/ekspor'.$query)->assertOk()->streamedContent())->toArray(), 2);
+        $this->assertContains('Dalam Filter', $titles);
         foreach (['Di Luar Tanggal', 'Status Lain', 'Draf Tak Diekspor'] as $title) {
-            $this->assertStringNotContainsString($title, $csv);
+            $this->assertNotContains($title, $titles);
         }
         $this->getJson('/laporan/ekspor?status=draft')->assertUnprocessable()->assertJsonValidationErrors('status');
     }
@@ -150,6 +151,15 @@ class UnifiedReportWorkspaceTest extends TestCase
         $user->roles()->attach(Role::firstOrCreate(['name' => $role]));
 
         return $user;
+    }
+
+    private function downloadSheet(string $content): \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet
+    {
+        $path = tempnam(sys_get_temp_dir(), 'report_workspace_');
+        file_put_contents($path, $content);
+        $this->beforeApplicationDestroyed(fn () => @unlink($path));
+
+        return IOFactory::load($path)->getActiveSheet();
     }
 
     private function report(User $author, string $title, string $status, int $male = 0, int $female = 0, string $date = '2026-10-16'): KajianReport

@@ -35,7 +35,7 @@ Tabel ini memetakan alasan pekerjaan, bukan menyalin statusnya. Detail baseline 
 
 Perapian schema/fixture (RFIX-02/05/06/23/24) memerlukan inventaris dan regresi, bukan asumsi data telah rusak. Kontrak laporan yang berbeda antara helper/request dan route (RFIX-18) bukan bukti alumni berhasil menembus endpoint. Batas workbook/UX (RFIX-16/17), operasional (RFIX-19/22) dan dokumentasi/aset (RFIX-20) dinilai sesuai lingkungan dan kebutuhan, bukan hanya jumlah berkas/tabel.
 
-Penyatuan halaman Laporan (RFIX-17) memakai scope/filter bersama untuk daftar dan CSV; mutasi tetap memeriksa izin pada server. Penghapusan dibatasi pada draf sendiri dengan lock transaksi dan pembersihan foto setelah commit. Bukti regresi akses, rollback, konsistensi hitungan/CSV dan alur browser tercatat pada [TASK](TASK.md#halaman-laporan-terpadu-7-november--rfix-17); bukti lokal ini tidak mengubah risiko lingkungan tujuan di bawah.
+Penyatuan halaman Laporan (RFIX-17) memakai scope/filter bersama untuk daftar dan ekspor; mutasi tetap memeriksa izin pada server. Penghapusan dibatasi pada draf sendiri dengan lock transaksi dan pembersihan foto setelah commit. Ekspor Excel mengikuti batas volume KEP-05 dan teks sel harus diperlakukan sebagai data, bukan rumus. Bukti regresi dan alur browser tercatat pada [TASK](TASK.md); bukti lokal ini tidak mengubah risiko lingkungan tujuan di bawah.
 
 ## Daftar risiko aktif
 

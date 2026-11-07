@@ -26,7 +26,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-14 | Grafik dan kondisi gagal | P2 | B | DONE | Bundle lockfile, tabel angka, kondisi kosong/gagal diuji |
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
-| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Laporan terpadu: filter/status, ringkasan, CSV dan aksi baris; modal serta responsivitas diuji dari baseline 2b56f97 |
+| RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Filter/Reset tunggal, ekspor Excel, kartu list dan pagination 12 laporan; regresi/browser lulus dari baseline 1db1fd5 |
 | RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
@@ -127,6 +127,19 @@ Daftar dan CSV memakai scope/filter bersama. Hitungan laporan mencakup draf yang
 | Tampilan | Lebar 320/390/768/1280 px tanpa overflow. Screenshot halaman terpadu dan modal pada desktop/ponsel diperiksa; ringkasan berupa baris ringkas di atas satu daftar, aksi satu kata dengan tooltip selektif |
 
 Log: `storage/logs/phpunit-unified-report-2026-11-07.txt` dan `phpunit-unified-report.xml`. Artefak browser: `storage/app/qa-report-ui-2026-11-07/unified-report.json`, `unified-final.json`, `unified-workspace-1280.png`, `unified-workspace-390.png` dan screenshot modal pendamping, seluruhnya diabaikan Git. Server QA sementara port 8768 telah diverifikasi dan dihentikan. Pemeriksaan 18 dokumen/111 tautan lokal lulus tanpa tautan/anchor putus; ID keputusan/pekerjaan tetap lengkap. Verifikasi ini mencakup modul Laporan/navigasi; suite aplikasi penuh, CI remote dan staging tidak diulang. DOCX pengguna tetap identik dengan hash yang dicatat sebelumnya.
+
+## Filter, kartu dan Excel Laporan 7 November — RFIX-17
+
+Branch `develop`, baseline `1db1fd5`. Arahan pengguna menyederhanakan kontrol Filter/Reset menjadi satu tombol, mengubah ekspor Laporan menjadi Excel, serta memperjelas kartu list dan pagination. Kontrak aktif diperbarui pada PRD; KEP-05 membedakan ekspor Laporan dan pilihan CSV alumni yang tetap tersedia.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Integrasi laporan/navigasi | PHP 8.3.30 dengan ZIP, MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis dan config cache terisolasi. `php -d extension=zip vendor/bin/phpunit --filter 'KajianReport\|ReportAvailabilityTest\|UnifiedReportWorkspaceTest\|NavigationAccessibilityTest' --display-warnings --display-deprecations --display-notices`: **61 tests, 707 assertions**, tanpa failure/error/warning/deprecation/notice/skip; PHPUnit 11.5.57 |
+| Workbook nyata | Unduhan dibaca kembali dengan PhpSpreadsheet: struktur XLSX, sheet/header, tipe sel teks/numerik, label status, privasi, scope/filter lintas halaman dan hasil kosong lulus. Batas 5.001 ditolak sebelum ekspor dan saat iterasi; tepat 5.000 serta filter yang lebih sempit lulus. Memori puncak batch integrasi 98 MiB pada lingkungan uji, bukan jaminan hosting |
+| Interaksi browser | Chrome headless dengan data sintetis pada `rf_report_browser_testing`: **6 kelompok pemeriksaan PASS**, tanpa page error. Filter/Reset, perubahan pilihan aktif, Enter, scope wilayah tetap koorda, 15 hasil menjadi halaman 12+3, navigasi dengan filter tetap, unduhan XLSX serta kondisi draf/kosong/satu halaman lulus |
+| Tampilan dan source | Kartu list, footer dan modal pada 320/390/768/1280 px tanpa overflow; screenshot desktop/ponsel diperiksa. Duplikasi teks footer bawaan dihapus, navigasi memakai Sebelumnya/Berikutnya. Lint 5 berkas PHP/Blade, `node --check resources/js/pages/reports.js`, `git diff --check` dan `npm.cmd run build` lulus; Vite 7.3.7, 177 modul. Review backend/UI tidak menemukan masalah konkret tersisa |
+
+Log server: `storage/logs/phpunit-report-excel-final-2026-11-07.txt` dan `phpunit-report-excel-final.xml`. Artefak browser terpisah dari run sebelumnya pada `storage/app/qa-report-ui-2026-11-07/filter-excel-report.json`, `filter-excel-workspace-1280.png` dan `filter-excel-workspace-390.png`, diabaikan Git. Server QA sementara port 8768 sudah dihentikan. Pemeriksaan 18 dokumen/111 tautan lokal lulus tanpa tautan/anchor putus. Tidak ada perubahan schema atau reset develop. Suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini; bahan diskusi pengguna tetap identik.
 
 ## Riwayat sebelum rencana RFIX
 
