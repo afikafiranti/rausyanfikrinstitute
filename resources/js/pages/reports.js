@@ -131,7 +131,7 @@ export function initReportModals() {
   };
   const close = async () => {
     if (saving) return;
-    if (isDirty() && !await confirmAction({ title: 'Tutup formulir?', message: 'Perubahan draf belum disimpan dan akan hilang.', confirmLabel: 'Tutup', danger: true })) return;
+    if (isDirty() && !await confirmAction({ title: 'Tutup formulir?', message: 'Perubahan laporan belum disimpan dan akan hilang.', confirmLabel: 'Tutup', danger: true })) return;
     if (saving || !dialog.open) return;
     baseline = contentSnapshot();
     request?.abort();
@@ -352,13 +352,13 @@ export function initReportModals() {
     }
   };
 
-  const deleteDraft = async form => {
-    if (saving || !await confirmAction({ title: 'Hapus draf?', message: 'Draf dan foto dokumentasinya akan dihapus permanen.', confirmLabel: 'Hapus', danger: true })) return;
+  const deleteReport = async form => {
+    if (saving || !await confirmAction({ title: 'Hapus laporan?', message: 'Laporan dan foto dokumentasinya akan dihapus permanen.', confirmLabel: 'Hapus', danger: true })) return;
     if (saving) return;
     saving = true;
     const button = form.querySelector('button[type="submit"]');
     if (button) button.disabled = true;
-    workspaceStatus('Menghapus draf…');
+    workspaceStatus('Menghapus laporan…');
     try {
       const response = await fetch(sameOriginUrl(form.action), {
         method: 'POST', credentials: 'same-origin',
@@ -368,14 +368,14 @@ export function initReportModals() {
       const payload = await response.json().catch(() => ({}));
       if (!response.ok || payload.deleted !== true) {
         workspaceStatus('');
-        toast(payload.message || 'Draf gagal dihapus.', { type: 'error' });
+        toast(payload.message || 'Laporan gagal dihapus.', { type: 'error' });
         return;
       }
       let refreshed = false;
       try { refreshed = await refreshWorkspace(); } catch { /* deletion already succeeded */ }
       workspaceStatus('');
       document.querySelector('[data-report-list] a[data-report-modal], [data-report-workspace] a[data-report-modal]')?.focus();
-      toast(refreshed ? (payload.message || 'Draf dihapus.') : 'Draf dihapus, tetapi daftar belum terbarui. Muat ulang halaman.', { type: refreshed ? 'success' : 'error' });
+      toast(refreshed ? (payload.message || 'Laporan dihapus.') : 'Laporan dihapus, tetapi daftar belum terbarui. Muat ulang halaman.', { type: refreshed ? 'success' : 'error' });
     } catch {
       workspaceStatus('');
       toast('Koneksi terputus. Periksa daftar sebelum mencoba menghapus lagi.', { type: 'error' });
@@ -440,7 +440,7 @@ export function initReportModals() {
     if (saving) { event.preventDefault(); return; }
     if (dialog.open && isDirty()) {
       event.preventDefault();
-      if (!await confirmAction({ title: 'Pindah halaman?', message: 'Perubahan draf belum disimpan dan akan hilang.', confirmLabel: 'Pindah', danger: true })) return;
+      if (!await confirmAction({ title: 'Pindah halaman?', message: 'Perubahan laporan belum disimpan dan akan hilang.', confirmLabel: 'Pindah', danger: true })) return;
       if (saving || !dialog.open) return;
     }
     try { sameOriginUrl(link.href); } catch { return; }
@@ -459,7 +459,7 @@ export function initReportModals() {
     }
     if (!(form instanceof HTMLFormElement) || !form.matches('[data-report-row-form]')) return;
     event.preventDefault();
-    deleteDraft(form);
+    deleteReport(form);
   });
   document.addEventListener('input', event => {
     updateFilterButton(event.target instanceof Element ? event.target.closest('[data-report-filters]') : null);

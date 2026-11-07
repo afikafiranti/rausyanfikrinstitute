@@ -42,11 +42,13 @@ class KajianReportSubmissionTest extends TestCase
     {
         $owner = $this->member('koorda');
         $report = $this->draft($owner);
-        foreach (['koorda', 'admin', 'super_admin'] as $role) {
+        foreach (['koorda', 'admin'] as $role) {
             $this->actingAs($this->member($role, $owner->wilayah_id))->get('/laporan/'.$report->id.'/edit')->assertNotFound();
             $this->put('/laporan/'.$report->id, $this->data())->assertNotFound();
             $this->post('/laporan/'.$report->id.'/submit')->assertNotFound();
         }
+        $this->actingAs($this->member('super_admin', $owner->wilayah_id))
+            ->post('/laporan/'.$report->id.'/submit')->assertNotFound();
         $this->assertSame('Judul Lama', $report->fresh()->judul);
         $this->assertSame('draft', $report->fresh()->status);
     }

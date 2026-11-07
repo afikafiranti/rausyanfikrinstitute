@@ -350,7 +350,7 @@ Konfirmasi/toast lintas aplikasi mengikuti [Umpan Balik Antarmuka](PRD.md#umpan-
 
 - Selaraskan request/helper laporan dengan kontrak pengelola aktif saja; alumni tetap ditolak.
 - Petakan aturan yang sama di route, controller, request dan view; tentukan satu rujukan aturan yang sederhana menggunakan pola Laravel existing.
-- Pertahankan scope wilayah, role ganda, kepemilikan draf, larangan self-review dan row lock.
+- Ikuti [kontrak Laporan Kajian](PRD.md#modul-laporan-kajian), termasuk pengecualian edit/hapus super admin aktif yang diaudit. Pertahankan scope pengelola lain, role ganda, kepemilikan saat kirim, larangan self-review dan row lock.
 - Kurangi percabangan mati yang hanya mendukung alur lama yang sudah dikeluarkan dari cakupan.
 - Uji endpoint langsung, bukan hanya keberadaan menu.
 

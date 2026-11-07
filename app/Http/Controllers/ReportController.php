@@ -6,6 +6,7 @@ use App\Http\Requests\StoreKajianReportRequest;
 use App\Http\Requests\UpdateKajianReportRequest;
 use App\Http\Requests\ReportWorkspaceRequest;
 use App\Models\KajianReport;
+use App\Models\AuditLog;
 use App\Models\Wilayah;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -50,10 +51,11 @@ class ReportController extends Controller
             ->orderBy('tanggal', $direction)->orderBy('id', $direction)->paginate(12)
             ->appends(array_filter($filters, fn ($value) => $value !== null && $value !== ''));
         $canChooseRegion = $request->user()->hasAnyRole(['super_admin', 'admin']);
+        $canManageAllReports = $request->user()->hasRole('super_admin');
         $regions = Wilayah::query()->when(! $canChooseRegion, fn (Builder $query) => $query->whereKey($request->user()->wilayah_id))
             ->orderBy('name')->get(['id', 'name']);
 
-        return response()->view('laporan.index', compact('reports', 'filters', 'totals', 'regions', 'canChooseRegion'))
+        return response()->view('laporan.index', compact('reports', 'filters', 'totals', 'regions', 'canChooseRegion', 'canManageAllReports'))
             ->header('Cache-Control', 'private, no-store');
     }
 
@@ -110,11 +112,13 @@ class ReportController extends Controller
 
     public function edit(Request $request, KajianReport $report)
     {
-        $report = $this->ownedDraft($request, $report->id);
+        $report = $this->manageableReport($request, $report->id);
         $canChooseRegion = false;
+        $administrativeEdit = $request->user()->hasRole('super_admin')
+            && ($report->user_id !== $request->user()->id || $report->status !== KajianReport::STATUS_DRAFT);
         $regions = Wilayah::query()->whereKey($report->wilayah_id)->get(['id', 'name']);
 
-        return $this->reportView($request, 'laporan.create', 'laporan.partials.form', compact('report', 'regions', 'canChooseRegion'));
+        return $this->reportView($request, 'laporan.create', 'laporan.partials.form', compact('report', 'regions', 'canChooseRegion', 'administrativeEdit'));
     }
 
     public function update(UpdateKajianReportRequest $request, KajianReport $report)
@@ -123,7 +127,8 @@ class ReportController extends Controller
         $oldPath = null;
         try {
             DB::transaction(function () use ($request, $report, &$path, &$oldPath) {
-                $draft = $this->ownedDraft($request, $report->id, true);
+                $draft = $this->manageableReport($request, $report->id, true);
+                $before = $request->user()->hasRole('super_admin') ? $this->auditSnapshot($draft) : null;
                 $data = $request->safe()->except('foto');
                 $data['total_peserta'] = (int) $data['peserta_l'] + (int) $data['peserta_p'];
                 if ($request->hasFile('foto')) {
@@ -135,7 +140,17 @@ class ReportController extends Controller
                     $data['foto_url'] = $path;
                 }
                 if (! $draft->fill($data)->save()) {
-                    throw new RuntimeException('Draf laporan gagal diperbarui.');
+                    throw new RuntimeException('Laporan gagal diperbarui.');
+                }
+                if ($before !== null) {
+                    AuditLog::create([
+                        'actor_id' => $request->user()->id,
+                        'action' => 'report.update',
+                        'entity_type' => 'kajian_report',
+                        'entity_id' => $draft->id,
+                        'payload_json' => ['administrative' => true, 'before' => $before, 'after' => $this->auditSnapshot($draft)],
+                        'created_at' => now(),
+                    ]);
                 }
             });
         } catch (Throwable $exception) {
@@ -144,7 +159,7 @@ class ReportController extends Controller
         }
         $this->deletePrivatePhoto($oldPath);
 
-        return $this->reportSaved($request, $report, 'Perubahan draf tersimpan.');
+        return $this->reportSaved($request, $report, 'Perubahan laporan tersimpan.');
     }
 
     public function submit(Request $request, KajianReport $report)
@@ -166,22 +181,33 @@ class ReportController extends Controller
             }
         });
 
-        return $this->reportSaved($request, $report, 'Laporan berhasil dikirim dan menunggu review. Isian laporan kini terkunci.');
+        return $this->reportSaved($request, $report, 'Laporan berhasil dikirim dan menunggu review. Perubahan selanjutnya hanya dapat dilakukan super admin.');
     }
 
     public function destroy(Request $request, KajianReport $report)
     {
         $path = DB::transaction(function () use ($request, $report) {
-            $draft = $this->ownedDraft($request, $report->id, true);
+            $draft = $this->manageableReport($request, $report->id, true);
+            $before = $request->user()->hasRole('super_admin') ? $this->auditSnapshot($draft) : null;
             $path = $draft->foto_url;
             if (! $draft->delete()) {
-                throw new RuntimeException('Draf laporan gagal dihapus.');
+                throw new RuntimeException('Laporan gagal dihapus.');
+            }
+            if ($before !== null) {
+                AuditLog::create([
+                    'actor_id' => $request->user()->id,
+                    'action' => 'report.delete',
+                    'entity_type' => 'kajian_report',
+                    'entity_id' => $draft->id,
+                    'payload_json' => ['administrative' => true, 'before' => $before],
+                    'created_at' => now(),
+                ]);
             }
 
             return $path;
         });
         $this->deletePrivatePhoto($path);
-        $message = 'Draf laporan dihapus.';
+        $message = 'Laporan dihapus.';
 
         if ($request->expectsJson()) {
             return response()->json(['message' => $message, 'deleted' => true])->header('Cache-Control', 'private, no-store');
@@ -194,9 +220,26 @@ class ReportController extends Controller
     {
         $query = $this->visibleReports($request)->where('user_id', $request->user()->id);
         $draft = $query->when($lock, fn ($query) => $query->lockForUpdate())->findOrFail($id);
-        abort_unless($draft->status === KajianReport::STATUS_DRAFT, 409, 'Laporan sudah dikirim dan tidak dapat diubah.');
+        abort_unless($draft->status === KajianReport::STATUS_DRAFT, 409, 'Tindakan ini hanya tersedia untuk draf milik Anda.');
 
         return $draft;
+    }
+
+    private function manageableReport(Request $request, int $id, bool $lock = false): KajianReport
+    {
+        if (! $request->user()->hasRole('super_admin')) {
+            return $this->ownedDraft($request, $id, $lock);
+        }
+
+        return $this->visibleReports($request)->when($lock, fn ($query) => $query->lockForUpdate())->findOrFail($id);
+    }
+
+    private function auditSnapshot(KajianReport $report): array
+    {
+        return $report->only([
+            'user_id', 'wilayah_id', 'tanggal', 'tempat', 'judul', 'pemateri', 'peserta_l', 'peserta_p',
+            'total_peserta', 'durasi_menit', 'catatan', 'foto_url', 'status', 'reviewed_by', 'reviewed_at', 'reject_reason',
+        ]);
     }
 
     private function deletePrivatePhoto(?string $path): void
@@ -219,8 +262,13 @@ class ReportController extends Controller
         $canReview = $request->user()->can('review-report')
             && $report->user_id !== $request->user()->id
             && $report->status === KajianReport::STATUS_SUBMITTED;
+        $canManageReport = $request->user()->hasRole('super_admin')
+            || ($report->user_id === $request->user()->id && $report->status === KajianReport::STATUS_DRAFT);
+        $lastAdministrativeChange = AuditLog::query()
+            ->where('entity_type', 'kajian_report')->where('entity_id', $report->id)->where('action', 'report.update')
+            ->with('actor:id,name')->orderByDesc('created_at')->orderByDesc('id')->first();
 
-        return $this->reportView($request, 'laporan.show', 'laporan.partials.detail', compact('report', 'canReview'));
+        return $this->reportView($request, 'laporan.show', 'laporan.partials.detail', compact('report', 'canReview', 'canManageReport', 'lastAdministrativeChange'));
     }
 
     public function photo(Request $request, KajianReport $report)

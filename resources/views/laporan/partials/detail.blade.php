@@ -23,19 +23,24 @@
         @else
             <p class="mt-6 rounded-lg bg-slate-50 p-4 text-sm text-muted">Belum ada foto dokumentasi.</p>
         @endif
+        @if ($lastAdministrativeChange)
+            <p class="mt-6 rounded-lg bg-blue-50 p-3 text-sm text-blue-900">Perubahan administratif terakhir oleh {{ $lastAdministrativeChange->actor?->name ?? 'Super admin' }} pada {{ $lastAdministrativeChange->created_at->format('d/m/Y H:i') }}.</p>
+        @endif
+        @if ($canManageReport)
+            <a href="{{ route('laporan.edit', $report) }}" data-report-modal data-report-tooltip="Edit isi dan foto laporan" class="rf-btn-secondary mt-6 px-4">Edit</a>
+        @endif
         @if ($report->status === 'draft' && $report->user_id === auth()->id())
-            <a href="{{ route('laporan.edit', $report) }}" data-report-modal data-report-tooltip="Edit draf dan foto laporan" class="rf-btn-secondary mt-6 px-4">Edit</a>
             <form data-report-form action="{{ route('laporan.submit', $report) }}" method="POST" class="mt-5 rounded-lg border border-slate-200 p-4">
                 @csrf
                 <div data-report-form-errors role="alert" tabindex="-1" hidden class="mb-3 rounded-lg border border-red-300 bg-red-50 p-3 text-sm text-red-800"></div>
-                <p class="text-slate-700">Setelah dikirim, isian laporan terkunci. Pastikan data dan foto sudah benar.</p>
+                <p class="text-slate-700">Setelah dikirim, perubahan hanya dapat dilakukan super admin. Pastikan data dan foto sudah benar.</p>
                 <label class="mt-3 flex items-start gap-2"><input type="checkbox" name="confirmation" value="1" required class="mt-1 rounded border-slate-300"><span>Saya sudah memeriksa laporan ini.</span></label>
                 <button type="submit" data-report-tooltip="Kirim laporan untuk masuk antrean review" class="rf-btn mt-4 px-4">Kirim</button>
             </form>
-        @elseif ($report->status === 'draft')
+        @elseif (! $canManageReport && $report->status === 'draft')
             <p class="mt-6 rounded-lg bg-slate-50 p-4 text-sm text-slate-700">Hanya pembuat draf yang dapat mengedit laporan ini.</p>
-        @else
-            <p class="mt-6 text-slate-700">Laporan sudah dikirim. Isian laporan terkunci.</p>
+        @elseif (! $canManageReport)
+            <p class="mt-6 text-slate-700">Laporan sudah dikirim. Perubahan hanya dapat dilakukan super admin.</p>
         @endif
         @if ($canReview)
             <section class="mt-6 rounded-lg border border-slate-200 p-4" aria-labelledby="decision-heading">

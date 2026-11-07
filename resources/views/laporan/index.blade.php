@@ -86,14 +86,15 @@
                     </a>
                     <div role="group" class="flex flex-wrap items-center gap-2 pl-0 sm:pl-24 lg:pl-0" aria-label="Aksi {{ $report->judul }}">
                         <a href="{{ route('laporan.show', $report) }}" data-report-modal class="rf-btn-secondary p-2" aria-label="Detail laporan {{ $report->judul }}" title="Detail laporan {{ $report->judul }}" data-action-tooltip="Detail laporan {{ $report->judul }}"><i class="fas fa-magnifying-glass" aria-hidden="true"></i></a>
-                        @if ($report->status === 'draft' && $report->user_id === auth()->id())
+                        @if ($canManageAllReports || ($report->status === 'draft' && $report->user_id === auth()->id()))
                             <a href="{{ route('laporan.edit', $report) }}" data-report-modal class="rf-btn-secondary p-2" aria-label="Edit laporan {{ $report->judul }}" title="Edit laporan {{ $report->judul }}" data-action-tooltip="Edit laporan {{ $report->judul }}"><i class="fas fa-pen" aria-hidden="true"></i></a>
                             <form data-report-row-form action="{{ route('laporan.destroy', $report) }}" method="POST">
                                 @csrf
                                 @method('DELETE')
-                                <button type="submit" class="rf-btn-danger p-2" aria-label="Hapus laporan {{ $report->judul }}" title="Hapus laporan {{ $report->judul }}" data-report-tooltip="Hapus draf dan foto laporan {{ $report->judul }} secara permanen"><i class="fas fa-trash" aria-hidden="true"></i></button>
+                                <button type="submit" class="rf-btn-danger p-2" aria-label="Hapus laporan {{ $report->judul }}" title="Hapus laporan {{ $report->judul }}" data-report-tooltip="Hapus laporan dan foto {{ $report->judul }} secara permanen"><i class="fas fa-trash" aria-hidden="true"></i></button>
                             </form>
-                        @elseif ($report->status === 'submitted' && $report->user_id !== auth()->id())
+                        @endif
+                        @if ($report->status === 'submitted' && $report->user_id !== auth()->id())
                             <a href="{{ route('laporan.show', $report) }}" data-report-modal data-report-focus="approve" data-report-tooltip="Periksa laporan sebelum menyetujui" class="rf-btn-secondary px-3">Setujui</a>
                             <a href="{{ route('laporan.show', $report) }}" data-report-modal data-report-focus="reject" data-report-tooltip="Periksa laporan dan beri alasan penolakan" class="rf-btn-secondary px-3">Tolak</a>
                         @endif

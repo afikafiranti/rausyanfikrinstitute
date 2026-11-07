@@ -2,8 +2,8 @@
         <div class="flex items-start justify-between gap-4 border-b border-slate-200 pb-4">
             <div>
                 <p class="text-sm font-medium text-brand">Laporan Kajian</p>
-                <h1 id="report-modal-heading" tabindex="-1" class="mt-1 text-2xl font-semibold text-ink">{{ isset($report) ? 'Edit draf' : 'Buat draf' }}</h1>
-                <p class="mt-2 text-sm leading-6 text-muted">Simpan draf, periksa hasilnya, lalu kirim. Foto hanya dapat dilihat pengguna yang berhak.</p>
+                <h1 id="report-modal-heading" tabindex="-1" class="mt-1 text-2xl font-semibold text-ink">{{ isset($report) ? 'Edit laporan' : 'Buat draf' }}</h1>
+                <p class="mt-2 text-sm leading-6 text-muted">{{ ($administrativeEdit ?? false) ? 'Perubahan administratif dicatat. Status laporan dan hasil review dipertahankan.' : 'Simpan draf, periksa hasilnya, lalu kirim. Foto hanya dapat dilihat pengguna yang berhak.' }}</p>
             </div>
             <a href="{{ route('laporan.index') }}" data-report-close aria-label="Tutup formulir laporan" class="rf-btn-secondary shrink-0 px-3">Tutup</a>
         </div>
@@ -60,7 +60,7 @@
             </div>
             <div class="sm:col-span-2">
                 <label for="foto" class="block font-medium">Foto kegiatan</label>
-                <p id="foto-help" class="mt-1 text-sm text-slate-600">JPG atau PNG, maksimal 2 MB. Foto baru menggantikan foto lama setelah draf disimpan.</p>
+                <p id="foto-help" class="mt-1 text-sm text-slate-600">JPG atau PNG, maksimal 2 MB. Foto baru menggantikan foto lama setelah perubahan disimpan.</p>
                 @if (isset($report) && $report->foto_url)
                     <p class="mt-1 text-sm text-slate-600">Foto lama dipertahankan jika tidak memilih foto baru.</p>
                 @endif

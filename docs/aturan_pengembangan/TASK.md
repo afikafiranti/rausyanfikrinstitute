@@ -27,7 +27,7 @@ Pembaruan 7 November 2026: hasil RFIX setelah baseline `5b65ecf` disimpan pada c
 | RFIX-15 | URL tulisan | P2 | B | DONE | Edit judul mempertahankan slug; regresi akses lulus |
 | RFIX-16 | Batas ekspor XLSX | P2 | A+B | DONE | Pengukuran, scope/filter dan batas selama iterasi diuji |
 | RFIX-17 | Form/interaksi responsif | P2 | A+B | DONE | Artikel/Galeri memakai form samping tambah/edit; Alumni/Materi/Laporan tetap modal; regresi/browser lulus, bukti di bawah |
-| RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | Helper/request dan endpoint selaras |
+| RFIX-18 | Kontrak izin laporan | P1 | A+B | DONE | develop baseline c0bb7a0: super admin aktif dapat edit/hapus semua laporan dengan audit; 100 tes terkait dan 7 kelompok browser lulus |
 | RFIX-19 | Email/operasional target | P1 rilis | Operator+A+B | TODO | Staging dan SMTP eksternal belum ada bukti lulus |
 | RFIX-20 | Dokumentasi, identitas dan arsip | P2/P3 | Integrasi | PARTIAL | Dokumentasi ditata; dependency Tailwind 4 usang dihapus. Aset/template dan keputusan lisensi tersisa |
 | RFIX-21 | Nama menu Artikel | P2 | B | DONE | Publik memakai Catatan Pemikiran dan CTA masuk hero dihapus; menu pengelolaan Artikel tetap, regresi publik lulus |
@@ -212,6 +212,22 @@ Branch `develop`, baseline `04bcac9`. Sesuai arahan pengguna, modal edit Artikel
 | Source/aset | Build Vite 7.3.7, **181 modul**; lint 6 berkas PHP/Blade, node syntax app/editor dan git diff --check lulus. Pemeriksaan 18 dokumen/127 tautan lokal dan 45 ID ARAH/KEP/RFIX lulus. Chrome headless: **13 kelompok PASS** (7 fungsi, 2 layout/fallback, 4 edge), tanpa page error atau dialog native; desktop/mobile 320/390/768/1280 px diperiksa |
 
 Log: `storage/logs/phpunit-content-editor.txt` dan `phpunit-content-editor.xml`. Artefak browser: `storage/app/qa-content-editor-2026-11-07/report-functional.json`, `report-layout.json`, `report-edge.json` serta screenshot desktop/ponsel, diabaikan Git. Stored image di-stub PNG sintetis untuk pemeriksaan visual karena router QA memblokir /storage; persistensi/penggantian file diuji di server. Jadwal publikasi diuji pada regresi PHP, bukan browser. Server QA sementara port 8768 dihentikan setelah pemeriksaan. Tidak ada reset develop; data QA tersisa dua Artikel dan dua Galeri sintetis untuk inspeksi ulang. DOCX pengguna tetap identik dengan hash sebelumnya. Suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini.
+
+## Pengecualian pengelolaan Laporan oleh Super Admin 7 November — RFIX-18
+
+Branch `develop`, baseline `c0bb7a0`. Arahan pengguna memperbolehkan super admin aktif mengedit/menghapus laporan semua penulis, wilayah dan status. Kontrak ada pada [Laporan Kajian](PRD.md#modul-laporan-kajian); hak peran lain, kirim draf dan larangan self-review tetap mengikuti kontrak tersebut. Tidak ada migration/reset develop atau bypass gate global.
+
+| Verifikasi | Hasil dan batas |
+|---|---|
+| Regresi server | PHP 8.3.30 dengan ZIP, MySQL 8.4.3, database terpisah `127.0.0.1/rf_report_ui_testing`, kunci sintetis/config cache terisolasi. `php -d extension=zip vendor/bin/phpunit --filter 'Report\|RegionalAccessTest\|AccountIntegrityTest\|AlumniDestroyTest' --display-warnings --display-deprecations --display-notices`: **100 tests, 1.098 assertions**, tanpa failure/error/warning/deprecation/notice/skip; PHPUnit 11.5.57 |
+| Kontrol tambahan | Pengujian Super Admin diperluas untuk tombol/modal dan atribusi audit pada detail: **4 tests, 152 assertions** lulus. Ini pengulangan bagian suite terkait, bukan empat tes unik tambahan |
+| Cakupan | Empat status, penulis/wilayah lain, multi-role Super Admin, laporan sendiri yang disetujui, suspended/alumni/admin ditolak sesuai batasnya. Payload identitas/status/reviewer palsu diabaikan, total dihitung server, audit/foto/penghapusan dan rollback gagal audit lulus. Penulis/wilayah/status/hasil review dipertahankan pada edit |
+| Review independen | Tidak ada temuan bermakna pada pengecualian izin, pemisahan submit, row lock, allowlist field, audit dalam transaksi serta pembersihan foto setelah commit |
+| Source/aset | Lint 7 berkas PHP/Blade pada PHP 8.3, node syntax, git diff --check dan build akhir Vite 7.3.7 **181 modul** lulus. Pemeriksaan 18 dokumen/129 tautan lokal dan 45 ID ARAH/KEP/RFIX lulus. Teks status terkunci serta konfirmasi perubahan belum disimpan sudah diselaraskan untuk laporan non-draf |
+| Browser | Chrome headless dengan data sintetis pada `rf_report_browser_testing`: **7 kelompok PASS**, tanpa page error/dialog native. Edit aktual empat status, penulis/wilayah lain dan foto privat, atribusi editor, status/review tetap, hapus non-draf batal/setuju dengan toast serta GET 404 lulus. Kontrol dan endpoint koorda tetap terbatas; modal 380 px dan desktop 1280 px diperiksa |
+| Data/foto | Pembacaan ulang database QA mengonfirmasi audit update/delete oleh aktor yang benar, snapshot status sebelum/sesudah tetap, foto lama dibersihkan dan foto pengganti tersedia. Laporan sintetis id30 dihapus; id27–29 serta id31 tersisa untuk inspeksi ulang. Tidak ada perubahan data develop |
+
+Log dan XML: `storage/logs/phpunit-report-superadmin.*` dan `phpunit-report-superadmin-controls.*`. Artefak browser `report-core.json` (5 kelompok), `report-followup.json` (2 kelompok), `before.json`, `after-final.json` dan screenshot desktop/ponsel pada `storage/app/qa-report-superadmin-2026-11-07/` diabaikan Git. Assertion harness awal melewatkan pagination koorda; pemeriksaan ulang dengan halaman yang benar lulus. Server QA sementara port 8768 dihentikan setelah pemeriksaan. DOCX diskusi pengguna tetap identik dengan hash sebelumnya. Suite aplikasi penuh, CI remote dan staging tidak diulang untuk perubahan ini.
 
 ## Riwayat sebelum rencana RFIX
 

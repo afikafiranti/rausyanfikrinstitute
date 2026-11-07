@@ -9,6 +9,9 @@ class UpdateKajianReportRequest extends StoreKajianReportRequest
         if (! parent::authorize()) {
             return false;
         }
+        if ($this->user()->hasRole('super_admin')) {
+            return true;
+        }
         $report = $this->route('report');
         abort_unless($report->user_id === $this->user()->id, 404);
         if (! $this->user()->hasAnyRole(['super_admin', 'admin'])) {
